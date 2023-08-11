@@ -44,6 +44,7 @@
             pictureBox1.Size = new Size(428, 392);
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
+            pictureBox1.Paint += pictureBox1_Paint;
             // 
             // textBox1
             // 
@@ -87,7 +88,7 @@
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 5;
-            textBox2.Text = "100";
+            textBox2.Text = "81";
             // 
             // Form1
             // 

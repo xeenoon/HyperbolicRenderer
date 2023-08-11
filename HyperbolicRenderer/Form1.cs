@@ -9,11 +9,11 @@ namespace HyperbolicRenderer
         int areasize = 50000;
         int sides = -1;
         int size = -1;
-        
+
         private void button1_Click(object sender, EventArgs e)
         {
             int.TryParse(textBox1.Text, out sides);
-            int.TryParse(textBox2.Text, out sides);
+            int.TryParse(textBox2.Text, out size);
             if (sides == -1 || size == -1)
             {
                 return;
@@ -23,15 +23,26 @@ namespace HyperbolicRenderer
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            int size = pictureBox1.Width;
+            if (sides == -1)
+            {
+                return;
+            }
             PointF[] points = new PointF[sides];
 
-            //Generate corners of polygon
-
-            //4 sides to a picturebox, so sides placed on first 3 sides should be sides/4
-            for (int i = 0; i < sides/4; ++i)
+            double radiansstepsize = Math.Tau / sides;
+            float radius = pictureBox1.Width / 2;
+            for (int i = 0; i < sides; ++i)
             {
-                points[i] = new PointF(, 0); //For 2 total iterations
+                //Draw a ray from the centre until it hits the edge of the square
+                //Make this a vector
+                double angle = Math.PI - (radiansstepsize * i);
+
+                float x = (float)(Math.Cos(angle) * radius + radius);
+                float y = (float)(Math.Sin(angle) * radius + radius);
+                points[i] = new PointF(x, y);
             }
+            e.Graphics.FillPolygon(new Pen(Color.Green).Brush, points);
         }
     }
     public class Trapezium
@@ -50,36 +61,3 @@ namespace HyperbolicRenderer
         }
     }
 }
-
-
-/*
- * width = 100
-
-Sides = 4
-
-100 / 2 = 50
-
-Sides = 5
-
-100 / (3) = 33
-100 / (1.5) = 66
-
-...
-
-Sides = 8
-
-100 / 3 = 33
-100 / 0.5 = 66
-
-Sides = 9
-
-100 / x = 25
-100 / 2 = 50
-100 / 1 = 75
-
-let x = ((sides-1) / 4) + 1
-
-100 / x = 25
-100 / 2 = 50
-100 / 1 = 75
- */

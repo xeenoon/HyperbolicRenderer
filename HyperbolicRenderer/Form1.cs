@@ -174,6 +174,7 @@ namespace HyperbolicRenderer
         }
         bool keydown = false;
         string keys = ""; //Change to flags enum later
+        bool shift = false;
         System.Timers.Timer movetimer = new System.Timers.Timer();
         bool runningtimer = false;
         float xchange = 1;
@@ -207,6 +208,9 @@ namespace HyperbolicRenderer
                         keys += "d";
                     }
                     break;
+                case Keys.Shift:
+                    shift = true;
+                    break;
             }
             if (!runningtimer)
             {
@@ -224,16 +228,44 @@ namespace HyperbolicRenderer
                 switch (c)
                 {
                     case 'w':
-                        ychange--;
+                        if (shift)
+                        {
+                            ychange -= 3;
+                        }
+                        else
+                        {
+                            ychange--;
+                        }
                         break;
                     case 'a':
-                        xchange--;
+                        if (shift)
+                        {
+                            xchange -= 3;
+                        }
+                        else
+                        {
+                            xchange--;
+                        }
                         break;
                     case 's':
-                        ychange++;
+                        if (shift)
+                        {
+                            ychange += 3;
+                        }
+                        else
+                        {
+                            ychange++;
+                        }
                         break;
                     case 'd':
-                        xchange++;
+                        if (shift)
+                        {
+                            xchange += 3;
+                        }
+                        else
+                        {
+                            xchange++;
+                        }
                         break;
                 }
             }
@@ -249,6 +281,7 @@ namespace HyperbolicRenderer
         }
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
+            shift = false;
             keydown = false;
             keys = "";
         }
@@ -436,7 +469,7 @@ namespace HyperbolicRenderer
                     {
                         y_scale = -limiter;
                     }
-                    if (Math.Abs(x * squaresize - radius) < squaresize && Math.Abs(y * squaresize - radius) < squaresize)
+                    if (Math.Abs(x * squaresize + offsetx - radius) < squaresize && Math.Abs(y * squaresize + offsety - radius) < squaresize)
                     {
                         x_scale /= 2;
                         y_scale /= 2;
@@ -445,11 +478,11 @@ namespace HyperbolicRenderer
                     float ax=x;
                     if (offsety != 0) //Removes infinity errors
                     {
-                        ay += (offsety / (radius * 2));
+                        ay += (offsety / squaresize);
                     }
                     if(offsetx != 0) //Removes infinity errors
                     { 
-                        ax += (offsetx / (radius * 2));
+                        ax += (offsetx / squaresize);
                     }
                     ay += y_scale;
                     ax += x_scale;

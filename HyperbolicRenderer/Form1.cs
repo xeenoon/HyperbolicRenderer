@@ -35,9 +35,8 @@ namespace HyperbolicRenderer
                 return;
             }
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            if (showdebugdata)
+            if (showdebugdata && showgrid)
             {
-
                 for (int y = 0; y < m.volumewidth; ++y)
                 {
                     e.Graphics.DrawLine(new Pen(Color.Orange), new PointF(0, y * m.squaresize), new PointF(pictureBox1.Width, y * m.squaresize));
@@ -50,9 +49,13 @@ namespace HyperbolicRenderer
             e.Graphics.FillPolygon(new Pen(Color.DarkBlue).Brush, m.points);
             foreach (var trapezium in m.volume)
             {
-                if (showdebugdata)
+                if (showdebugdata && straighlines)
                 {
                     trapezium.Draw(e.Graphics, false, Color.Black, 1);
+                }
+                else if (showdebugdata && !showbackground)
+                {
+                    trapezium.Draw(e.Graphics, true, Color.Black, 1);
                 }
                 else
                 {
@@ -66,16 +69,27 @@ namespace HyperbolicRenderer
                 {
                     PointF connection = m.connections[i];
                     PointF oldconnection = m.oldconnections[i];
-                    e.Graphics.DrawLine(new Pen(Color.Green, 2), m.connections[i], m.oldconnections[i]);
-                    e.Graphics.DrawLine(new Pen(Color.Magenta, 1), m.sideconnections[i].start, m.sideconnections[i].end);
-                    e.Graphics.FillEllipse(new Pen(Color.Magenta).Brush, m.sideconnections[i].end.X - 2, m.sideconnections[i].end.Y - 2, 4, 4);
-
-                    e.Graphics.FillEllipse(new Pen(Color.Red).Brush, connection.X - 2, connection.Y - 2, 4, 4);
-                    e.Graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
+                    if (showpointmovement)
+                    {
+                        e.Graphics.DrawLine(new Pen(Color.Green, 2), m.connections[i], m.oldconnections[i]);
+                    }
+                    if (showclosestedge)
+                    {
+                        e.Graphics.DrawLine(new Pen(Color.Magenta, 1), m.sideconnections[i].start, m.sideconnections[i].end);
+                        e.Graphics.FillEllipse(new Pen(Color.Magenta).Brush, m.sideconnections[i].end.X - 2, m.sideconnections[i].end.Y - 2, 4, 4);
+                    }
+                    if (showmodifiedpoints)
+                    {
+                        e.Graphics.FillEllipse(new Pen(Color.Red).Brush, connection.X - 2, connection.Y - 2, 4, 4);
+                    }
+                    if (showgridpoints)
+                    {
+                        e.Graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
+                    }
                 }
             }
 
-            if (showdebugdata)
+            if (showdebugdata && !showbackground)
             {
                 return;
             }
@@ -95,12 +109,64 @@ namespace HyperbolicRenderer
         bool showdebugdata;
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            label3.Visible = checkBox1.Checked;
-            label4.Visible = checkBox1.Checked;
-            label5.Visible = checkBox1.Checked;
-            label6.Visible = checkBox1.Checked;
+            checkBox2.Visible = checkBox1.Checked;
+            checkBox3.Visible = checkBox1.Checked;
+            checkBox4.Visible = checkBox1.Checked;
+            checkBox5.Visible = checkBox1.Checked;
+            checkBox6.Visible = checkBox1.Checked;
+            checkBox7.Visible = checkBox1.Checked;
+            checkBox8.Visible = checkBox1.Checked;
 
             showdebugdata = checkBox1.Checked;
+            pictureBox1.Invalidate();
+        }
+        bool showgridpoints = true;
+        bool showgrid = true;
+        bool showmodifiedpoints = true;
+        bool showpointmovement = true;
+        bool showclosestedge = true;
+        bool straighlines = true;
+        bool showbackground = true;
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            showgridpoints = checkBox2.Checked;
+            pictureBox1.Invalidate();
+        }
+
+        private void checkBox7_CheckedChanged(object sender, EventArgs e)
+        {
+            showgrid = checkBox7.Checked;
+            pictureBox1.Invalidate();
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            showmodifiedpoints = checkBox3.Checked;
+            pictureBox1.Invalidate();
+        }
+
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            showpointmovement = checkBox4.Checked;
+            pictureBox1.Invalidate();
+        }
+
+        private void checkBox5_CheckedChanged(object sender, EventArgs e)
+        {
+            showclosestedge = checkBox5.Checked;
+            pictureBox1.Invalidate();
+        }
+
+        private void checkBox6_CheckedChanged(object sender, EventArgs e)
+        {
+            straighlines = checkBox6.Checked;
+            pictureBox1.Invalidate();
+        }
+
+        private void checkBox8_CheckedChanged(object sender, EventArgs e)
+        {
+            showbackground = checkBox8.Checked;
             pictureBox1.Invalidate();
         }
     }

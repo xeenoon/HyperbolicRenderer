@@ -9,21 +9,21 @@ namespace HyperbolicRenderer
             InitializeComponent();
         }
         int sides = -1;
-        int size = -1;
+        float scale = -1;
 
         Map m;
 
         private void button1_Click(object sender, EventArgs e)
         {
             int.TryParse(textBox1.Text, out sides);
-            int.TryParse(textBox2.Text, out size);
-            if (sides == -1 || size == -1)
+            float.TryParse(textBox2.Text, out scale);
+            if (sides == -1 || scale == -1)
             {
                 return;
             }
             m = new Map(sides, pictureBox1.Width / 2f);
             m.GenerateShape();
-            m.GenerateVolume(0.775f);
+            m.GenerateVolume(scale);
             pictureBox1.Invalidate();
         }
 
@@ -38,22 +38,34 @@ namespace HyperbolicRenderer
             e.Graphics.FillPolygon(new Pen(Color.DarkBlue).Brush, m.points);
             foreach (var trapezium in m.volume)
             {
-                trapezium.Draw(e.Graphics);
+                if (showdebugdata)
+                {
+                    trapezium.Draw(e.Graphics, false, Color.Black, 1);
+                }
+                else
+                {
+                    trapezium.Draw(e.Graphics, true, Color.White, 1);
+                }
                 //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
             }
             for (int i = 0; i < m.oldconnections.Length; i++)
             {
-                continue;
-                PointF connection = m.connections[i];
-                PointF oldconnection = m.oldconnections[i];
-                e.Graphics.DrawLine(new Pen(Color.Green, 2), m.connections[i], m.oldconnections[i]);
-                e.Graphics.DrawLine(new Pen(Color.Cyan, 1), m.sideconnections[i].start, m.sideconnections[i].end);
-                e.Graphics.FillEllipse(new Pen(Color.Cyan).Brush, m.sideconnections[i].end.X - 2, m.sideconnections[i].end.Y - 2, 4, 4);
+                if (showdebugdata)
+                {
+                    PointF connection = m.connections[i];
+                    PointF oldconnection = m.oldconnections[i];
+                    e.Graphics.DrawLine(new Pen(Color.Green, 2), m.connections[i], m.oldconnections[i]);
+                    e.Graphics.DrawLine(new Pen(Color.Magenta, 1), m.sideconnections[i].start, m.sideconnections[i].end);
+                    e.Graphics.FillEllipse(new Pen(Color.Magenta).Brush, m.sideconnections[i].end.X - 2, m.sideconnections[i].end.Y - 2, 4, 4);
 
-                e.Graphics.FillEllipse(new Pen(Color.Red).Brush, connection.X - 2, connection.Y - 2, 4, 4);
-                e.Graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
+                    e.Graphics.FillEllipse(new Pen(Color.Red).Brush, connection.X - 2, connection.Y - 2, 4, 4);
+                    e.Graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
+                }
             }
-            //return;
+            if (showdebugdata)
+            {
+                return;
+            }
             using (var path = new System.Drawing.Drawing2D.GraphicsPath())
             {
                 path.AddPolygon(m.points);
@@ -66,6 +78,17 @@ namespace HyperbolicRenderer
                     e.Graphics.FillPath(brush, path);
                 }
             }
+        }
+        bool showdebugdata;
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            label3.Visible = checkBox1.Checked;
+            label4.Visible = checkBox1.Checked;
+            label5.Visible = checkBox1.Checked;
+            label6.Visible = checkBox1.Checked;
+
+            showdebugdata = checkBox1.Checked;
+            pictureBox1.Invalidate();
         }
     }
     public class Trapezium
@@ -83,9 +106,9 @@ namespace HyperbolicRenderer
             this.bottom_right = bottom_right;
         }
 
-        internal void Draw(Graphics graphics)
+        internal void Draw(Graphics graphics, bool curved, Color color, int thickness)
         {
-            Pen pen = new Pen(Color.White);
+            Pen pen = new Pen(color, thickness);
             graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
 
@@ -98,7 +121,14 @@ namespace HyperbolicRenderer
             {
                 modifier = 0.495f;
             }
-            graphics.DrawCurve(pen, new PointF[3] { top_left, new PointF((top_left.X + top_right.X) / 2, (top_left.Y + top_right.Y) * modifier), top_right });
+            if (curved)
+            {
+                graphics.DrawCurve(pen, new PointF[3] { top_left, new PointF((top_left.X + top_right.X) / 2, (top_left.Y + top_right.Y) * modifier), top_right });
+            }
+            else
+            {
+                graphics.DrawCurve(pen, new PointF[2] { top_left, top_right });
+            }
             if (top_right.X > 200)
             {
                 modifier = 0.505f;
@@ -107,7 +137,14 @@ namespace HyperbolicRenderer
             {
                 modifier = 0.495f;
             }
-            graphics.DrawCurve(pen, new PointF[3] { top_right, new PointF((top_right.X + bottom_right.X) * modifier, (bottom_right.Y + top_right.Y) / 2), bottom_right });
+            if (curved)
+            {
+                graphics.DrawCurve(pen, new PointF[3] { top_right, new PointF((top_right.X + bottom_right.X) * modifier, (bottom_right.Y + top_right.Y) / 2), bottom_right });
+            }
+            else
+            {
+                graphics.DrawCurve(pen, new PointF[2] { top_right, bottom_right });
+            }
 
         }
     }
@@ -129,7 +166,7 @@ namespace HyperbolicRenderer
         public float radius;
         public PointF[] connections;
         public PointF[] oldconnections;
-        public Line[]   sideconnections;
+        public Line[] sideconnections;
 
         public Map(int points, float radius)
         {
@@ -168,7 +205,7 @@ namespace HyperbolicRenderer
             List<Line> shapelines = new List<Line>();
             for (int i = 0; i < points.Count(); i++)
             {
-                shapelines.Add(new Line(points[i], points[i+1 >= points.Count() ? 0 : i+1]));
+                shapelines.Add(new Line(points[i], points[i + 1 >= points.Count() ? 0 : i + 1]));
             }
             if (points.Count() == 6)
             {
@@ -214,12 +251,12 @@ namespace HyperbolicRenderer
 
                         PointF intersection = linevector.Intersection(perpindicular);
 
-                        connections[x + y * (volumewidth)] = intersection;
-                        continue;
+                        //connections[x + y * (volumewidth)] = intersection;
+                        //continue;
                     }
 
                     y_scale *= y_scalemodifier;
-                    sideconnections[x + y * volumewidth] = new Line(new PointF(x*squaresize, y* squaresize), new PointF(x_scale+x*squaresize, y_scale+y*squaresize));
+                    sideconnections[x + y * volumewidth] = new Line(new PointF(x * squaresize, y * squaresize), new PointF(x_scale + x * squaresize, y_scale + y * squaresize));
                     if (x_scale >= 100)
                     {
 
@@ -264,7 +301,7 @@ namespace HyperbolicRenderer
                 for (int y = 0; y < volumewidth - 1; y++)
                 {
                     int ay = y * volumewidth; //Adjusted y
-                    
+
                     volume.Add(new Trapezium(connections[x + ay], connections[x + (ay + volumewidth)], connections[(x + 1) + ay], connections[(x + 1) + (ay + volumewidth)]));
                 }
             }

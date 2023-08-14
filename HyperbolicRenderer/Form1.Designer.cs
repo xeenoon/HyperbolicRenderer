@@ -34,6 +34,11 @@
             label1 = new Label();
             label2 = new Label();
             textBox2 = new TextBox();
+            checkBox1 = new CheckBox();
+            label3 = new Label();
+            label4 = new Label();
+            label5 = new Label();
+            label6 = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -56,7 +61,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(491, 114);
+            button1.Location = new Point(484, 100);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 2;
@@ -76,11 +81,11 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(491, 75);
+            label2.Location = new Point(484, 74);
             label2.Name = "label2";
-            label2.Size = new Size(27, 15);
+            label2.Size = new Size(34, 15);
             label2.TabIndex = 4;
-            label2.Text = "Size";
+            label2.Text = "Scale";
             // 
             // textBox2
             // 
@@ -88,13 +93,73 @@
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 5;
-            textBox2.Text = "81";
+            textBox2.Text = "0.776";
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(687, 40);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(87, 19);
+            checkBox1.TabIndex = 6;
+            checkBox1.Text = "Debug data";
+            checkBox1.UseVisualStyleBackColor = true;
+            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.ForeColor = Color.FromArgb(255, 128, 0);
+            label3.Location = new Point(687, 62);
+            label3.Name = "label3";
+            label3.Size = new Size(62, 15);
+            label3.TabIndex = 7;
+            label3.Text = "Gridpoints";
+            label3.Visible = false;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.ForeColor = Color.Red;
+            label4.Location = new Point(687, 83);
+            label4.Name = "label4";
+            label4.Size = new Size(86, 15);
+            label4.TabIndex = 8;
+            label4.Text = "Modified Point";
+            label4.Visible = false;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.ForeColor = Color.Magenta;
+            label5.Location = new Point(687, 125);
+            label5.Name = "label5";
+            label5.Size = new Size(74, 15);
+            label5.TabIndex = 9;
+            label5.Text = "Closest edge";
+            label5.Visible = false;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.ForeColor = Color.Green;
+            label6.Location = new Point(687, 104);
+            label6.Name = "label6";
+            label6.Size = new Size(96, 15);
+            label6.TabIndex = 10;
+            label6.Text = "Point Movement";
+            label6.Visible = false;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(label6);
+            Controls.Add(label5);
+            Controls.Add(label4);
+            Controls.Add(label3);
+            Controls.Add(checkBox1);
             Controls.Add(textBox2);
             Controls.Add(label2);
             Controls.Add(label1);
@@ -116,5 +181,10 @@
         private Label label1;
         private Label label2;
         private TextBox textBox2;
+        private CheckBox checkBox1;
+        private Label label3;
+        private Label label4;
+        private Label label5;
+        private Label label6;
     }
 }

@@ -35,6 +35,18 @@ namespace HyperbolicRenderer
                 return;
             }
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            if (showdebugdata)
+            {
+
+                for (int y = 0; y < m.volumewidth; ++y)
+                {
+                    e.Graphics.DrawLine(new Pen(Color.Orange), new PointF(0, y * m.squaresize), new PointF(pictureBox1.Width, y * m.squaresize));
+                }
+                for (int x = 0; x < m.volumewidth; ++x)
+                {
+                    e.Graphics.DrawLine(new Pen(Color.Orange), new PointF(x * m.squaresize, 0), new PointF(x * m.squaresize, pictureBox1.Width));
+                }
+            }
             e.Graphics.FillPolygon(new Pen(Color.DarkBlue).Brush, m.points);
             foreach (var trapezium in m.volume)
             {
@@ -62,6 +74,7 @@ namespace HyperbolicRenderer
                     e.Graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
                 }
             }
+
             if (showdebugdata)
             {
                 return;
@@ -188,16 +201,18 @@ namespace HyperbolicRenderer
                 points[i] = new PointF(x, y);
             }
         }
+        public int volumewidth = 0;
+        public float squaresize = 0;
         public void GenerateVolume(float scale) //Scale of 1 will have squares of 20% size, 0.5 = 10% size...
         {
-            float squaresize = radius * 0.2f * scale;
+            squaresize = radius * 0.2f * scale;
             /*volume.Add(new Trapezium(new PointF(radius - squaresize / 2f, radius - squaresize / 2f),
                                      new PointF(radius - squaresize / 2f, radius + squaresize / 2f),
                                      new PointF(radius + squaresize / 2f, radius - squaresize / 2f),
                                      new PointF(radius + squaresize / 2f, radius + squaresize / 2f)
                                      ));*/
 
-            int volumewidth = (int)Math.Ceiling((radius * 2) / squaresize) + 1;
+            volumewidth = (int)Math.Ceiling((radius * 2) / squaresize) + 1;
             connections = new PointF[(volumewidth) * (volumewidth)];
             oldconnections = new PointF[(volumewidth) * (volumewidth)];
             sideconnections = new Line[(volumewidth) * (volumewidth)];

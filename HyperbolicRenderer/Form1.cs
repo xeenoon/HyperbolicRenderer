@@ -41,17 +41,25 @@ namespace HyperbolicRenderer
                 trapezium.Draw(e.Graphics);
                 //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
             }
-            foreach(var connection in m.connections)
+            for (int i = 0; i < m.oldconnections.Length; i++)
             {
-                e.Graphics.FillEllipse(new Pen(Color.Red).Brush, connection.X-2, connection.Y-2, 4, 4);
-            }
+                continue;
+                PointF connection = m.connections[i];
+                PointF oldconnection = m.oldconnections[i];
+                e.Graphics.DrawLine(new Pen(Color.Green, 2), m.connections[i], m.oldconnections[i]);
+                e.Graphics.DrawLine(new Pen(Color.Cyan, 1), m.sideconnections[i].start, m.sideconnections[i].end);
+                e.Graphics.FillEllipse(new Pen(Color.Cyan).Brush, m.sideconnections[i].end.X - 2, m.sideconnections[i].end.Y - 2, 4, 4);
 
+                e.Graphics.FillEllipse(new Pen(Color.Red).Brush, connection.X - 2, connection.Y - 2, 4, 4);
+                e.Graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
+            }
+            //return;
             using (var path = new System.Drawing.Drawing2D.GraphicsPath())
             {
                 path.AddPolygon(m.points);
 
                 // Uncomment this to invert:
-                 path.AddRectangle(pictureBox1.ClientRectangle);
+                path.AddRectangle(pictureBox1.ClientRectangle);
 
                 using (var brush = new SolidBrush(Color.Black))
                 {
@@ -80,41 +88,38 @@ namespace HyperbolicRenderer
             Pen pen = new Pen(Color.White);
             graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
-            if (top_right.Y != top_left.Y) //Curving top?
-            {
-                float modifier = 0;
-                if (top_right.Y > 200)
-                {
-                    modifier = 0.505f;
-                }
-                else
-                {
-                    modifier = 0.495f;
-                }
-                graphics.DrawCurve(pen, new PointF[3] { top_left, new PointF((top_left.X+top_right.X)/2, (top_left.Y + top_right.Y) * 0.505f), top_right});
-            }
-            else
-            {
-                graphics.DrawLine(pen, top_left, top_right);
-            }
 
-            if (top_right.X != bottom_right.X) //Curving right?
+            float modifier;
+            if (top_right.Y > 200)
             {
-                float modifier = 0;
-                if (top_right.X > 200)
-                {
-                    modifier = 0.505f;
-                }
-                else
-                {
-                    modifier = 0.495f;
-                }
-                graphics.DrawCurve(pen, new PointF[3] { top_right, new PointF((top_right.X + bottom_right.X) * modifier, (bottom_right.Y + top_right.Y) / 2), bottom_right });
+                modifier = 0.505f;
             }
             else
             {
-                graphics.DrawLine(pen, top_right, bottom_right);
+                modifier = 0.495f;
             }
+            graphics.DrawCurve(pen, new PointF[3] { top_left, new PointF((top_left.X + top_right.X) / 2, (top_left.Y + top_right.Y) * modifier), top_right });
+            if (top_right.X > 200)
+            {
+                modifier = 0.505f;
+            }
+            else
+            {
+                modifier = 0.495f;
+            }
+            graphics.DrawCurve(pen, new PointF[3] { top_right, new PointF((top_right.X + bottom_right.X) * modifier, (bottom_right.Y + top_right.Y) / 2), bottom_right });
+
+        }
+    }
+    public struct Line
+    {
+        public PointF start;
+        public PointF end;
+
+        public Line(PointF start, PointF end)
+        {
+            this.start = start;
+            this.end = end;
         }
     }
     public class Map
@@ -123,6 +128,8 @@ namespace HyperbolicRenderer
         public List<Trapezium> volume = new List<Trapezium>();
         public float radius;
         public PointF[] connections;
+        public PointF[] oldconnections;
+        public Line[]   sideconnections;
 
         public Map(int points, float radius)
         {
@@ -136,9 +143,10 @@ namespace HyperbolicRenderer
             {
                 //Draw a ray from the centre until it hits the edge of the square
                 //Make this a vector
-                double angle = 3 * (Math.PI / 2) - (radiansstepsize * i);
+                double angle = (3 * (Math.PI / 2)) + (radiansstepsize * i);
 
                 float x = (float)(Math.Cos(angle) * radius + radius);
+
                 float y = (float)(Math.Sin(angle) * radius + radius);
                 points[i] = new PointF(x, y);
             }
@@ -154,87 +162,71 @@ namespace HyperbolicRenderer
 
             int volumewidth = (int)Math.Ceiling((radius * 2) / squaresize) + 1;
             connections = new PointF[(volumewidth) * (volumewidth)];
-            float relativeradius = (radius / squaresize);
+            oldconnections = new PointF[(volumewidth) * (volumewidth)];
+            sideconnections = new Line[(volumewidth) * (volumewidth)];
 
+            List<Line> shapelines = new List<Line>();
+            for (int i = 0; i < points.Count(); i++)
+            {
+                shapelines.Add(new Line(points[i], points[i+1 >= points.Count() ? 0 : i+1]));
+            }
+            if (points.Count() == 6)
+            {
+            }
             for (int y = 0; y < (volumewidth); ++y)
             {
                 for (int x = 0; x < (volumewidth); ++x)
                 {
                     float x_scale = float.MaxValue;
                     float y_scale = float.MaxValue;
+                    float y_scalemodifier = 1;
 
-                    foreach (var point in points)
+                    Line closestline = new Line();
+
+                    foreach (var line in shapelines)
                     {
-                        //Use herons formula to find the area of the bounded area of the triangle
-                        //basevector = point
-                        PointF a = new PointF((x*squaresize) - (radius), (y*squaresize) - (radius)); //From 0,0 to the current point
-                        PointF b = new PointF((point.X) - ((x*squaresize)),(point.Y) - ((y*squaresize))); //From point to the current point
+                        PointF distance = new PointF(x * squaresize, y * squaresize).DistanceTo(line);
 
-                        //Area = sqrt(s(s - a)(s - b)(s - c))
-                        //Where s = perimetre / 2
-
-                        float mag_a = (float)Math.Sqrt(a.X*a.X + a.Y*a.Y);
-                        float mag_c = radius;
-                        float mag_b = (float)Math.Sqrt(b.X*b.X + b.Y*b.Y);
-
-                        float s = (mag_c + mag_a + mag_b)/2;
-
-                        float area = (float)Math.Sqrt(s * (s-mag_a) * (s-mag_b) * (s-mag_c));
-
-                        //From the area the height can be determined as:
-                        //a = 1/2 * b * h
-                        //h = 2a / b
-
-                        float height = 2 * area / mag_c;
-                        //The height is the shortest distance and therefore the scaling factor
-                        if (mag_b < radius / 2)
+                        if (distance.Y == 0)
                         {
-                            height = mag_b;
+                            y_scalemodifier = 0.5f;
                         }
-                        else
+
+                        if (Math.Abs(distance.Y) < Math.Abs(y_scale) && distance.Y != 0)
                         {
-                            height = (float)Math.Sqrt(mag_b * mag_b - (radius / 2) * (radius / 2));
+                            y_scale = distance.Y;
+                            closestline = line;
                         }
-                        //if (height < radius * 0.5f)
-                        //{
-                        //    height = radius * 0.5f;
-                        //}
-                        if (a.X > 0)
+                        if (Math.Abs(distance.X) < Math.Abs(x_scale))
                         {
-                            if (height < Math.Abs(x_scale))
-                            {
-                                x_scale = -height;
-                            }
-                        }
-                        else
-                        {
-                            if (height < Math.Abs(x_scale))
-                            {
-                                x_scale = height;
-                            }
-                        }
-                        if (a.Y > 0)
-                        {
-                            if (height < Math.Abs(y_scale))
-                            {
-                                y_scale = -height;
-                            }
-                        }
-                        else
-                        {
-                            if (height < Math.Abs(y_scale))
-                            {
-                                y_scale = height;
-                            }
+                            x_scale = distance.X;
+                            closestline = line;
                         }
                     }
+
+                    if (!new PointF(x * squaresize, y * squaresize).InPolygon(points))
+                    {
+                        PointF p = new PointF(x * squaresize, y * squaresize);
+
+                        Vector linevector = new Vector(closestline.start, closestline.end);
+                        Vector perpindicular = linevector.GetPerpindicular().GetUnitVector();
+                        perpindicular = new Vector(p, new PointF((float)(perpindicular.i + p.X), (float)(perpindicular.j + p.Y)));
+
+                        PointF intersection = linevector.Intersection(perpindicular);
+
+                        connections[x + y * (volumewidth)] = intersection;
+                        continue;
+                    }
+
+                    y_scale *= y_scalemodifier;
+                    sideconnections[x + y * volumewidth] = new Line(new PointF(x*squaresize, y* squaresize), new PointF(x_scale+x*squaresize, y_scale+y*squaresize));
                     if (x_scale >= 100)
                     {
 
                     }
-                    x_scale = (float)Math.Tanh((x_scale) / 100)/1.5f;
-                    y_scale = (float)Math.Tanh((y_scale) / 100)/1.5f;
-                    const float limiter = 1f;
+                    x_scale = (float)Math.Sin(x_scale / 20) / 2;
+                    y_scale = (float)Math.Sin(y_scale / 20) / 2;
+                    const float limiter = 0.45f;
                     if (x_scale >= limiter)
                     {
                         x_scale = limiter;
@@ -251,15 +243,19 @@ namespace HyperbolicRenderer
                     {
                         y_scale = -limiter;
                     }
+                    if (Math.Abs(x * squaresize - radius) < squaresize && Math.Abs(y * squaresize - radius) < squaresize)
+                    {
+                        x_scale /= 2;
+                        y_scale /= 2;
+                    }
+
                     float ay = y;
                     float ax = x;
                     ay += y_scale;
                     ax += x_scale;
-                    if (ay == float.NegativeInfinity)
-                    {
 
-                    }
                     connections[x + y * (volumewidth)] = new PointF(ax * squaresize, ay * squaresize);
+                    oldconnections[x + y * (volumewidth)] = new PointF(x * squaresize, y * squaresize);
                 }
             }
 
@@ -268,6 +264,7 @@ namespace HyperbolicRenderer
                 for (int y = 0; y < volumewidth - 1; y++)
                 {
                     int ay = y * volumewidth; //Adjusted y
+                    
                     volume.Add(new Trapezium(connections[x + ay], connections[x + (ay + volumewidth)], connections[(x + 1) + ay], connections[(x + 1) + (ay + volumewidth)]));
                 }
             }

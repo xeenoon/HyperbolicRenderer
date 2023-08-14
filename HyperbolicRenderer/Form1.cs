@@ -34,15 +34,16 @@ namespace HyperbolicRenderer
             {
                 return;
             }
-
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             e.Graphics.FillPolygon(new Pen(Color.DarkBlue).Brush, m.points);
             foreach (var trapezium in m.volume)
             {
-                e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
+                trapezium.Draw(e.Graphics);
+                //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
             }
             foreach(var connection in m.connections)
             {
-                //e.Graphics.FillEllipse(new Pen(Color.Red).Brush, connection.X-2, connection.Y-2, 4, 4);
+                e.Graphics.FillEllipse(new Pen(Color.Red).Brush, connection.X-2, connection.Y-2, 4, 4);
             }
 
             using (var path = new System.Drawing.Drawing2D.GraphicsPath())
@@ -72,6 +73,48 @@ namespace HyperbolicRenderer
             this.bottom_left = bottom_left;
             this.top_right = top_right;
             this.bottom_right = bottom_right;
+        }
+
+        internal void Draw(Graphics graphics)
+        {
+            Pen pen = new Pen(Color.White);
+            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            if (top_right.Y != top_left.Y) //Curving top?
+            {
+                float modifier = 0;
+                if (top_right.Y > 200)
+                {
+                    modifier = 0.505f;
+                }
+                else
+                {
+                    modifier = 0.495f;
+                }
+                graphics.DrawCurve(pen, new PointF[3] { top_left, new PointF((top_left.X+top_right.X)/2, (top_left.Y + top_right.Y) * 0.505f), top_right});
+            }
+            else
+            {
+                graphics.DrawLine(pen, top_left, top_right);
+            }
+
+            if (top_right.X != bottom_right.X) //Curving right?
+            {
+                float modifier = 0;
+                if (top_right.X > 200)
+                {
+                    modifier = 0.505f;
+                }
+                else
+                {
+                    modifier = 0.495f;
+                }
+                graphics.DrawCurve(pen, new PointF[3] { top_right, new PointF((top_right.X + bottom_right.X) * modifier, (bottom_right.Y + top_right.Y) / 2), bottom_right });
+            }
+            else
+            {
+                graphics.DrawLine(pen, top_right, bottom_right);
+            }
         }
     }
     public class Map
@@ -119,10 +162,7 @@ namespace HyperbolicRenderer
                 {
                     float x_scale = float.MaxValue;
                     float y_scale = float.MaxValue;
-                    if (x==7)
-                    {
 
-                    }
                     foreach (var point in points)
                     {
                         //Use herons formula to find the area of the bounded area of the triangle
@@ -155,9 +195,9 @@ namespace HyperbolicRenderer
                         {
                             height = (float)Math.Sqrt(mag_b * mag_b - (radius / 2) * (radius / 2));
                         }
-                        //if (height > radius * 0.75f)
+                        //if (height < radius * 0.5f)
                         //{
-                        //    height = radius * 0.75f;
+                        //    height = radius * 0.5f;
                         //}
                         if (a.X > 0)
                         {
@@ -192,11 +232,24 @@ namespace HyperbolicRenderer
                     {
 
                     }
-                    x_scale = (float)Math.Tanh((x_scale) / 200)/2f;
-                    y_scale = (float)Math.Tanh((y_scale) / 200)/2f;
-                    if (x_scale >= 1)
+                    x_scale = (float)Math.Tanh((x_scale) / 100)/1.5f;
+                    y_scale = (float)Math.Tanh((y_scale) / 100)/1.5f;
+                    const float limiter = 1f;
+                    if (x_scale >= limiter)
                     {
-
+                        x_scale = limiter;
+                    }
+                    if (x_scale <= -limiter)
+                    {
+                        x_scale = -limiter;
+                    }
+                    if (y_scale >= limiter)
+                    {
+                        y_scale = limiter;
+                    }
+                    if (y_scale <= -limiter)
+                    {
+                        y_scale = -limiter;
                     }
                     float ay = y;
                     float ax = x;

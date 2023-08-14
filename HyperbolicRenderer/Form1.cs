@@ -8,8 +8,8 @@ namespace HyperbolicRenderer
         {
             InitializeComponent();
         }
-        int sides = -1;
-        float scale = -1;
+        int sides = 4;
+        float scale = 0.77f;
 
         Map m;
 
@@ -21,14 +21,17 @@ namespace HyperbolicRenderer
             {
                 return;
             }
-            m = new Map(sides, pictureBox1.Width / 2f);
-            m.GenerateShape();
-            m.GenerateVolume(scale);
+            xchange = 0;
+            ychange = 0;
             pictureBox1.Invalidate();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            m = new Map(sides, pictureBox1.Width / 2f);
+            m.GenerateShape();
+            m.GenerateVolume(scale, xchange, ychange);
+
             int size = pictureBox1.Width;
             if (sides == -1)
             {
@@ -169,6 +172,86 @@ namespace HyperbolicRenderer
             showbackground = checkBox8.Checked;
             pictureBox1.Invalidate();
         }
+        bool keydown = false;
+        string keys = ""; //Change to flags enum later
+        System.Timers.Timer movetimer = new System.Timers.Timer();
+        bool runningtimer = false;
+        float xchange = 1;
+        float ychange = 1;
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            keydown = true;
+            switch (e.KeyCode)
+            {
+                case Keys.W:
+                    if (!keys.Contains("w"))
+                    {
+                        keys += "w";
+                    }
+                    break;
+                case Keys.A:
+                    if (!keys.Contains("a"))
+                    {
+                        keys += "a";
+                    }
+                    break;
+                case Keys.S:
+                    if (!keys.Contains("s"))
+                    {
+                        keys += "s";
+                    }
+                    break;
+                case Keys.D:
+                    if (!keys.Contains("d"))
+                    {
+                        keys += "d";
+                    }
+                    break;
+            }
+            if (!runningtimer)
+            {
+                runningtimer = true;
+                movetimer = new System.Timers.Timer(100);
+                movetimer.AutoReset = false;
+                movetimer.Elapsed += new System.Timers.ElapsedEventHandler(MovetimeTick);
+                movetimer.Start();
+            }
+        }
+        private void MovetimeTick(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            foreach (var c in keys)
+            {
+                switch (c)
+                {
+                    case 'w':
+                        ychange--;
+                        break;
+                    case 'a':
+                        xchange--;
+                        break;
+                    case 's':
+                        ychange++;
+                        break;
+                    case 'd':
+                        xchange++;
+                        break;
+                }
+            }
+            pictureBox1.Invalidate();
+            if (keydown)
+            {
+                movetimer.Start();
+            }
+            else
+            {
+                runningtimer = false;
+            }
+        }
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        {
+            keydown = false;
+            keys = "";
+        }
     }
     public class Trapezium
     {
@@ -269,32 +352,28 @@ namespace HyperbolicRenderer
         }
         public int volumewidth = 0;
         public float squaresize = 0;
-        public void GenerateVolume(float scale) //Scale of 1 will have squares of 20% size, 0.5 = 10% size...
+        public void GenerateVolume(float scale, float offsetx, float offsety) //Scale of 1 will have squares of 20% size, 0.5 = 10% size...
         {
             squaresize = radius * 0.2f * scale;
-            /*volume.Add(new Trapezium(new PointF(radius - squaresize / 2f, radius - squaresize / 2f),
-                                     new PointF(radius - squaresize / 2f, radius + squaresize / 2f),
-                                     new PointF(radius + squaresize / 2f, radius - squaresize / 2f),
-                                     new PointF(radius + squaresize / 2f, radius + squaresize / 2f)
-                                     ));*/
 
             volumewidth = (int)Math.Ceiling((radius * 2) / squaresize) + 1;
             connections = new PointF[(volumewidth) * (volumewidth)];
-            oldconnections = new PointF[(volumewidth) * (volumewidth)];
-            sideconnections = new Line[(volumewidth) * (volumewidth)];
+            oldconnections = new PointF[(volumewidth) * (volumewidth)]; //debugdata
+            sideconnections = new Line[(volumewidth) * (volumewidth)]; //debugdata
+            volume.Clear();
 
             List<Line> shapelines = new List<Line>();
             for (int i = 0; i < points.Count(); i++)
             {
                 shapelines.Add(new Line(points[i], points[i + 1 >= points.Count() ? 0 : i + 1]));
             }
-            if (points.Count() == 6)
-            {
-            }
+
             for (int y = 0; y < (volumewidth); ++y)
             {
                 for (int x = 0; x < (volumewidth); ++x)
                 {
+                    PointF relativepoint = new PointF(x * squaresize + offsetx, y * squaresize + offsety);
+
                     float x_scale = float.MaxValue;
                     float y_scale = float.MaxValue;
                     float y_scalemodifier = 1;
@@ -303,7 +382,7 @@ namespace HyperbolicRenderer
 
                     foreach (var line in shapelines)
                     {
-                        PointF distance = new PointF(x * squaresize, y * squaresize).DistanceTo(line);
+                        PointF distance = relativepoint.DistanceTo(line);
 
                         if (distance.Y == 0)
                         {
@@ -322,13 +401,12 @@ namespace HyperbolicRenderer
                         }
                     }
 
-                    if (!new PointF(x * squaresize, y * squaresize).InPolygon(points))
+                    if (!relativepoint.InPolygon(points))
                     {
-                        PointF p = new PointF(x * squaresize, y * squaresize);
 
                         Vector linevector = new Vector(closestline.start, closestline.end);
                         Vector perpindicular = linevector.GetPerpindicular().GetUnitVector();
-                        perpindicular = new Vector(p, new PointF((float)(perpindicular.i + p.X), (float)(perpindicular.j + p.Y)));
+                        perpindicular = new Vector(relativepoint, new PointF((float)(perpindicular.i + relativepoint.X), (float)(perpindicular.j + relativepoint.Y)));
 
                         PointF intersection = linevector.Intersection(perpindicular);
 
@@ -337,11 +415,8 @@ namespace HyperbolicRenderer
                     }
 
                     y_scale *= y_scalemodifier;
-                    sideconnections[x + y * volumewidth] = new Line(new PointF(x * squaresize, y * squaresize), new PointF(x_scale + x * squaresize, y_scale + y * squaresize));
-                    if (x_scale >= 100)
-                    {
-
-                    }
+                    sideconnections[x + y * volumewidth] = new Line(relativepoint, new PointF(x_scale + relativepoint.X, y_scale + relativepoint.Y)); //debugdata
+                    
                     x_scale = (float)Math.Sin(x_scale / 20) / 2;
                     y_scale = (float)Math.Sin(y_scale / 20) / 2;
                     const float limiter = 0.45f;
@@ -366,14 +441,21 @@ namespace HyperbolicRenderer
                         x_scale /= 2;
                         y_scale /= 2;
                     }
-
-                    float ay = y;
-                    float ax = x;
+                    float ay=y;
+                    float ax=x;
+                    if (offsety != 0) //Removes infinity errors
+                    {
+                        ay += (offsety / (radius * 2));
+                    }
+                    if(offsetx != 0) //Removes infinity errors
+                    { 
+                        ax += (offsetx / (radius * 2));
+                    }
                     ay += y_scale;
                     ax += x_scale;
 
                     connections[x + y * (volumewidth)] = new PointF(ax * squaresize, ay * squaresize);
-                    oldconnections[x + y * (volumewidth)] = new PointF(x * squaresize, y * squaresize);
+                    oldconnections[x + y * (volumewidth)] = relativepoint;
                 }
             }
 

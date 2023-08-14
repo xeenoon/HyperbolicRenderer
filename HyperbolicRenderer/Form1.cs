@@ -208,7 +208,7 @@ namespace HyperbolicRenderer
                         keys += "d";
                     }
                     break;
-                case Keys.Shift:
+                case Keys.ShiftKey:
                     shift = true;
                     break;
             }
@@ -281,7 +281,12 @@ namespace HyperbolicRenderer
         }
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
-            shift = false;
+            if (e.KeyCode == Keys.ShiftKey)
+            {
+                shift = false;
+                return;
+            }
+
             keydown = false;
             keys = "";
         }
@@ -410,6 +415,7 @@ namespace HyperbolicRenderer
                     float x_scale = float.MaxValue;
                     float y_scale = float.MaxValue;
                     float y_scalemodifier = 1;
+                    float x_scalemodifier = 1;
 
                     Line closestline = new Line();
 
@@ -421,13 +427,17 @@ namespace HyperbolicRenderer
                         {
                             y_scalemodifier = 0.5f;
                         }
+                        if (distance.X == 0)
+                        {
+                            x_scalemodifier = 0.5f;
+                        }
 
                         if (Math.Abs(distance.Y) < Math.Abs(y_scale) && distance.Y != 0)
                         {
                             y_scale = distance.Y;
                             closestline = line;
                         }
-                        if (Math.Abs(distance.X) < Math.Abs(x_scale))
+                        if (Math.Abs(distance.X) < Math.Abs(x_scale) && distance.X != 0)
                         {
                             x_scale = distance.X;
                             closestline = line;
@@ -448,6 +458,7 @@ namespace HyperbolicRenderer
                     }
 
                     y_scale *= y_scalemodifier;
+                    x_scale *= x_scalemodifier;
                     sideconnections[x + y * volumewidth] = new Line(relativepoint, new PointF(x_scale + relativepoint.X, y_scale + relativepoint.Y)); //debugdata
                     
                     x_scale = (float)Math.Sin(x_scale / 20) / 2;

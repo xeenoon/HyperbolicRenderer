@@ -177,8 +177,8 @@ namespace HyperbolicRenderer
         bool shift = false;
         System.Timers.Timer movetimer = new System.Timers.Timer();
         bool runningtimer = false;
-        float xchange = 1;
-        float ychange = 1;
+        float xchange = 0;
+        float ychange = 0;
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             keydown = true;
@@ -223,6 +223,8 @@ namespace HyperbolicRenderer
         }
         private void MovetimeTick(object sender, System.Timers.ElapsedEventArgs e)
         {
+            int yadd = 0;
+            int xadd = 0;
             foreach (var c in keys)
             {
                 switch (c)
@@ -230,45 +232,56 @@ namespace HyperbolicRenderer
                     case 'w':
                         if (shift)
                         {
-                            ychange -= 3;
+                            yadd = -3;
                         }
                         else
                         {
-                            ychange--;
+                            yadd = -1;
                         }
                         break;
                     case 'a':
                         if (shift)
                         {
-                            xchange -= 3;
+                            xadd = -3;
                         }
                         else
                         {
-                            xchange--;
+                            xadd = -1;
                         }
                         break;
                     case 's':
                         if (shift)
                         {
-                            ychange += 3;
+                            yadd = 3;
                         }
                         else
                         {
-                            ychange++;
+                            yadd = 1;
                         }
                         break;
                     case 'd':
                         if (shift)
                         {
-                            xchange += 3;
+                            xadd = 3;
                         }
                         else
                         {
-                            xchange++;
+                            xadd = 1;
                         }
                         break;
                 }
             }
+            if (m.points.Count() % 2 == 0 || !invertodd)
+            {
+                xchange += xadd * speedmodifier;
+                ychange += yadd * speedmodifier;
+            }
+            else
+            {
+                xchange += xadd * speedmodifier;
+                ychange -= yadd * speedmodifier;
+            }
+
             pictureBox1.Invalidate();
             if (keydown)
             {
@@ -295,6 +308,25 @@ namespace HyperbolicRenderer
         {
             infinitemovement = checkBox9.Checked;
             pictureBox1.Invalidate();
+        }
+        float speedmodifier = 1;
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            float.TryParse(textBox3.Text, out speedmodifier);
+            pictureBox1.Invalidate();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+       
+        bool invertodd = false;
+        private void checkBox10_CheckedChanged(object sender, EventArgs e)
+        {
+            invertodd = checkBox10.Checked;
         }
     }
     public class Trapezium

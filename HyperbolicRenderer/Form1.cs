@@ -469,8 +469,12 @@ namespace HyperbolicRenderer
                 {
                     PointF relativepoint = new PointF(x * squaresize + offsetx, y * squaresize + offsety);
 
-                    float x_scale = float.MaxValue;
-                    float y_scale = float.MaxValue;
+                    float neg_x_scale = float.MinValue;
+                    float pos_x_scale = float.MaxValue;
+
+                    float neg_y_scale = float.MinValue;
+                    float pos_y_scale = float.MaxValue;
+
                     float y_scalemodifier = 1;
                     float x_scalemodifier = 1;
 
@@ -488,30 +492,75 @@ namespace HyperbolicRenderer
                         {
                             x_scalemodifier = 0.5f;
                         }
-
-                        if (Math.Abs(distance.Y) < Math.Abs(y_scale) && distance.Y != 0)
+                        if (distance.Y > neg_y_scale && distance.Y < 0 && distance.Y != 0)
                         {
-                            y_scale = distance.Y;
-                            closestline = line;
+                            neg_y_scale = distance.Y;
                         }
-                        if (Math.Abs(distance.X) < Math.Abs(x_scale) && distance.X != 0)
+                        if (distance.Y < pos_y_scale && distance.Y > 0 && distance.Y != 0)
                         {
-                            x_scale = distance.X;
-                            closestline = line;
+                            pos_y_scale = distance.Y;
+                        }
+
+                        if (distance.X > neg_x_scale && distance.X < 0 && distance.X != 0)
+                        {
+                            neg_x_scale = distance.X;
+                        }
+                        if (distance.X < pos_x_scale && distance.X > 0 && distance.X != 0)
+                        {
+                            pos_x_scale = distance.X;
                         }
                     }
 
-                    if (!relativepoint.InPolygon(points))
+                    float y_scale;
+                    float x_scale;
+                    if (Math.Abs(neg_y_scale) < pos_y_scale)
                     {
+                        y_scale = neg_y_scale;
+                    }
+                    else
+                    {
+                        y_scale = pos_y_scale;
+                    }
 
-                        Vector linevector = new Vector(closestline.start, closestline.end);
-                        Vector perpindicular = linevector.GetPerpindicular().GetUnitVector();
-                        perpindicular = new Vector(relativepoint, new PointF((float)(perpindicular.i + relativepoint.X), (float)(perpindicular.j + relativepoint.Y)));
+                    if (Math.Abs(neg_x_scale) < pos_x_scale)
+                    {
+                        x_scale = neg_x_scale;
+                    }
+                    else
+                    {
+                        x_scale = pos_x_scale;
+                    }
 
-                        PointF intersection = linevector.Intersection(perpindicular);
+                    float y_distancetocentre = Math.Abs(neg_y_scale + pos_y_scale);
+                    if (y_distancetocentre < squaresize / 5)
+                    {
+                        //Begin to approach a linear straight line at the centre
+                        if (neg_y_scale + pos_y_scale == 0)
+                        {
+                            y_scale = 0;
+                        }
+                        else
+                        {
+                            //Should equal zero when distancetocentre == 0
+                            //Should equal 1 when distancetocentre == squaresize/5
+                            y_scale *= (y_distancetocentre/(squaresize / 5));
+                        }
+                    }
 
-                        //connections[x + y * (volumewidth)] = intersection;
-                        //continue;
+                    float x_distancetocentre = Math.Abs(neg_x_scale + pos_x_scale);
+                    if (x_distancetocentre < squaresize/5)
+                    {
+                        //Begin to approach a linear straight line at the centre
+                        if (neg_x_scale + pos_x_scale == 0)
+                        {
+                            x_scale = 0;
+                        }
+                        else
+                        {
+                            //Should equal zero when distancetocentre == 0
+                            //Should equal 1 when distancetocentre == squaresize/5
+                            x_scale *= (x_distancetocentre / (squaresize / 5));
+                        }
                     }
 
                     y_scale *= y_scalemodifier;
@@ -520,7 +569,7 @@ namespace HyperbolicRenderer
 
                     x_scale = (float)Math.Sin(x_scale / 20) / 2;
                     y_scale = (float)Math.Sin(y_scale / 20) / 2;
-                    const float limiter = 0.45f;
+                    const float limiter = 0.5f;
                     if (x_scale >= limiter)
                     {
                         x_scale = limiter;

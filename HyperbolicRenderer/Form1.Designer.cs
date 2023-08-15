@@ -50,6 +50,7 @@
             textBox3 = new TextBox();
             button2 = new Button();
             checkBox10 = new CheckBox();
+            label7 = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -323,11 +324,20 @@
             checkBox10.UseVisualStyleBackColor = true;
             checkBox10.CheckedChanged += checkBox10_CheckedChanged;
             // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(642, 293);
+            label7.Name = "label7";
+            label7.Size = new Size(0, 15);
+            label7.TabIndex = 26;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(label7);
             Controls.Add(checkBox10);
             Controls.Add(button2);
             Controls.Add(textBox3);
@@ -384,5 +394,6 @@
         private TextBox textBox3;
         private Button button2;
         private CheckBox checkBox10;
+        private Label label7;
     }
 }

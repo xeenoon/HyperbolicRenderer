@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace HyperbolicRenderer
@@ -29,10 +30,18 @@ namespace HyperbolicRenderer
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             m = new Map(sides, pictureBox1.Width / 2f);
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            double gentime = 0;
             m.GenerateShape();
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
+            s.Stop();
 
-            int size = pictureBox1.Width;
+            gentime += s.ElapsedTicks;
+
+            double finaldraw = 0;
+            s.Restart();
+
             if (sides == -1)
             {
                 return;
@@ -49,27 +58,34 @@ namespace HyperbolicRenderer
                     e.Graphics.DrawLine(new Pen(Color.Orange), new PointF(x * m.squaresize, 0), new PointF(x * m.squaresize, pictureBox1.Width));
                 }
             }
+
             e.Graphics.FillPolygon(new Pen(Color.DarkBlue).Brush, m.points);
-            foreach (var trapezium in m.volume)
+            Bitmap volumebmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            using(BMP fastbmp = new BMP(volumebmp))
             {
-                if (showdebugdata && straighlines)
+                foreach (var trapezium in m.volume)
                 {
-                    trapezium.Draw(e.Graphics, false, Color.Black, 1, pictureBox1.Width);
+                    if (showdebugdata && straighlines)
+                    {
+                        trapezium.Draw(fastbmp, false, Color.Black, pictureBox1.Width);
+                    }
+                    else if (showdebugdata && !showbackground)
+                    {
+                        trapezium.Draw(fastbmp, true, Color.Black, pictureBox1.Width);
+                    }
+                    else
+                    {
+                        trapezium.Draw(fastbmp, true, Color.White, pictureBox1.Width);
+                    }
+                    //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
                 }
-                else if (showdebugdata && !showbackground)
-                {
-                    trapezium.Draw(e.Graphics, true, Color.Black, 1, pictureBox1.Width);
-                }
-                else
-                {
-                    trapezium.Draw(e.Graphics, true, Color.White, 1, pictureBox1.Width);
-                }
-                //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
             }
-            for (int i = 0; i < m.oldconnections.Length; i++)
+            e.Graphics.DrawImage(volumebmp, 0, 0);
+            if (showdebugdata)
             {
-                if (showdebugdata)
+                for (int i = 0; i < m.oldconnections.Length; i++)
                 {
+
                     PointF connection = m.connections[i];
                     PointF oldconnection = m.oldconnections[i];
                     if (showpointmovement)
@@ -92,23 +108,43 @@ namespace HyperbolicRenderer
                 }
             }
 
-            if (showdebugdata && !showbackground)
+            if (!(showdebugdata && !showbackground))
             {
-                return;
-            }
-            using (var path = new System.Drawing.Drawing2D.GraphicsPath())
-            {
-                path.AddPolygon(m.points);
 
-                // Uncomment this to invert:
-                path.AddRectangle(pictureBox1.ClientRectangle);
-
-                using (var brush = new SolidBrush(Color.Black))
+                using (var path = new System.Drawing.Drawing2D.GraphicsPath())
                 {
-                    e.Graphics.FillPath(brush, path);
+                    path.AddPolygon(m.points);
+
+                    // Uncomment this to invert:
+                    path.AddRectangle(pictureBox1.ClientRectangle);
+
+                    using (var brush = new SolidBrush(Color.Black))
+                    {
+                        e.Graphics.FillPath(brush, path);
+                    }
                 }
             }
+            s.Stop();
+            finaldraw = s.ElapsedMilliseconds;
+
+            longestgen = Math.Max(longestgen, gentime);
+            longestdraw = Math.Max(longestdraw, Trapezium.elapseddrawtime);
+            longesttrig = Math.Max(longesttrig, Trapezium.elapsedtrigtime);
+            longestfinaldraw = Math.Max(longestfinaldraw, finaldraw);
+
+
+            label7.Text = "Trig: " + Trapezium.elapsedtrigtime.ToString() + "\nDraw: " + Trapezium.elapseddrawtime.ToString() + "\nGen: " + gentime.ToString() + "\nFinaldraw: " + finaldraw.ToString() +
+                "\n\nMaxtrig: " + longesttrig + "\nMaxdraw: " + longestdraw + "\nMaxgen: " + longestgen + "\nMaxfinaldraw: " + longestfinaldraw;
+
+            Trapezium.elapseddrawtime = 0;
+            Trapezium.elapsedtrigtime = 0;
+            
         }
+        static double longesttrig = 0;
+        static double longestdraw = 0;
+        static double longestgen = 0;
+        static double longestfinaldraw = 0;
+
         bool showdebugdata;
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
@@ -322,7 +358,7 @@ namespace HyperbolicRenderer
 
         }
 
-       
+
         bool invertodd = false;
         private void checkBox10_CheckedChanged(object sender, EventArgs e)
         {

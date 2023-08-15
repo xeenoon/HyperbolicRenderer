@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,14 +23,10 @@ namespace HyperbolicRenderer
             this.top_right = top_right;
             this.bottom_right = bottom_right;
         }
-
-        internal void Draw(Graphics graphics, bool curved, Color color, int thickness, int mapsize)
+        public static double elapseddrawtime;
+        public static double elapsedtrigtime;
+        internal void Draw(BMP image, bool curved, Color color, int mapsize)
         {
-            Pen pen = new Pen(color, thickness);
-
-            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-
             float modifier;
             if (top_right.Y > 200)
             {
@@ -52,10 +50,11 @@ namespace HyperbolicRenderer
                 var topdistance = top_right.X - top_left.X;
 
                 double a = Math.PI / (topdistance);
-                Bitmap curve = new Bitmap(mapsize, mapsize);
 
+                Stopwatch s = new Stopwatch();
                 for (float i = 0; i < topdistance; ++i)
                 {
+                    s.Restart();
                     double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
                     int x = (int)(i + top_left.X);
 
@@ -82,13 +81,17 @@ namespace HyperbolicRenderer
                     {
                         continue;
                     }
-                    curve.SetPixel(x, y, color);
+                    s.Stop();
+                    elapsedtrigtime += s.ElapsedTicks;
+                    s.Restart();
+                    image.SetPixel(x, y, color);
+                    s.Stop();
+                    elapseddrawtime += s.ElapsedTicks;
                 }
-                graphics.DrawImage(curve, 0,0);
             }
             else
             {
-                graphics.DrawLine(pen,top_left, top_right);
+                //graphics.DrawLine(pen,top_left, top_right);
             }
             if (top_right.X > 200)
             {
@@ -105,17 +108,15 @@ namespace HyperbolicRenderer
                 var sidedistance = bottom_right.Y - top_right.Y;
 
                 double a = Math.PI / (sidedistance);
-                Bitmap curve = new Bitmap(mapsize, mapsize);
+                Stopwatch s = new Stopwatch();
 
                 for (float i = 0; i < sidedistance; ++i)
                 {
+                    s.Restart();
                     double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
                     int y = (int)(i + top_right.Y);
 
                     double m = sidedistance / (bottom_right.X - top_right.X);
-
-
-
                     //y = mx + c
 
                     //bottom_right.Y = m*bottom_right.X + c1
@@ -143,13 +144,17 @@ namespace HyperbolicRenderer
                     {
                         continue;
                     }
-                    curve.SetPixel(x, y, color);
+                    s.Stop();
+                    elapsedtrigtime += s.ElapsedTicks;
+                    s.Restart();
+                    image.SetPixel(x, y, color);
+                    s.Stop();
+                    elapseddrawtime += s.ElapsedTicks;
                 }
-                graphics.DrawImage(curve, 0, 0);
             }
             else
             {
-                graphics.DrawLine(pen, top_right, bottom_right);
+                //graphics.DrawLine(pen, top_right, bottom_right);
             }
 
         }

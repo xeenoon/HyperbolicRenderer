@@ -36,6 +36,8 @@ namespace HyperbolicRenderer
             {
                 modifier = 0.495f;
             }
+            Stopwatch s = new Stopwatch();
+
             if (curved)
             {
                 //Create a sin wave where ther period/2 == topright-topleft
@@ -51,7 +53,6 @@ namespace HyperbolicRenderer
 
                 double a = Math.PI / (topdistance);
 
-                Stopwatch s = new Stopwatch();
                 for (float i = 0; i < topdistance; ++i)
                 {
                     s.Restart();
@@ -91,6 +92,30 @@ namespace HyperbolicRenderer
             }
             else
             {
+                s.Restart();
+                var topdistance = top_right.X - top_left.X;
+                for (float i = 0; i < topdistance; ++i)
+                {
+                    int x = (int)(i + top_left.X);
+
+                    double m = (top_right.Y - top_left.Y) / topdistance;
+
+                    //y = mx + c
+
+                    //top_right.Y = m*top_right.X + c1
+                    //c = top_right.Y - m*top_right.X
+
+                    double c = top_right.Y - m * top_right.X;
+
+                    double y = m * x + c; //Find the height if it was a straight line
+                    if (x >= mapsize || x < 0 || y >= mapsize || y < 0)
+                    {
+                        continue;
+                    }
+                    image.SetPixel(x, (int)y, color);
+                }
+                s.Stop();
+                elapseddrawtime += s.ElapsedTicks;
                 //graphics.DrawLine(pen,top_left, top_right);
             }
             if (top_right.X > 200)
@@ -108,7 +133,6 @@ namespace HyperbolicRenderer
                 var sidedistance = bottom_right.Y - top_right.Y;
 
                 double a = Math.PI / (sidedistance);
-                Stopwatch s = new Stopwatch();
 
                 for (float i = 0; i < sidedistance; ++i)
                 {
@@ -154,7 +178,35 @@ namespace HyperbolicRenderer
             }
             else
             {
-                //graphics.DrawLine(pen, top_right, bottom_right);
+                s.Restart();
+                var sidedistance = bottom_right.Y - top_right.Y;
+
+                for (float i = 0; i < sidedistance; ++i)
+                {
+                    s.Restart();
+                    int y = (int)(i + top_right.Y);
+
+                    double m = sidedistance / (bottom_right.X - top_right.X);
+                    //y = mx + c
+
+                    //bottom_right.Y = m*bottom_right.X + c1
+                    //c = bottom_right.Y - m*bottom_right.X
+
+                    double c = bottom_right.Y - m * bottom_right.X;
+
+                    double x = (y - c) / m; //Find the height if it was a straight line
+                    if (bottom_right.X - top_right.X == 0)
+                    {
+                        x = top_right.X;
+                    }
+                    if (x >= mapsize || x < 0 || y >= mapsize || y < 0)
+                    {
+                        continue;
+                    }
+                    image.SetPixel((int)x, y, color);
+                }
+                s.Stop();
+                elapseddrawtime += s.ElapsedTicks;
             }
 
         }

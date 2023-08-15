@@ -30,7 +30,7 @@ namespace HyperbolicRenderer
         {
             m = new Map(sides, pictureBox1.Width / 2f);
             m.GenerateShape();
-            m.GenerateVolume(scale, xchange, ychange);
+            m.GenerateVolume(scale, xchange, ychange, infinitemovement);
 
             int size = pictureBox1.Width;
             if (sides == -1)
@@ -290,6 +290,12 @@ namespace HyperbolicRenderer
             keydown = false;
             keys = "";
         }
+        bool infinitemovement;
+        private void checkBox9_CheckedChanged(object sender, EventArgs e)
+        {
+            infinitemovement = checkBox9.Checked;
+            pictureBox1.Invalidate();
+        }
     }
     public class Trapezium
     {
@@ -390,9 +396,28 @@ namespace HyperbolicRenderer
         }
         public int volumewidth = 0;
         public float squaresize = 0;
-        public void GenerateVolume(float scale, float offsetx, float offsety) //Scale of 1 will have squares of 20% size, 0.5 = 10% size...
+        public void GenerateVolume(float scale, float offsetx, float offsety, bool infinitevolume) //Scale of 1 will have squares of 20% size, 0.5 = 10% size...
         {
             squaresize = radius * 0.2f * scale;
+            if (infinitevolume)
+            {
+                while (offsetx > squaresize)
+                {
+                    offsetx -= squaresize;
+                }
+                while (offsetx < -squaresize)
+                {
+                    offsetx += squaresize;
+                }
+                while (offsety > squaresize)
+                {
+                    offsety -= squaresize;
+                }
+                while (offsety < -squaresize)
+                {
+                    offsety += squaresize;
+                }
+            }
 
             volumewidth = (int)Math.Ceiling((radius * 2) / squaresize) + 1;
             connections = new PointF[(volumewidth) * (volumewidth)];
@@ -460,7 +485,7 @@ namespace HyperbolicRenderer
                     y_scale *= y_scalemodifier;
                     x_scale *= x_scalemodifier;
                     sideconnections[x + y * volumewidth] = new Line(relativepoint, new PointF(x_scale + relativepoint.X, y_scale + relativepoint.Y)); //debugdata
-                    
+
                     x_scale = (float)Math.Sin(x_scale / 20) / 2;
                     y_scale = (float)Math.Sin(y_scale / 20) / 2;
                     const float limiter = 0.45f;
@@ -485,14 +510,14 @@ namespace HyperbolicRenderer
                         x_scale /= 2;
                         y_scale /= 2;
                     }
-                    float ay=y;
-                    float ax=x;
+                    float ay = y;
+                    float ax = x;
                     if (offsety != 0) //Removes infinity errors
                     {
                         ay += (offsety / squaresize);
                     }
-                    if(offsetx != 0) //Removes infinity errors
-                    { 
+                    if (offsetx != 0) //Removes infinity errors
+                    {
                         ax += (offsetx / squaresize);
                     }
                     ay += y_scale;

@@ -543,6 +543,8 @@ namespace HyperbolicRenderer
                         {
                             //Should equal zero when distancetocentre == 0
                             //Should equal 1 when distancetocentre == squaresize/5
+
+                            //CAN use this formula, has less change towards 0, and more change towards squaresize/5
                             y_scale *= (y_distancetocentre/(squaresize / 5));
                         }
                     }
@@ -559,6 +561,8 @@ namespace HyperbolicRenderer
                         {
                             //Should equal zero when distancetocentre == 0
                             //Should equal 1 when distancetocentre == squaresize/5
+
+                            //CAN use this formula, has less change towards 0, and more change towards squaresize/5
                             x_scale *= (x_distancetocentre / (squaresize / 5));
                         }
                     }

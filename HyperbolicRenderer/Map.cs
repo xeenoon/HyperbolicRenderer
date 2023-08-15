@@ -300,7 +300,8 @@ namespace HyperbolicRenderer
                     }
 
                     float y_distancetocentre = Math.Abs(relativepoint.Y - radius);
-                    float turningtime = squaresize/5;
+                    float turningtime = squaresize/2f;
+                    const double cutoff = 0.7f;
                     if (y_distancetocentre < turningtime)
                     {
                         //y_distancetocentre = y_scale < 0 ? -y_distancetocentre : y_distancetocentre;
@@ -313,28 +314,26 @@ namespace HyperbolicRenderer
                         {
                             //Should equal zero when distancetocentre == 0
                             //Should equal 1 when distancetocentre == squaresize/5
-                            const double cutoff = 0.3f;
                             if (y_distancetocentre >= turningtime * cutoff)
                             {
                                 double a = 0.7f/Math.Pow(turningtime-(turningtime*cutoff),2);
-                                y_scale = (float)(a*Math.Pow(y_distancetocentre-(turningtime*cutoff),2)+0.3f);
+                                y_scale *= (float)(a*Math.Pow(y_distancetocentre-(turningtime*cutoff),2)+0.3f);
                                 //y_scale *= (float)Math.Pow(Math.E, y_distancetocentre - (squaresize / 5));
                             }
                             else
                             {
                                 //((0.7)/(3 a s)) x+1-((0.7)/(3 a s)) 
-                                y_scale = (float)((0.3f/(cutoff * turningtime)) * y_distancetocentre);
+                                y_scale *= (float)((0.3f/(cutoff * turningtime)) * y_distancetocentre);
                                 //y_scale *= (float)(y_distancetocentre * (Math.Pow(Math.E, ((squaresize / 5) * (1f / 6f)))/ ((squaresize / 5) * (5f / 6f))));
                             }
-                            y_scale *= 2;
                             //y_scale *= (float)(Math.Log((y_distancetocentre+1f)/((squaresize/5f)/2f)));
                         }
                     }
                     float x_distancetocentre = Math.Abs(relativepoint.X - radius);
 
-                    if (x_distancetocentre < turningtime && false)
+                    if (x_distancetocentre < turningtime)
                     {
-                        x_distancetocentre = x_scale < 0 ? -x_distancetocentre : x_distancetocentre;
+                        //x_distancetocentre = x_scale < 0 ? -x_distancetocentre : x_distancetocentre;
                         //Begin to approach a linear straight line at the centre
                         if (neg_x_scale + pos_x_scale == 0)
                         {
@@ -344,20 +343,18 @@ namespace HyperbolicRenderer
                         {
                             //Should equal zero when distancetocentre == 0
                             //Should equal 1 when distancetocentre == squaresize/5
-                            const double cutoff = 0.75f;
                             if (x_distancetocentre >= turningtime * cutoff)
                             {
                                 double a = 0.7f / Math.Pow(turningtime - (turningtime * cutoff), 2);
-                                x_scale = (float)(a * Math.Pow(x_distancetocentre - (turningtime * cutoff), 2) + 0.3f);
+                                x_scale *= (float)(a * Math.Pow(x_distancetocentre - (turningtime * cutoff), 2) + 0.3f);
                                 //x_scale *= (float)Math.Pow(Math.E, x_distancetocentre - (squaresize / 5));
                             }
                             else
                             {
                                 //((0.7)/(3 a s)) x+1-((0.7)/(3 a s)) 
-                                x_scale = (float)((0.3f / (cutoff * turningtime)) * x_distancetocentre);
+                                x_scale *= (float)((0.3f / (cutoff * turningtime)) * x_distancetocentre);
                                 //x_scale *= (float)(x_distancetocentre * (Math.Pow(Math.E, ((squaresize / 5) * (1f / 6f)))/ ((squaresize / 5) * (5f / 6f))));
                             }
-
                             //x_scale *= (float)(Math.Log((x_distancetocentre+1f)/((squaresize/5f)/2f)));
                         }
                     }

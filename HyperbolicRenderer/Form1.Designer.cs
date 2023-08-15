@@ -118,6 +118,7 @@
             checkBox1.TabIndex = 6;
             checkBox1.Text = "Debug data";
             checkBox1.UseVisualStyleBackColor = true;
+            checkBox1.CheckedChanged += checkBox1_CheckedChanged_1;
             checkBox1.Click += checkBox1_CheckedChanged;
             checkBox1.KeyDown += Form1_KeyDown;
             checkBox1.KeyUp += Form1_KeyUp;
@@ -125,8 +126,6 @@
             // checkBox2
             // 
             checkBox2.AutoSize = true;
-            checkBox2.Checked = true;
-            checkBox2.CheckState = CheckState.Checked;
             checkBox2.ForeColor = Color.FromArgb(255, 128, 0);
             checkBox2.Location = new Point(677, 90);
             checkBox2.Name = "checkBox2";
@@ -142,8 +141,6 @@
             // checkBox3
             // 
             checkBox3.AutoSize = true;
-            checkBox3.Checked = true;
-            checkBox3.CheckState = CheckState.Checked;
             checkBox3.ForeColor = Color.Red;
             checkBox3.Location = new Point(677, 138);
             checkBox3.Name = "checkBox3";
@@ -159,8 +156,6 @@
             // checkBox4
             // 
             checkBox4.AutoSize = true;
-            checkBox4.Checked = true;
-            checkBox4.CheckState = CheckState.Checked;
             checkBox4.ForeColor = Color.Green;
             checkBox4.Location = new Point(677, 162);
             checkBox4.Name = "checkBox4";
@@ -176,8 +171,6 @@
             // checkBox5
             // 
             checkBox5.AutoSize = true;
-            checkBox5.Checked = true;
-            checkBox5.CheckState = CheckState.Checked;
             checkBox5.ForeColor = Color.Magenta;
             checkBox5.Location = new Point(677, 186);
             checkBox5.Name = "checkBox5";
@@ -193,8 +186,6 @@
             // checkBox6
             // 
             checkBox6.AutoSize = true;
-            checkBox6.Checked = true;
-            checkBox6.CheckState = CheckState.Checked;
             checkBox6.ForeColor = Color.Black;
             checkBox6.Location = new Point(677, 210);
             checkBox6.Name = "checkBox6";
@@ -210,8 +201,6 @@
             // checkBox7
             // 
             checkBox7.AutoSize = true;
-            checkBox7.Checked = true;
-            checkBox7.CheckState = CheckState.Checked;
             checkBox7.ForeColor = Color.FromArgb(255, 128, 0);
             checkBox7.Location = new Point(677, 114);
             checkBox7.Name = "checkBox7";
@@ -331,6 +320,7 @@
             label7.Name = "label7";
             label7.Size = new Size(0, 15);
             label7.TabIndex = 26;
+            label7.Visible = false;
             // 
             // Form1
             // 

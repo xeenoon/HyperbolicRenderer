@@ -61,7 +61,7 @@ namespace HyperbolicRenderer
 
             e.Graphics.FillPolygon(new Pen(Color.DarkBlue).Brush, m.points);
             Bitmap volumebmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-            using(BMP fastbmp = new BMP(volumebmp))
+            using (BMP fastbmp = new BMP(volumebmp))
             {
                 foreach (var trapezium in m.volume)
                 {
@@ -133,12 +133,12 @@ namespace HyperbolicRenderer
             longestfinaldraw = Math.Max(longestfinaldraw, finaldraw);
 
 
-            label7.Text = "Trig: " + Trapezium.elapsedtrigtime.ToString() + "\nDraw: " + Trapezium.elapseddrawtime.ToString() + "\nGen: " + gentime.ToString() + "\nFinaldraw: " + finaldraw.ToString() +
-                "\n\nMaxtrig: " + longesttrig + "\nMaxdraw: " + longestdraw + "\nMaxgen: " + longestgen + "\nMaxfinaldraw: " + longestfinaldraw;
+            label7.Text = "DEBUG INFO: \nTrig: " + Trapezium.elapsedtrigtime.ToString() + " ticks\nDraw: " + Trapezium.elapseddrawtime.ToString() + " ticks\nGen: " + gentime.ToString() + " ticks\nFinaldraw: " + finaldraw.ToString() +
+                " ms\n\nMaxtrig: " + longesttrig + " ticks\nMaxdraw: " + longestdraw + " ticks\nMaxgen: " + longestgen + " ticks\nMaxfinaldraw: " + longestfinaldraw.ToString() + " ms";
 
             Trapezium.elapseddrawtime = 0;
             Trapezium.elapsedtrigtime = 0;
-            
+
         }
         static double longesttrig = 0;
         static double longestdraw = 0;
@@ -155,16 +155,17 @@ namespace HyperbolicRenderer
             checkBox6.Visible = checkBox1.Checked;
             checkBox7.Visible = checkBox1.Checked;
             checkBox8.Visible = checkBox1.Checked;
+            label7.Visible = checkBox1.Checked;
 
             showdebugdata = checkBox1.Checked;
             pictureBox1.Invalidate();
         }
-        bool showgridpoints = true;
-        bool showgrid = true;
-        bool showmodifiedpoints = true;
-        bool showpointmovement = true;
-        bool showclosestedge = true;
-        bool straighlines = true;
+        bool showgridpoints = false;
+        bool showgrid = false;
+        bool showmodifiedpoints = false;
+        bool showpointmovement = false;
+        bool showclosestedge = false;
+        bool straighlines = false;
         bool showbackground = true;
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
@@ -363,6 +364,11 @@ namespace HyperbolicRenderer
         private void checkBox10_CheckedChanged(object sender, EventArgs e)
         {
             invertodd = checkBox10.Checked;
+        }
+
+        private void checkBox1_CheckedChanged_1(object sender, EventArgs e)
+        {
+
         }
     }
 }

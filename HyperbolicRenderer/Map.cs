@@ -27,7 +27,7 @@ namespace HyperbolicRenderer
         public static double elapseddrawtime;
         public static double elapsedtrigtime;
         Stopwatch s = new Stopwatch();
-        internal void Draw(BMP image, bool curved, Color color, int mapsize, bool fill=true)
+        internal void Draw(BMP image, Graphics outerlayer, bool curved, Color color, int mapsize, bool fill=true)
         {
             List<PointF> polygonpoints = new List<PointF>();
             if (curved)
@@ -74,6 +74,8 @@ namespace HyperbolicRenderer
 
             if (fill)
             {
+                outerlayer.FillPolygon(new Pen(color).Brush, polygonpoints.ToArray());
+                return;
                 //Fill in the space enclosed by the polygon
                 int minx = (int)polygonpoints.OrderBy(p => p.X).First().X;
                 int maxx = (int)polygonpoints.OrderBy(p => p.X).Last().X;
@@ -88,27 +90,6 @@ namespace HyperbolicRenderer
                         if (p.InPolygon(polygonpoints.ToArray()))
                         {
                             image.SetPixel(x, y, color);
-                        }
-                    }
-                }
-                foreach (var point in polygonpoints)
-                {
-                    image.SetPixel((int)point.X, (int)point.Y, color);
-                }
-                return;
-
-                PointF[] shape = new PointF[4] {top_left, top_right, bottom_right, bottom_left};
-                for (int x = (int)Math.Min(top_left.X, bottom_left.X); x < Math.Max(top_right.X,bottom_right.X); ++x)
-                {
-                    for (int y = (int)Math.Min(top_left.Y, top_right.Y); y < Math.Max(bottom_left.Y, bottom_right.Y); ++y)
-                    {
-                        if (x >= mapsize || y >= mapsize || x < 0 || y < 0)
-                        {
-                            continue;
-                        }
-                        if (new PointF(x,y).InPolygon(shape))
-                        {
-                            image.SetPixel(x,y,color);
                         }
                     }
                 }

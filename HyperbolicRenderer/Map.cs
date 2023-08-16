@@ -331,26 +331,26 @@ namespace HyperbolicRenderer
         }
         public int volumewidth = 0;
         public float squaresize = 0;
-        public const int extracells = 100;
+        public static int extracells = 4;
 
         public void GenerateVolume(float scale, float offsetx, float offsety, bool infinitevolume) //Scale of 1 will have squares of 20% size, 0.5 = 10% size...
         {
             squaresize = radius * 0.2f * scale;
             if (infinitevolume)
             {
-                while (offsetx > squaresize)
+                while (offsetx > 0)
                 {
                     offsetx -= squaresize;
                 }
-                while (offsetx < -squaresize)
+                while (offsetx < -squaresize * (extracells / 2))
                 {
                     offsetx += squaresize;
                 }
-                while (offsety > squaresize)
+                while (offsety > 0)
                 {
                     offsety -= squaresize;
                 }
-                while (offsety < -squaresize)
+                while (offsety < -squaresize * (extracells / 2))
                 {
                     offsety += squaresize;
                 }

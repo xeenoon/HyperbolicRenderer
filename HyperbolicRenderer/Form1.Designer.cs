@@ -51,6 +51,8 @@
             button2 = new Button();
             checkBox10 = new CheckBox();
             label7 = new Label();
+            label8 = new Label();
+            textBox4 = new TextBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -73,7 +75,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(475, 123);
+            button1.Location = new Point(475, 153);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 2;
@@ -233,7 +235,7 @@
             // checkBox9
             // 
             checkBox9.AutoSize = true;
-            checkBox9.Location = new Point(475, 186);
+            checkBox9.Location = new Point(475, 215);
             checkBox9.Name = "checkBox9";
             checkBox9.Size = new Size(124, 19);
             checkBox9.TabIndex = 18;
@@ -267,7 +269,7 @@
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label5.Location = new Point(475, 158);
+            label5.Location = new Point(475, 187);
             label5.Name = "label5";
             label5.Size = new Size(93, 21);
             label5.TabIndex = 21;
@@ -276,7 +278,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(475, 229);
+            label6.Location = new Point(475, 258);
             label6.Name = "label6";
             label6.Size = new Size(39, 15);
             label6.TabIndex = 22;
@@ -284,7 +286,7 @@
             // 
             // textBox3
             // 
-            textBox3.Location = new Point(520, 225);
+            textBox3.Location = new Point(520, 254);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(99, 23);
             textBox3.TabIndex = 23;
@@ -292,7 +294,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(476, 252);
+            button2.Location = new Point(476, 281);
             button2.Name = "button2";
             button2.Size = new Size(75, 23);
             button2.TabIndex = 24;
@@ -305,7 +307,7 @@
             // checkBox10
             // 
             checkBox10.AutoSize = true;
-            checkBox10.Location = new Point(475, 206);
+            checkBox10.Location = new Point(475, 235);
             checkBox10.Name = "checkBox10";
             checkBox10.Size = new Size(80, 19);
             checkBox10.TabIndex = 25;
@@ -322,11 +324,30 @@
             label7.TabIndex = 26;
             label7.Visible = false;
             // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(454, 128);
+            label8.Name = "label8";
+            label8.Size = new Size(55, 15);
+            label8.TabIndex = 27;
+            label8.Text = "Extra size";
+            // 
+            // textBox4
+            // 
+            textBox4.Location = new Point(519, 125);
+            textBox4.Name = "textBox4";
+            textBox4.Size = new Size(100, 23);
+            textBox4.TabIndex = 28;
+            textBox4.Text = "0";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(textBox4);
+            Controls.Add(label8);
             Controls.Add(label7);
             Controls.Add(checkBox10);
             Controls.Add(button2);
@@ -385,5 +406,7 @@
         private Button button2;
         private CheckBox checkBox10;
         private Label label7;
+        private Label label8;
+        private TextBox textBox4;
     }
 }

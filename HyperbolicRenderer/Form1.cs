@@ -18,6 +18,9 @@ namespace HyperbolicRenderer
         {
             int.TryParse(textBox1.Text, out sides);
             float.TryParse(textBox2.Text, out scale);
+            int inputsize;
+            int.TryParse(textBox4.Text, out inputsize);
+            Map.extracells = inputsize + 4;
             if (sides == -1 || scale == -1)
             {
                 return;
@@ -88,9 +91,9 @@ namespace HyperbolicRenderer
                         //Scale with a red to green to blue gradient
                         float scalingfactor = (((float)i / m.volume.Count));
 
-                        float red=0;
-                        float green=0;
-                        float blue=0;
+                        float red = 0;
+                        float green = 0;
+                        float blue = 0;
                         if (i < m.volume.Count / 3)
                         {
                             red = scalingfactor * 3;
@@ -108,7 +111,7 @@ namespace HyperbolicRenderer
 
 
                         Color result = Color.FromArgb((int)red, (int)green, (int)blue);
-                        
+
                         //trapezium.Draw(fastbmp, true, result, pictureBox1.Width);
                         trapezium.Draw(fastbmp, true, Color.White, pictureBox1.Width, false);
                     }

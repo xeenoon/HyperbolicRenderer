@@ -78,46 +78,48 @@ namespace HyperbolicRenderer
                 for (int i = 0; i < m.volume.Count; i++)
                 {
                     Trapezium trapezium = m.volume[i];
+                    //Scale with a red to green to blue gradient
+                    double scalingfactor = ((((i % Math.Sqrt(m.volume.Count)) * (i / (float)Math.Sqrt(m.volume.Count))) / (float)(m.volume.Count)));
+
+                    if (scalingfactor < 0 || scalingfactor > 1)
+                    {
+                        continue;
+                    }
+
+                    double red = 0;
+                    double green = 0;
+                    double blue = 0;
+                    if (scalingfactor < 0.33f)
+                    {
+                        blue = 255 - ((scalingfactor) * 255);
+                        red = scalingfactor * 3 * 255;
+                    }
+                    else if (scalingfactor < 0.66f)
+                    {
+                        red = 255 - ((scalingfactor - 0.33f) * 3 * 255);
+                        green = (scalingfactor - 0.33f) * 3 * 255;
+                    }
+                    else
+                    {
+                        green = 255 - ((scalingfactor - 0.66f) * 3 * 255);
+                        blue = (scalingfactor - 0.66f) * 3 * 255;
+                    }
+
+
+                    Color result = Color.FromArgb((int)red, (int)green, (int)blue);
+
+
                     if (showdebugdata && straighlines)
                     {
                         trapezium.Draw(fastbmp, e.Graphics, false, Color.Black, pictureBox1.Width, false);
                     }
                     else if (showdebugdata && !showbackground)
                     {
+                        trapezium.Draw(fastbmp, e.Graphics, true, result, pictureBox1.Width);
                         trapezium.Draw(fastbmp, e.Graphics, true, Color.Black, pictureBox1.Width, false);
                     }
                     else
                     {
-                        //Scale with a red to green to blue gradient
-                        double scalingfactor = ((((i % Math.Sqrt(m.volume.Count)) * (i/(float)Math.Sqrt(m.volume.Count))) / (float)(m.volume.Count)));
-
-                        if (scalingfactor < 0 || scalingfactor > 1)
-                        {
-                            continue;
-                        }
-
-                        double red = 0;
-                        double green = 0;
-                        double blue = 0;
-                        if (scalingfactor < 0.33f)
-                        {
-                            blue = 255 - ((scalingfactor) * 255);
-                            red = scalingfactor * 3 * 255;
-                        }
-                        else if (scalingfactor < 0.66f)
-                        {
-                            red = 255 - ((scalingfactor - 0.33f) * 3 * 255);
-                            green = (scalingfactor - 0.33f) * 3 * 255;
-                        }
-                        else
-                        {
-                            green = 255 - ((scalingfactor - 0.66f) * 3 * 255);
-                            blue = (scalingfactor - 0.66f) * 3 * 255;
-                        }
-
-
-                        Color result = Color.FromArgb((int)red, (int)green, (int)blue);
-
                         trapezium.Draw(fastbmp, e.Graphics, true, result, pictureBox1.Width);
                         trapezium.Draw(fastbmp, e.Graphics, true, Color.White, pictureBox1.Width, false);
                     }

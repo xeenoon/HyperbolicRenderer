@@ -75,24 +75,6 @@ namespace HyperbolicRenderer
             if (fill)
             {
                 outerlayer.FillPolygon(new Pen(color).Brush, polygonpoints.ToArray());
-                return;
-                //Fill in the space enclosed by the polygon
-                int minx = (int)polygonpoints.OrderBy(p => p.X).First().X;
-                int maxx = (int)polygonpoints.OrderBy(p => p.X).Last().X;
-                int miny = (int)polygonpoints.OrderBy(p => p.Y).First().Y;
-                int maxy = (int)polygonpoints.OrderBy(p => p.Y).Last().Y;
-
-                for (int x = minx; x < maxx; ++x)
-                {
-                    for (int y = miny; y < maxy; ++y)
-                    {
-                        PointF p = new PointF(x, y);
-                        if (p.InPolygon(polygonpoints.ToArray()))
-                        {
-                            image.SetPixel(x, y, color);
-                        }
-                    }
-                }
             }
         }
         private void DrawCurve(double distance, double m, double c, bool horizontal, double mapsize, BMP image, Color color)
@@ -180,7 +162,14 @@ namespace HyperbolicRenderer
 
                 if (bottom_right.X - top_right.X == 0 && !horizontal) //Check for pure vertical lines
                 {
-                    normalheight = top_right.X;
+                    if (startidx == top_right.X)
+                    {
+                        normalheight = top_right.X;
+                    }
+                    else
+                    {
+                        normalheight = top_left.X;
+                    }
                 }
 
                 //Use pythag to get distance to centre

@@ -96,23 +96,24 @@ namespace HyperbolicRenderer
                         float blue = 0;
                         if (i < m.volume.Count / 3)
                         {
-                            red = scalingfactor * 3;
+                            blue = 255 - ((scalingfactor) * 255);
+                            red = scalingfactor * 3 * 255;
                         }
                         else if (i < m.volume.Count * 0.66f)
                         {
-                            red = 255 - ((scalingfactor - 0.33f) * 3);
-                            green = (scalingfactor - 0.33f) * 3;
+                            red = 255 - ((scalingfactor - 0.33f) * 3 * 255);
+                            green = (scalingfactor - 0.33f) * 3 * 255;
                         }
                         else
                         {
-                            green = 255 - ((scalingfactor - 0.66f) * 3);
-                            blue = (scalingfactor - 0.66f) * 3;
+                            green = 255 - ((scalingfactor - 0.66f) * (2f/3f) * 255);
+                            blue = (scalingfactor - 0.66f) * (2f/3f) * 255;
                         }
 
 
                         Color result = Color.FromArgb((int)red, (int)green, (int)blue);
 
-                        //trapezium.Draw(fastbmp, true, result, pictureBox1.Width);
+                        trapezium.Draw(fastbmp, true, result, pictureBox1.Width);
                         trapezium.Draw(fastbmp, true, Color.White, pictureBox1.Width, false);
                     }
                     //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });

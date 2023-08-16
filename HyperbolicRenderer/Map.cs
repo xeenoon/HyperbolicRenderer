@@ -25,19 +25,9 @@ namespace HyperbolicRenderer
         }
         public static double elapseddrawtime;
         public static double elapsedtrigtime;
+        Stopwatch s = new Stopwatch();
         internal void Draw(BMP image, bool curved, Color color, int mapsize)
         {
-            float modifier;
-            if (top_right.Y > 200)
-            {
-                modifier = 0.505f;
-            }
-            else
-            {
-                modifier = 0.495f;
-            }
-            Stopwatch s = new Stopwatch();
-
             if (curved)
             {
                 //Create a sin wave where ther period/2 == topright-topleft
@@ -51,48 +41,16 @@ namespace HyperbolicRenderer
 
                 var topdistance = top_right.X - top_left.X;
 
-                double a = Math.PI / (topdistance);
+                double m = (top_right.Y - top_left.Y) / topdistance;
+                double c = top_right.Y - m * top_right.X;
 
-                for (float i = 0; i < topdistance; ++i)
-                {
-                    s.Restart();
-                    double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
-                    int x = (int)(i + top_left.X);
-
-                    double m = (top_right.Y - top_left.Y) / topdistance;
-
-                    //y = mx + c
-
-                    //top_right.Y = m*top_right.X + c1
-                    //c = top_right.Y - m*top_right.X
-
-                    double c = top_right.Y - m * top_right.X;
-
-                    double normalheight = m * x + c; //Find the height if it was a straight line
-
-
-                    double ydist = normalheight - (mapsize / 2);
-                    double xdist = x - (mapsize / 2);
-                    double scalingfactor = Math.Abs(ydist) / (mapsize / 2);
-                    scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
-                    scalingfactor = ydist > 0 ? scalingfactor : -scalingfactor;
-
-                    int y = (int)(sin_height*(topdistance) * scalingfactor + normalheight);
-                    if (x >= mapsize || x < 0 || y >= mapsize || y < 0)
-                    {
-                        continue;
-                    }
-                    s.Stop();
-                    elapsedtrigtime += s.ElapsedTicks;
-                    s.Restart();
-                    image.SetPixel(x, y, color);
-                    s.Stop();
-                    elapseddrawtime += s.ElapsedTicks;
-                }
+                DrawCurve(topdistance, m, c, true, mapsize, image, color);
             }
             else
             {
                 s.Restart();
+                DrawLine(top_left, top_right, true, mapsize, image, color);
+                /*
                 var topdistance = top_right.X - top_left.X;
                 for (float i = 0; i < topdistance; ++i)
                 {
@@ -116,71 +74,24 @@ namespace HyperbolicRenderer
                 }
                 s.Stop();
                 elapseddrawtime += s.ElapsedTicks;
-                //graphics.DrawLine(pen,top_left, top_right);
-            }
-            if (top_right.X > 200)
-            {
-                modifier = 0.505f;
-            }
-            else
-            {
-                modifier = 0.495f;
+                //graphics.DrawLine(pen,top_left, top_right);*/
             }
             if (curved)
             {
                 //Sin wave math same as above
-
                 var sidedistance = bottom_right.Y - top_right.Y;
 
-                double a = Math.PI / (sidedistance);
+                double m = sidedistance / (bottom_right.X - top_right.X);
+                double c = bottom_right.Y - m * bottom_right.X;
 
-                for (float i = 0; i < sidedistance; ++i)
-                {
-                    s.Restart();
-                    double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
-                    int y = (int)(i + top_right.Y);
-
-                    double m = sidedistance / (bottom_right.X - top_right.X);
-                    //y = mx + c
-
-                    //bottom_right.Y = m*bottom_right.X + c1
-                    //c = bottom_right.Y - m*bottom_right.X
-
-                    double c = bottom_right.Y - m * bottom_right.X;
-
-                    double normalheight = (y - c)/m; //Find the height if it was a straight line
-
-                    if (bottom_right.X - top_right.X == 0)
-                    {
-                        normalheight = top_right.X;
-                    }
-
-                    //Use pythag to get distance to centre
-                    double ydist = y - (mapsize / 2);
-                    double xdist = normalheight - (mapsize / 2);
-                    
-                    double scalingfactor = Math.Abs(xdist)/(mapsize/2);
-                    scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
-                    scalingfactor = xdist > 0 ? scalingfactor : -scalingfactor;
-
-                    int x = (int)(sin_height * (sidedistance) * scalingfactor + normalheight);
-                    if (x >= mapsize || x < 0 || y >= mapsize || y < 0)
-                    {
-                        continue;
-                    }
-                    s.Stop();
-                    elapsedtrigtime += s.ElapsedTicks;
-                    s.Restart();
-                    image.SetPixel(x, y, color);
-                    s.Stop();
-                    elapseddrawtime += s.ElapsedTicks;
-                }
+                DrawCurve(sidedistance, m, c, false, mapsize, image, color);
             }
             else
             {
                 s.Restart();
+                //DrawLine(top_right, bottom_right, false, mapsize, image, color);
+                //return;
                 var sidedistance = bottom_right.Y - top_right.Y;
-
                 for (float i = 0; i < sidedistance; ++i)
                 {
                     s.Restart();
@@ -205,10 +116,130 @@ namespace HyperbolicRenderer
                     }
                     image.SetPixel((int)x, y, color);
                 }
+
                 s.Stop();
                 elapseddrawtime += s.ElapsedTicks;
             }
 
+        }
+        private void DrawCurve(double distance, double m, double c, bool horizontal, double mapsize, BMP image, Color color)
+        {
+            double a = Math.PI / (distance);
+
+            for (float i = 0; i < distance; ++i)
+            {
+                s.Restart();
+                double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
+                int workingvar;
+                if (horizontal)
+                {
+                    workingvar = (int)(i + top_left.X);
+                }
+                else
+                {
+                    workingvar = (int)(i + top_right.Y);
+                }
+
+                double normalheight;
+                if (horizontal)
+                {
+                    normalheight = m*workingvar + c;
+                }
+                else
+                {
+                    normalheight = (workingvar - c) / m; //Find the height if it was a straight line
+                }
+
+                if (bottom_right.X - top_right.X == 0 && !horizontal) //Check fofr pure vertical lines
+                {
+                    normalheight = top_right.X;
+                }
+
+                //Use pythag to get distance to centre
+
+                double axisdist = normalheight - (mapsize / 2);
+
+                double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
+                scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
+                scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
+
+                int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
+                if (curveheight >= mapsize || curveheight < 0 || workingvar >= mapsize || workingvar < 0)
+                {
+                    continue;
+                }
+                s.Stop();
+                elapsedtrigtime += s.ElapsedTicks;
+                s.Restart();
+                if (horizontal)
+                {
+                    image.SetPixel(workingvar, curveheight, color);
+                }
+                else
+                {
+                    image.SetPixel(curveheight, workingvar, color);
+                }
+                s.Stop();
+                elapseddrawtime += s.ElapsedTicks;
+            }
+        }
+        private void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
+        {
+            if (start.X > end.X && horizontal) //Reversed pointers given?
+            {
+                //Switch them
+                PointF placeholder = new PointF(end.X, end.Y);
+                end = new PointF(start.X, start.Y);
+                start = new PointF(placeholder.X, placeholder.Y);
+            }
+            double distance;
+            double m;
+            double c;
+            if (horizontal)
+            {
+                distance = end.X - start.X;
+                m = (end.Y - start.Y) / distance;
+                c = end.Y - m * end.X;
+            }
+            else
+            {
+                distance = end.Y - start.Y;
+                m = distance / (end.X - start.X);
+                c = end.Y - m * end.X;
+            }
+            for (float i = 0; i < distance; ++i)
+            {
+                int workingvar;
+
+                int resultheight;
+                if (horizontal)
+                {
+                    workingvar = (int)(i + start.X);
+                    resultheight = (int)(m * workingvar + c); //Find the height if it was a straight line
+                }
+                else
+                {
+                    workingvar = (int)(i+start.Y);
+                    resultheight = (int)((workingvar - c) / m); //Find the height if it was a straight line
+
+                    if (end.X - start.X == 0)
+                    {
+                        resultheight = (int)start.X;
+                    }
+                }
+                if (workingvar >= mapsize || workingvar < 0 || resultheight >= mapsize || resultheight < 0)
+                {
+                    continue;
+                }
+                if (horizontal)
+                {
+                    image.SetPixel(workingvar, resultheight, color);
+                }
+                else
+                {
+                    image.SetPixel(resultheight, workingvar, color);
+                }
+            }
         }
     }
     public struct Line

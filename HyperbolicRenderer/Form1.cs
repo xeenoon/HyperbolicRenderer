@@ -24,9 +24,10 @@ namespace HyperbolicRenderer
             }
             xchange = 0;
             ychange = 0;
+            firstdraw = true;
             pictureBox1.Invalidate();
         }
-
+        bool firstdraw = true;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             m = new Map(sides, pictureBox1.Width / 2);
@@ -35,11 +36,19 @@ namespace HyperbolicRenderer
             double gentime = 0;
             m.GenerateShape();
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
+            if (firstdraw)
+            {
+                xchange = -m.squaresize * (Map.extracells / 2);
+                ychange = -m.squaresize * (Map.extracells / 2);
+                m.GenerateVolume(scale, xchange, ychange, infinitemovement);
+                firstdraw = false;
+            }
+
             s.Stop();
 
             gentime += s.ElapsedTicks;
 
-            double finaldraw = 0;
+            double finaldraw;
             s.Restart();
 
             if (sides == -1)
@@ -68,17 +77,40 @@ namespace HyperbolicRenderer
                     Trapezium trapezium = m.volume[i];
                     if (showdebugdata && straighlines)
                     {
-                        trapezium.Draw(fastbmp, false, Color.Black, pictureBox1.Width);
+                        trapezium.Draw(fastbmp, false, Color.Black, pictureBox1.Width, false);
                     }
                     else if (showdebugdata && !showbackground)
                     {
-                        trapezium.Draw(fastbmp, true, Color.Black, pictureBox1.Width);
+                        trapezium.Draw(fastbmp, true, Color.Black, pictureBox1.Width, false);
                     }
                     else
                     {
-                        int scalingfactor = (int)(((float)i/m.volume.Count)*255f);
-                        Color result = Color.FromArgb(scalingfactor, scalingfactor, scalingfactor);
-                        trapezium.Draw(fastbmp, true, result, pictureBox1.Width);
+                        //Scale with a red to green to blue gradient
+                        float scalingfactor = (((float)i / m.volume.Count));
+
+                        float red=0;
+                        float green=0;
+                        float blue=0;
+                        if (i < m.volume.Count / 3)
+                        {
+                            red = scalingfactor * 3;
+                        }
+                        else if (i < m.volume.Count * 0.66f)
+                        {
+                            red = 255 - ((scalingfactor - 0.33f) * 3);
+                            green = (scalingfactor - 0.33f) * 3;
+                        }
+                        else
+                        {
+                            green = 255 - ((scalingfactor - 0.66f) * 3);
+                            blue = (scalingfactor - 0.66f) * 3;
+                        }
+
+
+                        Color result = Color.FromArgb((int)red, (int)green, (int)blue);
+                        
+                        //trapezium.Draw(fastbmp, true, result, pictureBox1.Width);
+                        trapezium.Draw(fastbmp, true, Color.White, pictureBox1.Width, false);
                     }
                     //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
                 }

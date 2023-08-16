@@ -29,53 +29,74 @@ namespace HyperbolicRenderer
         Stopwatch s = new Stopwatch();
         internal void Draw(BMP image, bool curved, Color color, int mapsize, bool fill=true)
         {
+            List<PointF> polygonpoints = new List<PointF>();
             if (curved)
             {
                 var topdistance = top_right.X - top_left.X;
+                var bottomdistance = bottom_right.X - bottom_left.X;
+                var rightdistance = bottom_right.Y - top_right.Y;
+                var leftdistance = bottom_left.Y - top_left.Y;
 
-                double m = (top_right.Y - top_left.Y) / topdistance;
-                double c = top_right.Y - m * top_right.X;
+                double t_m = (top_right.Y - top_left.Y) / topdistance;
+                double t_c = top_right.Y - t_m * top_right.X;
+
+
+                double b_m = (bottom_right.Y - bottom_left.Y) / bottomdistance;
+                double b_c = bottom_right.Y - b_m * bottom_right.X;
+
+                double r_m = rightdistance / (bottom_right.X - top_right.X);
+                double r_c = bottom_right.Y - r_m * bottom_right.X;
+                
+                double l_m = leftdistance / (bottom_left.X - top_left.X);
+                double l_c = bottom_left.Y - l_m * bottom_left.X;
+
                 if (fill)
                 {
-                    FillCurve(topdistance, m, c, true, mapsize, image, color);
+                    polygonpoints.AddRange(CurvePoints(topdistance, t_m, t_c, true, (int)top_left.X, mapsize, image, color));
+                    polygonpoints.AddRange(CurvePoints(rightdistance, r_m, r_c, false, (int)top_right.Y, mapsize, image, color));
+                    polygonpoints.AddRange(CurvePoints(bottomdistance, b_m, b_c, true, (int)bottom_left.X, mapsize, image, color).Reverse());
+                    polygonpoints.AddRange(CurvePoints(leftdistance, l_m, l_c, false, (int)top_left.Y, mapsize, image, color).Reverse());
                 }
                 else
                 {
-                    DrawCurve(topdistance, m, c, true, mapsize, image, color);
+                    DrawCurve(topdistance, t_m, t_c, true, mapsize, image, color);
+                    DrawCurve(rightdistance, r_m, r_c, false, mapsize, image, color);
                 }
             }
             else
             {
                 s.Restart();
                 DrawLine(top_left, top_right, true, mapsize, image, color);
-            }
-            if (curved)
-            {
-                //Sin wave math same as above
-                var sidedistance = bottom_right.Y - top_right.Y;
-
-                double m = sidedistance / (bottom_right.X - top_right.X);
-                double c = bottom_right.Y - m * bottom_right.X;
-                if (fill)
-                {
-                    FillCurve(sidedistance, m, c, false, mapsize, image, color);
-                }
-                else
-                {
-                    DrawCurve(sidedistance, m, c, false, mapsize, image, color);
-                }
-            }
-            else
-            {
-                s.Restart();
                 DrawLine(top_right, bottom_right, false, mapsize, image, color);
-
                 s.Stop();
                 elapseddrawtime += s.ElapsedTicks;
             }
 
             if (fill)
             {
+                //Fill in the space enclosed by the polygon
+                int minx = (int)polygonpoints.OrderBy(p => p.X).First().X;
+                int maxx = (int)polygonpoints.OrderBy(p => p.X).Last().X;
+                int miny = (int)polygonpoints.OrderBy(p => p.Y).First().Y;
+                int maxy = (int)polygonpoints.OrderBy(p => p.Y).Last().Y;
+
+                for (int x = minx; x < maxx; ++x)
+                {
+                    for (int y = miny; y < maxy; ++y)
+                    {
+                        PointF p = new PointF(x, y);
+                        if (p.InPolygon(polygonpoints.ToArray()))
+                        {
+                            image.SetPixel(x, y, color);
+                        }
+                    }
+                }
+                foreach (var point in polygonpoints)
+                {
+                    image.SetPixel((int)point.X, (int)point.Y, color);
+                }
+                return;
+
                 PointF[] shape = new PointF[4] {top_left, top_right, bottom_right, bottom_left};
                 for (int x = (int)Math.Min(top_left.X, bottom_left.X); x < Math.Max(top_right.X,bottom_right.X); ++x)
                 {
@@ -154,7 +175,7 @@ namespace HyperbolicRenderer
                 elapseddrawtime += s.ElapsedTicks;
             }
         }
-        private void FillCurve(double distance, double m, double c, bool horizontal, double mapsize, BMP image, Color color)
+        private PointF[] CurvePoints(double distance, double m, double c, bool horizontal, int startidx, double mapsize, BMP image, Color color)
         {
             PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
             double a = Math.PI / (distance);
@@ -163,15 +184,8 @@ namespace HyperbolicRenderer
             for (float i = 0; i < distance; ++i)
             {
                 double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
-                int workingvar;
-                if (horizontal)
-                {
-                    workingvar = (int)(i + top_left.X);
-                }
-                else
-                {
-                    workingvar = (int)(i + top_right.Y);
-                }
+                int workingvar = (int)(i + startidx);
+
 
                 double normalheight;
                 if (horizontal)
@@ -183,7 +197,7 @@ namespace HyperbolicRenderer
                     normalheight = (workingvar - c) / m; //Find the height if it was a straight line
                 }
 
-                if (bottom_right.X - top_right.X == 0 && !horizontal) //Check fofr pure vertical lines
+                if (bottom_right.X - top_right.X == 0 && !horizontal) //Check for pure vertical lines
                 {
                     normalheight = top_right.X;
                 }
@@ -197,8 +211,8 @@ namespace HyperbolicRenderer
                 scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
 
                 int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
-                curveheight = (int)Math.Min(curveheight, mapsize);
-                workingvar = (int)Math.Min(workingvar, mapsize);
+                curveheight = (int)Math.Min(curveheight, mapsize-1);
+                workingvar = (int)Math.Min(workingvar, mapsize-1);
                 workingvar = (int)Math.Max(workingvar, 0);
                 curveheight = (int)Math.Max(curveheight, 0);
 
@@ -214,23 +228,7 @@ namespace HyperbolicRenderer
             s.Stop();
             elapsedtrigtime += s.ElapsedTicks;
 
-            //Fill in the space enclosed by the polygon
-            int minx = (int)polygonpoints.OrderBy(p => p.X).First().X;
-            int maxx = (int)polygonpoints.OrderBy(p => p.X).Last() .X;
-            int miny = (int)polygonpoints.OrderBy(p => p.Y).First().Y;
-            int maxy = (int)polygonpoints.OrderBy(p => p.Y).Last(). Y;
-
-            for (int x = minx; x < maxx; ++x)
-            {
-                for (int y = miny; y < maxy; ++y)
-                {
-                    PointF p = new PointF(x,y);
-                    if (p.InPolygon(polygonpoints))
-                    {
-                        image.SetPixel(x,y,color);
-                    }
-                }
-            }
+            return polygonpoints;
         }
         private void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
         {
@@ -333,6 +331,8 @@ namespace HyperbolicRenderer
         }
         public int volumewidth = 0;
         public float squaresize = 0;
+        public const int extracells = 100;
+
         public void GenerateVolume(float scale, float offsetx, float offsety, bool infinitevolume) //Scale of 1 will have squares of 20% size, 0.5 = 10% size...
         {
             squaresize = radius * 0.2f * scale;
@@ -356,7 +356,6 @@ namespace HyperbolicRenderer
                 }
             }
 
-            const int extracells = 3;
             volumewidth = (int)Math.Ceiling((radius * 2) / squaresize) + 1 + extracells;
             connections = new PointF[(volumewidth) * (volumewidth)];
             oldconnections = new PointF[(volumewidth) * (volumewidth)]; //debugdata
@@ -538,7 +537,7 @@ namespace HyperbolicRenderer
                     ay += y_scale;
                     ax += x_scale;
 
-                    connections[x + y * (volumewidth)] = new PointF(ax * squaresize - (extracells/2)*squaresize, ay * squaresize - (extracells / 2) * squaresize);
+                    connections[x + y * (volumewidth)] = new PointF(ax * squaresize, ay * squaresize);
                     oldconnections[x + y * (volumewidth)] = relativepoint;
                 }
             }

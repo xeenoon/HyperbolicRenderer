@@ -30,15 +30,6 @@ namespace HyperbolicRenderer
         {
             if (curved)
             {
-                //Create a sin wave where ther period/2 == topright-topleft
-                //This will get the first crest
-
-                // y = sin(ax) where period = 2pi/a
-                // (2pi/a)/2 = topright - topleft
-                // 2pi/a = 2*(topright-topleft)
-                // a = 2pi / 2(topright-topleft)
-                // a = pi/(topright-topleft)
-
                 var topdistance = top_right.X - top_left.X;
 
                 double m = (top_right.Y - top_left.Y) / topdistance;
@@ -50,31 +41,6 @@ namespace HyperbolicRenderer
             {
                 s.Restart();
                 DrawLine(top_left, top_right, true, mapsize, image, color);
-                /*
-                var topdistance = top_right.X - top_left.X;
-                for (float i = 0; i < topdistance; ++i)
-                {
-                    int x = (int)(i + top_left.X);
-
-                    double m = (top_right.Y - top_left.Y) / topdistance;
-
-                    //y = mx + c
-
-                    //top_right.Y = m*top_right.X + c1
-                    //c = top_right.Y - m*top_right.X
-
-                    double c = top_right.Y - m * top_right.X;
-
-                    double y = m * x + c; //Find the height if it was a straight line
-                    if (x >= mapsize || x < 0 || y >= mapsize || y < 0)
-                    {
-                        continue;
-                    }
-                    image.SetPixel(x, (int)y, color);
-                }
-                s.Stop();
-                elapseddrawtime += s.ElapsedTicks;
-                //graphics.DrawLine(pen,top_left, top_right);*/
             }
             if (curved)
             {
@@ -89,33 +55,7 @@ namespace HyperbolicRenderer
             else
             {
                 s.Restart();
-                //DrawLine(top_right, bottom_right, false, mapsize, image, color);
-                //return;
-                var sidedistance = bottom_right.Y - top_right.Y;
-                for (float i = 0; i < sidedistance; ++i)
-                {
-                    s.Restart();
-                    int y = (int)(i + top_right.Y);
-
-                    double m = sidedistance / (bottom_right.X - top_right.X);
-                    //y = mx + c
-
-                    //bottom_right.Y = m*bottom_right.X + c1
-                    //c = bottom_right.Y - m*bottom_right.X
-
-                    double c = bottom_right.Y - m * bottom_right.X;
-
-                    double x = (y - c) / m; //Find the height if it was a straight line
-                    if (bottom_right.X - top_right.X == 0)
-                    {
-                        x = top_right.X;
-                    }
-                    if (x >= mapsize || x < 0 || y >= mapsize || y < 0)
-                    {
-                        continue;
-                    }
-                    image.SetPixel((int)x, y, color);
-                }
+                DrawLine(top_right, bottom_right, false, mapsize, image, color);
 
                 s.Stop();
                 elapseddrawtime += s.ElapsedTicks;
@@ -182,6 +122,10 @@ namespace HyperbolicRenderer
                 s.Stop();
                 elapseddrawtime += s.ElapsedTicks;
             }
+        }
+        private void FillCurve(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
+        {
+            
         }
         private void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
         {

@@ -356,7 +356,8 @@ namespace HyperbolicRenderer
                 }
             }
 
-            volumewidth = (int)Math.Ceiling((radius * 2) / squaresize) + 1;
+            const int extracells = 3;
+            volumewidth = (int)Math.Ceiling((radius * 2) / squaresize) + 1 + extracells;
             connections = new PointF[(volumewidth) * (volumewidth)];
             oldconnections = new PointF[(volumewidth) * (volumewidth)]; //debugdata
             sideconnections = new Line[(volumewidth) * (volumewidth)]; //debugdata
@@ -537,7 +538,7 @@ namespace HyperbolicRenderer
                     ay += y_scale;
                     ax += x_scale;
 
-                    connections[x + y * (volumewidth)] = new PointF(ax * squaresize, ay * squaresize);
+                    connections[x + y * (volumewidth)] = new PointF(ax * squaresize - (extracells/2)*squaresize, ay * squaresize - (extracells / 2) * squaresize);
                     oldconnections[x + y * (volumewidth)] = relativepoint;
                 }
             }

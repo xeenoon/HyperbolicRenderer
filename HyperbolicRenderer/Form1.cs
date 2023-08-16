@@ -29,7 +29,7 @@ namespace HyperbolicRenderer
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            m = new Map(sides, pictureBox1.Width / 2f);
+            m = new Map(sides, pictureBox1.Width / 2);
             Stopwatch s = new Stopwatch();
             s.Start();
             double gentime = 0;
@@ -63,8 +63,9 @@ namespace HyperbolicRenderer
             Bitmap volumebmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             using (BMP fastbmp = new BMP(volumebmp))
             {
-                foreach (var trapezium in m.volume)
+                for (int i = 0; i < m.volume.Count; i++)
                 {
+                    Trapezium trapezium = m.volume[i];
                     if (showdebugdata && straighlines)
                     {
                         trapezium.Draw(fastbmp, false, Color.Black, pictureBox1.Width);
@@ -75,7 +76,9 @@ namespace HyperbolicRenderer
                     }
                     else
                     {
-                        trapezium.Draw(fastbmp, true, Color.White, pictureBox1.Width);
+                        int scalingfactor = (int)(((float)i/m.volume.Count)*255f);
+                        Color result = Color.FromArgb(scalingfactor, scalingfactor, scalingfactor);
+                        trapezium.Draw(fastbmp, true, result, pictureBox1.Width);
                     }
                     //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
                 }

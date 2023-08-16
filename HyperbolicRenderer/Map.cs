@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.Logging;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
@@ -26,7 +27,7 @@ namespace HyperbolicRenderer
         public static double elapseddrawtime;
         public static double elapsedtrigtime;
         Stopwatch s = new Stopwatch();
-        internal void Draw(BMP image, bool curved, Color color, int mapsize)
+        internal void Draw(BMP image, bool curved, Color color, int mapsize, bool fill=true)
         {
             if (curved)
             {
@@ -34,8 +35,14 @@ namespace HyperbolicRenderer
 
                 double m = (top_right.Y - top_left.Y) / topdistance;
                 double c = top_right.Y - m * top_right.X;
-
-                DrawCurve(topdistance, m, c, true, mapsize, image, color);
+                if (fill)
+                {
+                    FillCurve(topdistance, m, c, true, mapsize, image, color);
+                }
+                else
+                {
+                    DrawCurve(topdistance, m, c, true, mapsize, image, color);
+                }
             }
             else
             {
@@ -49,8 +56,14 @@ namespace HyperbolicRenderer
 
                 double m = sidedistance / (bottom_right.X - top_right.X);
                 double c = bottom_right.Y - m * bottom_right.X;
-
-                DrawCurve(sidedistance, m, c, false, mapsize, image, color);
+                if (fill)
+                {
+                    FillCurve(sidedistance, m, c, false, mapsize, image, color);
+                }
+                else
+                {
+                    DrawCurve(sidedistance, m, c, false, mapsize, image, color);
+                }
             }
             else
             {
@@ -61,11 +74,29 @@ namespace HyperbolicRenderer
                 elapseddrawtime += s.ElapsedTicks;
             }
 
+            if (fill)
+            {
+                PointF[] shape = new PointF[4] {top_left, top_right, bottom_right, bottom_left};
+                for (int x = (int)Math.Min(top_left.X, bottom_left.X); x < Math.Max(top_right.X,bottom_right.X); ++x)
+                {
+                    for (int y = (int)Math.Min(top_left.Y, top_right.Y); y < Math.Max(bottom_left.Y, bottom_right.Y); ++y)
+                    {
+                        if (x >= mapsize || y >= mapsize || x < 0 || y < 0)
+                        {
+                            continue;
+                        }
+                        if (new PointF(x,y).InPolygon(shape))
+                        {
+                            image.SetPixel(x,y,color);
+                        }
+                    }
+                }
+            }
         }
         private void DrawCurve(double distance, double m, double c, bool horizontal, double mapsize, BMP image, Color color)
         {
             double a = Math.PI / (distance);
-
+            
             for (float i = 0; i < distance; ++i)
             {
                 s.Restart();
@@ -123,9 +154,83 @@ namespace HyperbolicRenderer
                 elapseddrawtime += s.ElapsedTicks;
             }
         }
-        private void FillCurve(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
+        private void FillCurve(double distance, double m, double c, bool horizontal, double mapsize, BMP image, Color color)
         {
+            PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
+            double a = Math.PI / (distance);
             
+            s.Restart();
+            for (float i = 0; i < distance; ++i)
+            {
+                double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
+                int workingvar;
+                if (horizontal)
+                {
+                    workingvar = (int)(i + top_left.X);
+                }
+                else
+                {
+                    workingvar = (int)(i + top_right.Y);
+                }
+
+                double normalheight;
+                if (horizontal)
+                {
+                    normalheight = m * workingvar + c;
+                }
+                else
+                {
+                    normalheight = (workingvar - c) / m; //Find the height if it was a straight line
+                }
+
+                if (bottom_right.X - top_right.X == 0 && !horizontal) //Check fofr pure vertical lines
+                {
+                    normalheight = top_right.X;
+                }
+
+                //Use pythag to get distance to centre
+
+                double axisdist = normalheight - (mapsize / 2);
+
+                double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
+                scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
+                scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
+
+                int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
+                curveheight = (int)Math.Min(curveheight, mapsize);
+                workingvar = (int)Math.Min(workingvar, mapsize);
+                workingvar = (int)Math.Max(workingvar, 0);
+                curveheight = (int)Math.Max(curveheight, 0);
+
+                if(horizontal)
+                {
+                    polygonpoints[(int)i] = new PointF(workingvar, curveheight);
+                }
+                else
+                {
+                    polygonpoints[(int)i] = new PointF(curveheight, workingvar);
+                }
+            }
+            s.Stop();
+            elapsedtrigtime += s.ElapsedTicks;
+
+            //Fill in the space enclosed by the polygon
+            int minx = (int)polygonpoints.OrderBy(p => p.X).First().X;
+            int maxx = (int)polygonpoints.OrderBy(p => p.X).Last() .X;
+            int miny = (int)polygonpoints.OrderBy(p => p.Y).First().Y;
+            int maxy = (int)polygonpoints.OrderBy(p => p.Y).Last(). Y;
+
+            for (int x = minx; x < maxx; ++x)
+            {
+                for (int y = miny; y < maxy; ++y)
+                {
+                    PointF p = new PointF(x,y);
+                    if (p.InPolygon(polygonpoints))
+                    {
+                        image.SetPixel(x,y,color);
+                    }
+                }
+            }
         }
         private void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
         {

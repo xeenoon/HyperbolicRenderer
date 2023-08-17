@@ -57,10 +57,10 @@ namespace HyperbolicRenderer
 
                     }
 
-                    polygonpoints.AddRange(CurvePoints(topdistance, t_m, t_c, true, (int)top_left.X, mapsize, image, color));
-                    polygonpoints.AddRange(CurvePoints(rightdistance, r_m, r_c, false, (int)top_right.Y, mapsize, image, color));
-                    polygonpoints.AddRange(CurvePoints(bottomdistance, b_m, b_c, true, (int)bottom_left.X, mapsize, image, color).Reverse());
-                    polygonpoints.AddRange(CurvePoints(leftdistance, l_m, l_c, false, (int)top_left.Y, mapsize, image, color).Reverse());
+                    polygonpoints.AddRange(CurvePoints(topdistance, t_m, t_c, Side.Top, (int)top_left.X, mapsize));
+                    polygonpoints.AddRange(CurvePoints(rightdistance, r_m, r_c, Side.Right, (int)top_right.Y, mapsize));
+                    polygonpoints.AddRange(CurvePoints(bottomdistance, b_m, b_c, Side.Bottom, (int)bottom_left.X, mapsize).Reverse());
+                    polygonpoints.AddRange(CurvePoints(leftdistance, l_m, l_c, Side.Left, (int)top_left.Y, mapsize).Reverse());
                 }
                 else
                 {
@@ -143,11 +143,18 @@ namespace HyperbolicRenderer
                 elapseddrawtime += s.ElapsedTicks;
             }
         }
-        private PointF[] CurvePoints(double distance, double m, double c, bool horizontal, int startidx, double mapsize, BMP image, Color color)
+        enum Side
+        {
+            Top,
+            Right,
+            Bottom,
+            Left
+        }
+        private PointF[] CurvePoints(double distance, double m, double c, Side side, int startidx, double mapsize)
         {
             if (startidx > mapsize-distance || startidx < 0)
             {
-             //   return new PointF[0];
+                return new PointF[0];
             }
             PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
             double a = Math.PI / (distance);
@@ -160,7 +167,7 @@ namespace HyperbolicRenderer
 
 
                 double normalheight;
-                if (horizontal)
+                if (side == Side.Top || side == Side.Bottom)
                 {
                     normalheight = m * workingvar + c;
                 }
@@ -169,23 +176,14 @@ namespace HyperbolicRenderer
                     normalheight = (workingvar - c) / m; //Find the height if it was a straight line
                 }
 
-                if (!horizontal) //Check for pure vertical lines
-                {
-                    if (startidx == (int)top_right.Y && double.IsNaN(normalheight))
-                    {
-                        normalheight = (top_right.X + bottom_right.X)/2;
-                    }
-                    else if(startidx == (int)top_left.Y && double.IsNaN(normalheight))
-                    {
-                        normalheight = top_left.X;
-                    }
-                }
-                else
-                {
-                    if (double.IsNaN(normalheight))
-                    {
 
-                    }
+                if (side == Side.Right && double.IsNaN(normalheight))
+                {
+                    normalheight = top_right.X;
+                }
+                else if (side == Side.Left && double.IsNaN(normalheight))
+                {
+                    normalheight = top_left.X;
                 }
 
                 //Use pythag to get distance to centre
@@ -202,7 +200,7 @@ namespace HyperbolicRenderer
                 workingvar = (int)Math.Max(workingvar, 0);
                 curveheight = (int)Math.Max(curveheight, 0);
 
-                if(horizontal)
+                if (side == Side.Top || side == Side.Bottom)
                 {
                     polygonpoints[(int)i] = new PointF(workingvar, curveheight);
                 }

@@ -52,6 +52,11 @@ namespace HyperbolicRenderer
 
                 if (fill)
                 {
+                    if (top_left.X > top_right.X)
+                    {
+
+                    }
+
                     polygonpoints.AddRange(CurvePoints(topdistance, t_m, t_c, true, (int)top_left.X, mapsize, image, color));
                     polygonpoints.AddRange(CurvePoints(rightdistance, r_m, r_c, false, (int)top_right.Y, mapsize, image, color));
                     polygonpoints.AddRange(CurvePoints(bottomdistance, b_m, b_c, true, (int)bottom_left.X, mapsize, image, color).Reverse());
@@ -72,7 +77,7 @@ namespace HyperbolicRenderer
                 elapseddrawtime += s.ElapsedTicks;
             }
 
-            if (fill)
+            if (fill && polygonpoints.Count() != 0)
             {
                 outerlayer.FillPolygon(new Pen(color).Brush, polygonpoints.ToArray());
             }
@@ -140,6 +145,10 @@ namespace HyperbolicRenderer
         }
         private PointF[] CurvePoints(double distance, double m, double c, bool horizontal, int startidx, double mapsize, BMP image, Color color)
         {
+            if (startidx > mapsize-distance || startidx < 0)
+            {
+             //   return new PointF[0];
+            }
             PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
             double a = Math.PI / (distance);
             
@@ -160,15 +169,22 @@ namespace HyperbolicRenderer
                     normalheight = (workingvar - c) / m; //Find the height if it was a straight line
                 }
 
-                if (bottom_right.X - top_right.X == 0 && !horizontal) //Check for pure vertical lines
+                if (!horizontal) //Check for pure vertical lines
                 {
-                    if (startidx == top_right.X)
+                    if (startidx == (int)top_right.Y && double.IsNaN(normalheight))
                     {
-                        normalheight = top_right.X;
+                        normalheight = (top_right.X + bottom_right.X)/2;
                     }
-                    else
+                    else if(startidx == (int)top_left.Y && double.IsNaN(normalheight))
                     {
                         normalheight = top_left.X;
+                    }
+                }
+                else
+                {
+                    if (double.IsNaN(normalheight))
+                    {
+
                     }
                 }
 

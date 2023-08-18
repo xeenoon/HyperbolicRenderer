@@ -32,6 +32,7 @@ namespace HyperbolicRenderer
             }
         }
         public List<Trapezium> volume = new List<Trapezium>();
+        public List<Trapezium> unadjustedvolume = new List<Trapezium>();
         public float radius;
         public PointF[] connections;
         public PointF[] oldconnections;
@@ -113,7 +114,9 @@ namespace HyperbolicRenderer
                     int ay = y * volumewidth; //Adjusted y
 
                     PointF[] points = new PointF[] { connections[x + ay], connections[x + (ay + volumewidth)], connections[(x + 1) + ay], connections[(x + 1) + (ay + volumewidth)] };
+                    PointF[] unadjustedpoints = new PointF[] { oldconnections[x + ay], oldconnections[x + (ay + volumewidth)], oldconnections[(x + 1) + ay], oldconnections[(x + 1) + (ay + volumewidth)] };
                     volume.Add(new Trapezium(points[0], points[1], points[2], points[3]));
+                    unadjustedvolume.Add(new Trapezium(unadjustedpoints[0], unadjustedpoints[1], unadjustedpoints[2], unadjustedpoints[3]));
                 }
             }
 
@@ -126,7 +129,7 @@ namespace HyperbolicRenderer
                 PointF centre = new PointF(shape.centre.X + offsetx, shape.centre.Y + offsety);
                 debugpoints.Add(centre);
                 List<PointF> closestpoints = new List<PointF>();
-                closestpoints = volume.Where(v=>centre.InPolygon(v.points)).FirstOrDefault().points.ToList();
+                closestpoints = volume[unadjustedvolume.FindIndex(v=>centre.InPolygon(v.points))].points.ToList();
                 
                 PointF newcentre = StretchShapePoint(offsetx, offsety, closestpoints, centre);
 

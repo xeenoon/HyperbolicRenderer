@@ -36,9 +36,10 @@ namespace HyperbolicRenderer
             m = new Map(sides, pictureBox1.Width / 2);
             Stopwatch s = new Stopwatch();
             s.Start();
-            double gentime = 0;
-            m.GenerateShape();
-            m.GenerateVolume(scale, xchange, ychange, infinitemovement);
+
+            
+            m.AddShape(m.CreateShape(5, 50), new PointF(300, 200));
+
             if (firstdraw)
             {
                 xchange = -m.squaresize * (Map.extracells / 2);
@@ -46,6 +47,12 @@ namespace HyperbolicRenderer
                 m.GenerateVolume(scale, xchange, ychange, infinitemovement);
                 firstdraw = false;
             }
+
+            double gentime = 0;
+            m.GenerateShape();
+            m.GenerateVolume(scale, xchange, ychange, infinitemovement);
+
+            
 
             s.Stop();
 
@@ -126,6 +133,12 @@ namespace HyperbolicRenderer
                     //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
                 }
             }
+
+            foreach (var shape in m.adjustedshapes)
+            {
+                e.Graphics.FillPolygon(new Pen(Color.LightBlue).Brush, shape);
+            }
+
             e.Graphics.DrawImage(volumebmp, 0, 0);
             if (showdebugdata)
             {

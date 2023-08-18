@@ -41,6 +41,14 @@ namespace HyperbolicRenderer
             intersection = new PointF(intersection.X - p.X, intersection.Y - p.Y);
             return intersection;
         }
+        public static double DistanceTo(this PointF p, PointF destination)
+        {
+            return Math.Sqrt(Math.Pow(destination.X - p.X,2) + Math.Pow(destination.Y - p.Y, 2));
+        }
+        public static double Magnitude(this PointF p)
+        {
+            return Math.Sqrt(p.X * p.X + p.Y * p.Y);
+        }
         public static PointF[] CreateShape(int points, float radius)
         {
             PointF[] result = new PointF[points];

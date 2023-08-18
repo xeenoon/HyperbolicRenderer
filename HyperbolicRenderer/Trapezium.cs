@@ -19,7 +19,14 @@ namespace HyperbolicRenderer
         public static double elapseddrawtime;
         public static double elapsedtrigtime;
         Stopwatch s = new Stopwatch();
-        List<PointF> polygonpoints = new List<PointF>();
+        public List<PointF> polygonpoints = new List<PointF>();
+        public PointF[] points
+        {
+            get
+            {
+                return new PointF[4] {top_left, top_right, bottom_right, bottom_left};
+            }
+        }
         internal void Draw(BMP image, Graphics outerlayer, bool curved, Color color, int mapsize, bool fill=true)
         {
             polygonpoints.Clear();
@@ -132,11 +139,37 @@ namespace HyperbolicRenderer
         {
             originalpoints = points;
         }
-        public void Draw(Graphics graphics, Color color, int mapsize)
+        public void Draw(Graphics graphics, Color color, int mapsize, List<Trapezium> trapeziums)
         {
             for (int i = 0; i < originalpoints.Count(); ++i)
             {
+                PointF point = originalpoints[i];
+                Trapezium background = null;
+                foreach (var trapezium in trapeziums)
+                {
+                    if (point.InPolygon(trapezium.polygonpoints.ToArray()))
+                    {
+                        background = trapezium;
+                        break;
+                    }
+                }
 
+                List<Line> lines = new List<Line>() { new Line(background.top_left, background.top_right) , new Line(background.top_right, background.bottom_right), new Line(background.bottom_right, background.bottom_left), new Line(background.bottom_left, background.top_left)};
+                double mindistance = double.MaxValue;
+                Line closestline = lines[0];
+                foreach (var line in lines)
+                {
+                    double distance = point.DistanceTo(line).Magnitude();
+                    if (distance < mindistance)
+                    {
+                        mindistance = distance;
+                        closestline = line;
+                    }
+                }
+                var end = closestline.end;
+                var start = closestline.start;
+
+                //var curve = AdjustPoint(closestline.start, closestline.end, mapsize, point);
             }
         }
         public static PointF[] CurvePoints(PointF start, PointF end, double mapsize)
@@ -152,7 +185,88 @@ namespace HyperbolicRenderer
             double c;
             int startidx;
 
-            if (end.X - start.X > end.Y-start.Y)
+            if (end.X - start.X > end.Y - start.Y)
+            {
+                startidx = (int)start.X;
+                horizontal = true;
+                distance = end.X - start.X;
+                m = (end.Y - start.Y) / distance;
+                c = end.Y - m * end.X;
+            }
+            else
+            {
+                startidx = (int)start.Y;
+                horizontal = false;
+                distance = end.Y - start.Y;
+                m = distance / (end.X - start.X);
+                c = end.Y - m * end.X;
+            }
+
+            PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
+            double a = Math.PI / (distance);
+
+            for (float i = 0; i < distance; ++i)
+            {
+                double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
+                int workingvar = (int)(i + startidx);
+
+
+                double normalheight;
+                if (horizontal)
+                {
+                    normalheight = m * workingvar + c;
+                }
+                else
+                {
+                    normalheight = (workingvar - c) / m; //Find the height if it was a straight line
+                }
+
+
+                if (double.IsNaN(normalheight))
+                {
+                    normalheight = start.X;
+                }
+
+                //Use pythag to get distance to centre
+
+                double axisdist = normalheight - (mapsize / 2);
+
+                double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
+                scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
+                scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
+
+                int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
+                curveheight = (int)Math.Min(curveheight, mapsize - 1);
+                workingvar = (int)Math.Min(workingvar, mapsize - 1);
+                workingvar = (int)Math.Max(workingvar, 0);
+                curveheight = (int)Math.Max(curveheight, 0);
+
+                if (horizontal)
+                {
+                    polygonpoints[(int)i] = new PointF(workingvar, curveheight);
+                }
+                else
+                {
+                    polygonpoints[(int)i] = new PointF(curveheight, workingvar);
+                }
+            }
+
+            return polygonpoints;
+        }
+        public static PointF[] CurvePoints(PointF start, PointF end, PointF changingstart, PointF changingend, double mapsize)
+        {
+            if (start.X < 0 || start.X > mapsize || start.Y < 0 || start.Y > mapsize)
+            {
+                return new PointF[0];
+            }
+
+            bool horizontal;
+            double distance;
+            double m;
+            double c;
+            int startidx;
+
+            if (end.X - start.X > end.Y - start.Y)
             {
                 startidx = (int)start.X;
                 horizontal = true;

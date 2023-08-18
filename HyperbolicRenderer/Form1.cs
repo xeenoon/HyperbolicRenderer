@@ -39,7 +39,7 @@ namespace HyperbolicRenderer
 
             //CurvedShape shape = new(Extensions.CreateShape(5, 50));
 
-            m.AddShape(Extensions.CreateShape(5, 50), new PointF(300, 200));
+            m.AddShape(Extensions.CreateShape(5, 15), new PointF(185, 185));
 
             if (firstdraw)
             {
@@ -145,7 +145,6 @@ namespace HyperbolicRenderer
             {
                 for (int i = 0; i < m.oldconnections.Length; i++)
                 {
-
                     PointF connection = m.connections[i];
                     PointF oldconnection = m.oldconnections[i];
                     if (showpointmovement)
@@ -165,6 +164,10 @@ namespace HyperbolicRenderer
                     {
                         e.Graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
                     }
+                }
+                foreach (var point in m.closestpoints) 
+                {
+                    e.Graphics.FillEllipse(new Pen(Color.SaddleBrown).Brush, point.X-2, point.Y-2, 4, 4);
                 }
             }
 

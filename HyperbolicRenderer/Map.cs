@@ -184,8 +184,6 @@ namespace HyperbolicRenderer
                         new PointF((((closestpoints[2].X - point.X)))*distances[2], (((closestpoints[2].Y - point.Y)) ) * (distances[2])),
                         new PointF((((closestpoints[3].X - point.X)))*distances[3], (((closestpoints[3].Y - point.Y)) ) * (distances[3]))
                     };
-
-
             PointF moveamount = new PointF(moveeffects.Sum(s => s.X), moveeffects.Sum(s => s.Y));
             return new PointF(moveamount.X + point.X, moveamount.Y + point.Y);
         }
@@ -194,7 +192,7 @@ namespace HyperbolicRenderer
         {
             float turningtime = squaresize;
             int debugidx = (int)((relativepoint.X - offsetx) / squaresize + ((relativepoint.Y - offsety) / squaresize) * volumewidth);
-            PointF scalar = SinScale(turningtime, relativepoint, radius, true, debugidx);
+            PointF scalar = SinScale(turningtime, relativepoint, true, debugidx);
 
             float ay = (relativepoint.Y - offsety) / squaresize;
             float ax = (relativepoint.X - offsetx) / squaresize;
@@ -214,7 +212,7 @@ namespace HyperbolicRenderer
             return new PointF(ax, ay);
         }
 
-        public PointF SinScale(double turningtime, PointF relativepoint, float radius, bool showdebug = false, int debugidx = 0)
+        public PointF SinScale(double turningtime, PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
             float y_scale;
             float x_scale;

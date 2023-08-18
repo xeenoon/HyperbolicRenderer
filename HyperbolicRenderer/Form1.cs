@@ -53,8 +53,6 @@ namespace HyperbolicRenderer
             m.GenerateShape();
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
 
-            
-
             s.Stop();
 
             gentime += s.ElapsedTicks;
@@ -119,17 +117,17 @@ namespace HyperbolicRenderer
 
                     if (showdebugdata && straighlines)
                     {
-                        trapezium.Draw(fastbmp, e.Graphics, false, Color.Black, pictureBox1.Width, false);
+                        trapezium.Draw(fastbmp, e.Graphics, false, Color.White, m, false);
                     }
                     else if (showdebugdata && !showbackground)
                     {
-                        trapezium.Draw(fastbmp, e.Graphics, true, result, pictureBox1.Width);
-                        trapezium.Draw(fastbmp, e.Graphics, true, Color.Black, pictureBox1.Width, false);
+                        trapezium.Draw(fastbmp, e.Graphics, true, result, m);
+                        trapezium.Draw(fastbmp, e.Graphics, true, Color.White, m, false);
                     }
                     else
                     {
-                        trapezium.Draw(fastbmp, e.Graphics, true, result, pictureBox1.Width);
-                        trapezium.Draw(fastbmp, e.Graphics, true, Color.White, pictureBox1.Width, false);
+                        trapezium.Draw(fastbmp, e.Graphics, true, result, m);
+                        trapezium.Draw(fastbmp, e.Graphics, true, Color.White, m, false);
                     }
                     //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
                 }

@@ -27,7 +27,7 @@ namespace HyperbolicRenderer
                 return new PointF[4] {top_left, top_right, bottom_right, bottom_left};
             }
         }
-        internal void Draw(BMP image, Graphics outerlayer, bool curved, Color color, int mapsize, bool fill=true)
+        internal void Draw(BMP image, Graphics outerlayer, bool curved, Color color, Map map, bool fill=true)
         {
             polygonpoints.Clear();
             if (curved)
@@ -41,31 +41,31 @@ namespace HyperbolicRenderer
                 double r_m = rightdistance / (bottom_right.X - top_right.X);
                 double r_c = bottom_right.Y - r_m * bottom_right.X;
 
-                if (fill)
-                {
-                    polygonpoints.AddRange(CurvedShape.CurvePoints(top_left, top_right, mapsize));
-                    polygonpoints.AddRange(CurvedShape.CurvePoints(top_right, bottom_right, mapsize));
-                    polygonpoints.AddRange(CurvedShape.CurvePoints(bottom_left, bottom_right, mapsize).Reverse());
-                    polygonpoints.AddRange(CurvedShape.CurvePoints(top_left, bottom_left, mapsize).Reverse());
-                }
-                else
-                {
-                    DrawCurve(topdistance, t_m, t_c, true, mapsize, image, color);
-                    DrawCurve(rightdistance, r_m, r_c, false, mapsize, image, color);
-                }
+
+                polygonpoints.AddRange(CurvedShape.SinCurvePoints(top_left, top_right, map));
+                polygonpoints.AddRange(CurvedShape.SinCurvePoints(top_right, bottom_right, map));
+                polygonpoints.AddRange(CurvedShape.SinCurvePoints(bottom_left, bottom_right, map).Reverse());
+                polygonpoints.AddRange(CurvedShape.SinCurvePoints(top_left, bottom_left, map).Reverse());
             }
             else
             {
                 s.Restart();
-                CurvedShape.DrawLine(top_left, top_right, true, mapsize, image, color);
-                CurvedShape.DrawLine(top_right, bottom_right, false, mapsize, image, color);
+                CurvedShape.DrawLine(top_left, top_right, true, map.radius * 2, image, color);
+                CurvedShape.DrawLine(top_right, bottom_right, false, map.radius * 2, image, color);
                 s.Stop();
                 elapseddrawtime += s.ElapsedTicks;
             }
 
-            if (fill && polygonpoints.Count() != 0)
+            if (polygonpoints.Count() >= 3)
             {
-                outerlayer.FillPolygon(new Pen(color).Brush, polygonpoints.ToArray());
+                if (fill)
+                {
+                    outerlayer.FillPolygon(new Pen(color).Brush, polygonpoints.ToArray());
+                }
+                else
+                {
+                    outerlayer.DrawPolygon(new Pen(color), polygonpoints.ToArray());
+                }
             }
         }
         private void DrawCurve(double distance, double m, double c, bool horizontal, double mapsize, BMP image, Color color)
@@ -172,8 +172,9 @@ namespace HyperbolicRenderer
                 //var curve = AdjustPoint(closestline.start, closestline.end, mapsize, point);
             }
         }
-        public static PointF[] CurvePoints(PointF start, PointF end, double mapsize)
+        public static PointF[] SinCurvePoints(PointF start, PointF end, Map map)
         {
+            double mapsize = map.radius * 2;
             if (start.X < 0 || start.X > mapsize || start.Y < 0 || start.Y > mapsize)
             {
                 return new PointF[0];
@@ -204,10 +205,9 @@ namespace HyperbolicRenderer
 
             PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
             double a = Math.PI / (distance);
-
+            distance = Math.Ceiling(distance);
             for (float i = 0; i < distance; ++i)
             {
-                double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
                 int workingvar = (int)(i + startidx);
 
 
@@ -226,11 +226,41 @@ namespace HyperbolicRenderer
                 {
                     normalheight = start.X;
                 }
+                PointF workingpoint;
+                if (horizontal)
+                {
+                    workingpoint = new PointF(workingvar, (float)normalheight);
+                }
+                else
+                {
+                    workingpoint = new PointF((float)normalheight, workingvar);
+                }
+                workingpoint = map.SinScale(0.6f, workingpoint);
+
+
+                double sin_height;
+                if (horizontal)
+                {
+                    sin_height = workingpoint.Y;
+                }
+                else
+                {
+                    sin_height = workingpoint.X;
+                }
+
+
+                //f: y=-((1)/(25)) (x-5)^(2)+1
+                double scaleamount = 3;
+                double axisdist = Math.Abs(normalheight - map.radius);
+                double y = (-(scaleamount / Math.Pow(distance / 2, 2)) * Math.Pow((i - (distance / 2)), (2))) + scaleamount;
+
+                sin_height *= y;
+
 
                 //Use pythag to get distance to centre
 
-                double axisdist = normalheight - (mapsize / 2);
-
+                sin_height = axisdist < 0 ? -sin_height : sin_height;
+                
                 double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
                 scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
                 scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
@@ -241,86 +271,10 @@ namespace HyperbolicRenderer
                 workingvar = (int)Math.Max(workingvar, 0);
                 curveheight = (int)Math.Max(curveheight, 0);
 
-                if (horizontal)
+                if (i == distance-1)
                 {
-                    polygonpoints[(int)i] = new PointF(workingvar, curveheight);
+                    curveheight = (int)normalheight;
                 }
-                else
-                {
-                    polygonpoints[(int)i] = new PointF(curveheight, workingvar);
-                }
-            }
-
-            return polygonpoints;
-        }
-        public static PointF[] CurvePoints(PointF start, PointF end, PointF changingstart, PointF changingend, double mapsize)
-        {
-            if (start.X < 0 || start.X > mapsize || start.Y < 0 || start.Y > mapsize)
-            {
-                return new PointF[0];
-            }
-
-            bool horizontal;
-            double distance;
-            double m;
-            double c;
-            int startidx;
-
-            if (end.X - start.X > end.Y - start.Y)
-            {
-                startidx = (int)start.X;
-                horizontal = true;
-                distance = end.X - start.X;
-                m = (end.Y - start.Y) / distance;
-                c = end.Y - m * end.X;
-            }
-            else
-            {
-                startidx = (int)start.Y;
-                horizontal = false;
-                distance = end.Y - start.Y;
-                m = distance / (end.X - start.X);
-                c = end.Y - m * end.X;
-            }
-
-            PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
-            double a = Math.PI / (distance);
-
-            for (float i = 0; i < distance; ++i)
-            {
-                double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
-                int workingvar = (int)(i + startidx);
-
-
-                double normalheight;
-                if (horizontal)
-                {
-                    normalheight = m * workingvar + c;
-                }
-                else
-                {
-                    normalheight = (workingvar - c) / m; //Find the height if it was a straight line
-                }
-
-
-                if (double.IsNaN(normalheight))
-                {
-                    normalheight = start.X;
-                }
-
-                //Use pythag to get distance to centre
-
-                double axisdist = normalheight - (mapsize / 2);
-
-                double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
-                scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
-                scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
-
-                int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
-                curveheight = (int)Math.Min(curveheight, mapsize - 1);
-                workingvar = (int)Math.Min(workingvar, mapsize - 1);
-                workingvar = (int)Math.Max(workingvar, 0);
-                curveheight = (int)Math.Max(curveheight, 0);
 
                 if (horizontal)
                 {

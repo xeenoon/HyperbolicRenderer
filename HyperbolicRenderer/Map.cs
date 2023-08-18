@@ -127,7 +127,6 @@ namespace HyperbolicRenderer
                 adjustedshapes.Add(new Shape(new PointF[shape.points.Count()], shape.centre));
 
                 PointF centre = new PointF(shape.centre.X + offsetx, shape.centre.Y + offsety);
-                debugpoints.Add(centre);
                 List<PointF> closestpoints = new List<PointF>();
                 closestpoints = volume[unadjustedvolume.FindIndex(v=>centre.InPolygon(v.points))].points.ToList();
                 
@@ -141,7 +140,6 @@ namespace HyperbolicRenderer
                     newpoints[i1] = new PointF(point.X + (newcentre.X - centre.X), point.Y + (newcentre.Y - centre.Y));
                 }
 
-                debugpoints.Add(newcentre);
                 closestpoints = volume.Where(v => newcentre.InPolygon(v.points)).FirstOrDefault().points.ToList(); //Recalculate incase we moved squares
 
                 //Find the point that is closest to it, and scale towards that one
@@ -150,12 +148,6 @@ namespace HyperbolicRenderer
 
                 exactyiterpoint = Math.Max(exactyiterpoint, 0);
                 exactxiterpoint = Math.Max(exactxiterpoint, 0);
-
-
-                debugpoints.Add(closestpoints[0]);
-                debugpoints.Add(closestpoints[1]);
-                debugpoints.Add(closestpoints[2]);
-                debugpoints.Add(closestpoints[3]);
 
                 //Find the centre of the shape
                 for (int j = 0; j < shape.points.Length; j++)

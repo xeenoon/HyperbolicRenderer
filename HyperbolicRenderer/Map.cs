@@ -192,49 +192,62 @@ namespace HyperbolicRenderer
 
         public PointF StretchPoint(PointF relativepoint, float offsetx, float offsety)
         {
+            float turningtime = squaresize;
+            int debugidx = (int)((relativepoint.X - offsetx) / squaresize + ((relativepoint.Y - offsety) / squaresize) * volumewidth);
+            PointF scalar = SinScale(turningtime, relativepoint, radius, true, debugidx);
+
+            float ay = (relativepoint.Y - offsety) / squaresize;
+            float ax = (relativepoint.X - offsetx) / squaresize;
+            if (offsety != 0) //Removes infinity errors
+            {
+                ay += (offsety / squaresize);
+            }
+            if (offsetx != 0) //Removes infinity errors
+            {
+                ax += (offsetx / squaresize);
+            }
+            ay += (float)scalar.Y;
+            ax += (float)scalar.X;
+            ay *= squaresize;
+            ax *= squaresize;
+
+            return new PointF(ax, ay);
+        }
+
+        public PointF SinScale(double turningtime, PointF relativepoint, float radius, bool showdebug = false, int debugidx = 0)
+        {
+            float y_scale;
+            float x_scale;
+
             float neg_x_scale = float.MinValue;
             float pos_x_scale = float.MaxValue;
 
             float neg_y_scale = float.MinValue;
             float pos_y_scale = float.MaxValue;
 
-            float y_scalemodifier = 1;
-            float x_scalemodifier = 1;
-
-
             foreach (var line in shapelines)
             {
-                PointF distance = relativepoint.DistanceTo(line);
+                PointF linedistance = relativepoint.DistanceTo(line);
 
-                if (distance.Y == 0)
+                if (linedistance.Y > neg_y_scale && linedistance.Y < 0 && linedistance.Y != 0)
                 {
-                    y_scalemodifier = 0.5f;
+                    neg_y_scale = linedistance.Y;
                 }
-                if (distance.X == 0)
+                if (linedistance.Y < pos_y_scale && linedistance.Y > 0 && linedistance.Y != 0)
                 {
-                    x_scalemodifier = 0.5f;
-                }
-                if (distance.Y > neg_y_scale && distance.Y < 0 && distance.Y != 0)
-                {
-                    neg_y_scale = distance.Y;
-                }
-                if (distance.Y < pos_y_scale && distance.Y > 0 && distance.Y != 0)
-                {
-                    pos_y_scale = distance.Y;
+                    pos_y_scale = linedistance.Y;
                 }
 
-                if (distance.X > neg_x_scale && distance.X < 0 && distance.X != 0)
+                if (linedistance.X > neg_x_scale && linedistance.X < 0 && linedistance.X != 0)
                 {
-                    neg_x_scale = distance.X;
+                    neg_x_scale = linedistance.X;
                 }
-                if (distance.X < pos_x_scale && distance.X > 0 && distance.X != 0)
+                if (linedistance.X < pos_x_scale && linedistance.X > 0 && linedistance.X != 0)
                 {
-                    pos_x_scale = distance.X;
+                    pos_x_scale = linedistance.X;
                 }
             }
 
-            float y_scale;
-            float x_scale;
             if (Math.Abs(neg_y_scale) < pos_y_scale)
             {
                 y_scale = neg_y_scale;
@@ -252,121 +265,45 @@ namespace HyperbolicRenderer
             {
                 x_scale = pos_x_scale;
             }
+            if (showdebug)
+            {
+                sideconnections[debugidx] = new Line(relativepoint, new PointF(x_scale + relativepoint.X, y_scale + relativepoint.Y)); //debugdata
+            }
 
-            float y_distancetocentre = Math.Abs(relativepoint.Y - radius);
-            float turningtime = squaresize;
+
+            float y_distancetocentre = relativepoint.Y - radius;
+            float x_distancetocentre = relativepoint.X - radius;
+
+            x_scale *= (float)SmootheCutoff(x_distancetocentre, turningtime);
+            y_scale *= (float)SmootheCutoff(y_distancetocentre, turningtime);
+
+            x_scale = (float)Math.Sin((x_scale) / 20) / 2;
+            y_scale = (float)Math.Sin((y_scale) / 20) / 2;
+
+            return new PointF(x_scale, y_scale);
+        }
+
+        private static double SmootheCutoff(double distance, double turningtime)
+        {
+            double result = 1;
             const double cutoff = 0.6f;
-            if (y_distancetocentre < turningtime)
+            if (Math.Abs(distance) < turningtime)
             {
-                //y_distancetocentre = y_scale < 0 ? -y_distancetocentre : y_distancetocentre;
-                //Begin to approach a linear straight line at the centre
-                if (neg_y_scale + pos_y_scale == 0)
+                //Should equal zero when distancetocentre == 0
+                //Should equal 1 when distancetocentre == turningtime
+                if (Math.Abs(distance) >= turningtime * cutoff)
                 {
-                    y_scale = 0;
+                    double a = 0.7f / Math.Pow(turningtime - (turningtime * cutoff), 2);
+                    result = (float)(a * Math.Pow(Math.Abs(distance) - (turningtime * cutoff), 2) + 0.3f);
                 }
                 else
                 {
-                    //Should equal zero when distancetocentre == 0
-                    //Should equal 1 when distancetocentre == squaresize/5
-                    float scalar;
-                    if (y_distancetocentre >= turningtime * cutoff)
-                    {
-                        double a = 0.7f / Math.Pow(turningtime - (turningtime * cutoff), 2);
-                        scalar = (float)(a * Math.Pow(y_distancetocentre - (turningtime * cutoff), 2) + 0.3f);
-                        //y_scale *= (float)Math.Pow(Math.E, y_distancetocentre - (squaresize / 5));
-                    }
-                    else
-                    {
-                        //((0.7)/(3 a s)) x+1-((0.7)/(3 a s)) 
-                        scalar = (float)((0.3f / (cutoff * turningtime)) * y_distancetocentre);
-                        //y_scale *= (float)(y_distancetocentre * (Math.Pow(Math.E, ((squaresize / 5) * (1f / 6f)))/ ((squaresize / 5) * (5f / 6f))));
-                    }
-                    y_scale *= scalar;
-                    //y_scale *= (float)(Math.Log((y_distancetocentre+1f)/((squaresize/5f)/2f)));
-                }
-            }
-            float x_distancetocentre = Math.Abs(relativepoint.X - radius);
-
-            if (x_distancetocentre < turningtime)
-            {
-                //x_distancetocentre = x_scale < 0 ? -x_distancetocentre : x_distancetocentre;
-                //Begin to approach a linear straight line at the centre
-                if (neg_x_scale + pos_x_scale == 0)
-                {
-                    x_scale = 0;
-                }
-                else
-                {
-                    //Should equal zero when distancetocentre == 0
-                    //Should equal 1 when distancetocentre == squaresize/5
-                    float scalar;
-                    if (x_distancetocentre >= turningtime * cutoff)
-                    {
-                        double a = 0.7f / Math.Pow(turningtime - (turningtime * cutoff), 2);
-                        scalar = (float)(a * Math.Pow(x_distancetocentre - (turningtime * cutoff), 2) + 0.3f);
-                        //x_scale *= (float)Math.Pow(Math.E, x_distancetocentre - (squaresize / 5));
-                    }
-                    else
-                    {
-                        //((0.7)/(3 a s)) x+1-((0.7)/(3 a s)) 
-                        scalar = (float)((0.3f / (cutoff * turningtime)) * x_distancetocentre);
-                        //x_scale *= (float)(x_distancetocentre * (Math.Pow(Math.E, ((squaresize / 5) * (1f / 6f)))/ ((squaresize / 5) * (5f / 6f))));
-                    }
-                    x_scale *= scalar;
-                    //x_scale *= (float)(Math.Log((x_distancetocentre+1f)/((squaresize/5f)/2f)));
+                    //((0.7)/(3 a s)) x+1-((0.7)/(3 a s)) 
+                    result = (float)((0.3f / (cutoff * turningtime)) * Math.Abs(distance));
                 }
             }
 
-            y_scale *= y_scalemodifier;
-            x_scale *= x_scalemodifier;
-            //sideconnections[x + y * volumewidth] = new Line(relativepoint, new PointF(x_scale + relativepoint.X, y_scale + relativepoint.Y)); //debugdata
-
-            x_scale = (float)Math.Sin(x_scale / 20) / 2;
-            y_scale = (float)Math.Sin(y_scale / 20) / 2;
-            const float limiter = 0.5f;
-            if (x_scale >= limiter)
-            {
-                x_scale = limiter;
-            }
-            if (x_scale <= -limiter)
-            {
-                x_scale = -limiter;
-            }
-            if (y_scale >= limiter)
-            {
-                y_scale = limiter;
-            }
-            if (y_scale <= -limiter)
-            {
-                y_scale = -limiter;
-            }
-       //    double xdist = Math.Abs(relativepoint.X - radius);
-       //    double ydist = Math.Abs(relativepoint.Y - radius);
-       //    if (xdist < squaresize*2)
-       //    {
-       //        x_scale *= (float)(xdist / squaresize);
-       //    }
-       //    if (ydist < squaresize*2)
-       //    {
-       //        y_scale *= (float)(ydist / squaresize);
-       //    }
-
-            float ay = (relativepoint.Y - offsety) / squaresize;
-            float ax = (relativepoint.X - offsetx) / squaresize;
-            if (offsety != 0) //Removes infinity errors
-            {
-                ay += (offsety / squaresize);
-            }
-            if (offsetx != 0) //Removes infinity errors
-            {
-                ax += (offsetx / squaresize);
-            }
-            ay += y_scale;
-            ax += x_scale;
-            ay *= squaresize;
-            ax *= squaresize;
-
-            return new PointF(ax, ay);
+            return result;
         }
     }
 }

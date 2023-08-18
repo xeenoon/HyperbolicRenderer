@@ -45,7 +45,6 @@ namespace HyperbolicRenderer
             {
                 xchange = -m.squaresize * (Map.extracells / 2);
                 ychange = -m.squaresize * (Map.extracells / 2);
-                m.GenerateVolume(scale, xchange, ychange, infinitemovement);
                 firstdraw = false;
             }
 

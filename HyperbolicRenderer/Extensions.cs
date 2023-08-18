@@ -35,9 +35,7 @@ namespace HyperbolicRenderer
             Vector normalvector = new Vector(line.start, line.end);
             Vector perpindicular = normalvector.GetPerpindicular().GetUnitVector();
             perpindicular = new Vector(p, new PointF((float)(perpindicular.i + p.X), (float)(perpindicular.j+ p.Y)));
-
             PointF intersection = normalvector.Intersection(perpindicular);
-
             intersection = new PointF(intersection.X - p.X, intersection.Y - p.Y);
             return intersection;
         }

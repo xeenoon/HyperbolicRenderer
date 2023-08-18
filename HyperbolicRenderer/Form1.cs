@@ -135,7 +135,7 @@ namespace HyperbolicRenderer
 
             foreach (var shape in m.adjustedshapes)
             {
-                e.Graphics.FillPolygon(new Pen(Color.LightBlue).Brush, shape.points);
+                shape.Draw(e.Graphics, Color.Brown, m);
             }
 
             e.Graphics.DrawImage(volumebmp, 0, 0);

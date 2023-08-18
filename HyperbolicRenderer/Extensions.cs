@@ -49,22 +49,5 @@ namespace HyperbolicRenderer
         {
             return Math.Sqrt(p.X * p.X + p.Y * p.Y);
         }
-        public static PointF[] CreateShape(int points, float radius)
-        {
-            PointF[] result = new PointF[points];
-            double radiansstepsize = Math.Tau / points;
-            for (int i = 0; i < points; ++i)
-            {
-                //Draw a ray from the centre until it hits the edge of the square
-                //Make this a vector
-                double angle = (3 * (Math.PI / 2)) + (radiansstepsize * i);
-
-                float x = (float)(Math.Cos(angle) * radius + radius);
-
-                float y = (float)(Math.Sin(angle) * radius + radius);
-                result[i] = new PointF(x, y);
-            }
-            return result;
-        }
     }
 }

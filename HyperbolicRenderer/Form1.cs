@@ -37,8 +37,9 @@ namespace HyperbolicRenderer
             Stopwatch s = new Stopwatch();
             s.Start();
 
-            
-            m.AddShape(m.CreateShape(5, 50), new PointF(300, 200));
+            //CurvedShape shape = new(Extensions.CreateShape(5, 50));
+
+            m.AddShape(Extensions.CreateShape(5, 50), new PointF(300, 200));
 
             if (firstdraw)
             {

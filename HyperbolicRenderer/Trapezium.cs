@@ -2,7 +2,7 @@
 
 namespace HyperbolicRenderer
 {
-    public class Trapezium : CurvedShape
+    public class Trapezium
     {
         public PointF top_left;
         public PointF bottom_left;
@@ -19,9 +19,10 @@ namespace HyperbolicRenderer
         public static double elapseddrawtime;
         public static double elapsedtrigtime;
         Stopwatch s = new Stopwatch();
+        List<PointF> polygonpoints = new List<PointF>();
         internal void Draw(BMP image, Graphics outerlayer, bool curved, Color color, int mapsize, bool fill=true)
         {
-            List<PointF> polygonpoints = new List<PointF>();
+            polygonpoints.Clear();
             if (curved)
             {
                 var rightdistance = bottom_right.Y - top_right.Y;
@@ -35,10 +36,10 @@ namespace HyperbolicRenderer
 
                 if (fill)
                 {
-                    polygonpoints.AddRange(CurvePoints(top_left, top_right, mapsize));
-                    polygonpoints.AddRange(CurvePoints(top_right, bottom_right, mapsize));
-                    polygonpoints.AddRange(CurvePoints(bottom_left, bottom_right, mapsize).Reverse());
-                    polygonpoints.AddRange(CurvePoints(top_left, bottom_left, mapsize).Reverse());
+                    polygonpoints.AddRange(CurvedShape.CurvePoints(top_left, top_right, mapsize));
+                    polygonpoints.AddRange(CurvedShape.CurvePoints(top_right, bottom_right, mapsize));
+                    polygonpoints.AddRange(CurvedShape.CurvePoints(bottom_left, bottom_right, mapsize).Reverse());
+                    polygonpoints.AddRange(CurvedShape.CurvePoints(top_left, bottom_left, mapsize).Reverse());
                 }
                 else
                 {
@@ -49,8 +50,8 @@ namespace HyperbolicRenderer
             else
             {
                 s.Restart();
-                DrawLine(top_left, top_right, true, mapsize, image, color);
-                DrawLine(top_right, bottom_right, false, mapsize, image, color);
+                CurvedShape.DrawLine(top_left, top_right, true, mapsize, image, color);
+                CurvedShape.DrawLine(top_right, bottom_right, false, mapsize, image, color);
                 s.Stop();
                 elapseddrawtime += s.ElapsedTicks;
             }
@@ -125,19 +126,27 @@ namespace HyperbolicRenderer
     }
     public class CurvedShape
     {
-        enum Side
+        PointF[] originalpoints;
+        PointF[] adjustedpoints;
+        public CurvedShape(PointF[] points)
         {
-            MostlyHorizontal,
-            MostlyVertical,
+            originalpoints = points;
         }
-        internal PointF[] CurvePoints(PointF start, PointF end, double mapsize)
+        public void Draw(Graphics graphics, Color color, int mapsize)
+        {
+            for (int i = 0; i < originalpoints.Count(); ++i)
+            {
+
+            }
+        }
+        public static PointF[] CurvePoints(PointF start, PointF end, double mapsize)
         {
             if (start.X < 0 || start.X > mapsize || start.Y < 0 || start.Y > mapsize)
             {
                 return new PointF[0];
             }
 
-            Side side;
+            bool horizontal;
             double distance;
             double m;
             double c;
@@ -146,7 +155,7 @@ namespace HyperbolicRenderer
             if (end.X - start.X > end.Y-start.Y)
             {
                 startidx = (int)start.X;
-                side = Side.MostlyHorizontal;
+                horizontal = true;
                 distance = end.X - start.X;
                 m = (end.Y - start.Y) / distance;
                 c = end.Y - m * end.X;
@@ -154,7 +163,7 @@ namespace HyperbolicRenderer
             else
             {
                 startidx = (int)start.Y;
-                side = Side.MostlyVertical;
+                horizontal = false;
                 distance = end.Y - start.Y;
                 m = distance / (end.X - start.X);
                 c = end.Y - m * end.X;
@@ -170,7 +179,7 @@ namespace HyperbolicRenderer
 
 
                 double normalheight;
-                if (side == Side.MostlyHorizontal)
+                if (horizontal)
                 {
                     normalheight = m * workingvar + c;
                 }
@@ -199,7 +208,7 @@ namespace HyperbolicRenderer
                 workingvar = (int)Math.Max(workingvar, 0);
                 curveheight = (int)Math.Max(curveheight, 0);
 
-                if (side == Side.MostlyHorizontal)
+                if (horizontal)
                 {
                     polygonpoints[(int)i] = new PointF(workingvar, curveheight);
                 }
@@ -211,7 +220,7 @@ namespace HyperbolicRenderer
 
             return polygonpoints;
         }
-        internal void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
+        public static void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
         {
             if (start.X > end.X && horizontal) //Reversed pointers given?
             {

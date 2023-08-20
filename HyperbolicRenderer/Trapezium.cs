@@ -27,8 +27,9 @@ namespace HyperbolicRenderer
                 return new PointF[4] {top_left, top_right, bottom_right, bottom_left};
             }
         }
-        internal void Draw(BMP image, Graphics outerlayer, bool curved, Color color, Map map, bool fill=true)
+        internal void Draw(Graphics graphics, bool curved, Color color, Map map, bool fill=true)
         {
+            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             polygonpoints.Clear();
             if (curved)
             {
@@ -50,8 +51,8 @@ namespace HyperbolicRenderer
             else
             {
                 s.Restart();
-                Shape.DrawLine(top_left, top_right, true, map.radius * 2, image, color);
-                Shape.DrawLine(top_right, bottom_right, false, map.radius * 2, image, color);
+                Shape.DrawLine(top_left, top_right, true, map.radius * 2, color, graphics);
+                Shape.DrawLine(top_right, bottom_right, false, map.radius * 2, color, graphics);
                 s.Stop();
                 elapseddrawtime += s.ElapsedTicks;
             }
@@ -60,76 +61,14 @@ namespace HyperbolicRenderer
             {
                 if (fill)
                 {
-                    outerlayer.FillPolygon(new Pen(color).Brush, polygonpoints.ToArray());
+                    graphics.FillPolygon(new Pen(color).Brush, polygonpoints.ToArray());
                 }
                 else
                 {
-                    outerlayer.DrawPolygon(new Pen(color), polygonpoints.ToArray());
+                    graphics.DrawPolygon(new Pen(color), polygonpoints.ToArray());
                 }
             }
-        }
-        private void DrawCurve(double distance, double m, double c, bool horizontal, double mapsize, BMP image, Color color)
-        {
-            double a = Math.PI / (distance);
-            
-            for (float i = 0; i < distance; ++i)
-            {
-                s.Restart();
-                double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
-                int workingvar;
-                if (horizontal)
-                {
-                    workingvar = (int)(i + top_left.X);
-                }
-                else
-                {
-                    workingvar = (int)(i + top_right.Y);
-                }
-
-                double normalheight;
-                if (horizontal)
-                {
-                    normalheight = m*workingvar + c;
-                }
-                else
-                {
-                    normalheight = (workingvar - c) / m; //Find the height if it was a straight line
-                }
-
-                if (bottom_right.X - top_right.X == 0 && !horizontal) //Check fofr pure vertical lines
-                {
-                    normalheight = top_right.X;
-                }
-
-                //Use pythag to get distance to centre
-
-                double axisdist = normalheight - (mapsize / 2);
-
-                double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
-                scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
-                scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
-
-                int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
-                if (curveheight >= mapsize || curveheight < 0 || workingvar >= mapsize || workingvar < 0)
-                {
-                    continue;
-                }
-                s.Stop();
-                elapsedtrigtime += s.ElapsedTicks;
-                s.Restart();
-                if (horizontal)
-                {
-                    image.SetPixel(workingvar, curveheight, color);
-                }
-                else
-                {
-                    image.SetPixel(curveheight, workingvar, color);
-                }
-                s.Stop();
-                elapseddrawtime += s.ElapsedTicks;
-            }
-        }
-        
+        }        
     }
     public class CurvedShape
     {

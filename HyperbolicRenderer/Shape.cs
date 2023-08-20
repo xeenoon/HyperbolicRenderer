@@ -150,7 +150,7 @@ namespace HyperbolicRenderer
 
 
                 //f: y=-((1)/(25)) (x-5)^(2)+1
-                double scaleamount = 3;
+                double scaleamount = 1;
                 double axisdist = Math.Abs(normalheight - map.radius);
                 double y = (-(scaleamount / Math.Pow(distance / 2, 2)) * Math.Pow((i - (distance / 2)), (2))) + scaleamount;
 
@@ -187,7 +187,7 @@ namespace HyperbolicRenderer
 
             return polygonpoints;
         }
-        public static void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
+        public static void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, Color color, Graphics g)
         {
             if (start.X > end.X && horizontal) //Reversed pointers given?
             {
@@ -211,6 +211,7 @@ namespace HyperbolicRenderer
                 m = distance / (end.X - start.X);
                 c = end.Y - m * end.X;
             }
+            PointF[] linepoints = new PointF[(int)Math.Ceiling(distance)];
             for (float i = 0; i < distance; ++i)
             {
                 int workingvar;
@@ -237,13 +238,14 @@ namespace HyperbolicRenderer
                 }
                 if (horizontal)
                 {
-                    image.SetPixel(workingvar, resultheight, color);
+                    linepoints[(int)i] = new PointF(workingvar, resultheight);
                 }
                 else
                 {
-                    image.SetPixel(resultheight, workingvar, color);
+                    linepoints[(int)i] = new PointF(resultheight, workingvar);
                 }
             }
+            g.DrawLines(new Pen(color, 5), linepoints);
         }
 
     }

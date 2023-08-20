@@ -44,7 +44,7 @@ namespace HyperbolicRenderer
 
         public Map(int pointcount, float radius)
         {
-            shape = Shape.CreateShape(pointcount, radius, new PointF(200, 200));
+            shape = Shape.CreateShape(pointcount, radius, new PointF(radius, radius));
             
             for (int i = 0; i < points.Count(); i++)
             {
@@ -275,8 +275,8 @@ namespace HyperbolicRenderer
             x_scale *= (float)SmootheCutoff(x_distancetocentre, turningtime);
             y_scale *= (float)SmootheCutoff(y_distancetocentre, turningtime);
 
-            x_scale = (float)Math.Sin((x_scale) / 20) / 2;
-            y_scale = (float)Math.Sin((y_scale) / 20) / 2;
+            x_scale = (float)Math.Sin((x_scale) / (radius / 10)) / 2;
+            y_scale = (float)Math.Sin((y_scale) / (radius / 10)) / 2;
 
             return new PointF(x_scale, y_scale);
         }

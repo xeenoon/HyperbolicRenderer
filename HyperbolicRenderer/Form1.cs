@@ -126,7 +126,7 @@ namespace HyperbolicRenderer
                     }
                     else
                     {
-                        trapezium.Draw(fastbmp, e.Graphics, true, result, m);
+                        //trapezium.Draw(fastbmp, e.Graphics, true, result, m);
                         trapezium.Draw(fastbmp, e.Graphics, true, Color.White, m, false);
                     }
                     //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
@@ -163,9 +163,9 @@ namespace HyperbolicRenderer
                         e.Graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
                     }
                 }
-                foreach (var point in m.debugpoints) 
+                foreach (var point in m.debugpoints)
                 {
-                    e.Graphics.FillEllipse(new Pen(Color.SaddleBrown).Brush, point.X-2, point.Y-2, 4, 4);
+                    e.Graphics.FillEllipse(new Pen(Color.SaddleBrown).Brush, point.X - 2, point.Y - 2, 4, 4);
                 }
             }
 
@@ -430,6 +430,12 @@ namespace HyperbolicRenderer
         private void checkBox1_CheckedChanged_1(object sender, EventArgs e)
         {
 
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            pictureBox1.Width = Height;
+            pictureBox1.Height = Height;
         }
     }
 }

@@ -137,7 +137,7 @@ namespace HyperbolicRenderer
                 {
                     workingpoint = new PointF((float)normalheight, workingvar);
                 }
-                workingpoint = map.SinScale(0.6f, workingpoint);
+                workingpoint = map.GetBakedHeights(workingpoint);
 
 
                 double sin_height;

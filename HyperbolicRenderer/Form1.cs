@@ -28,24 +28,24 @@ namespace HyperbolicRenderer
             xchange = 0;
             ychange = 0;
             firstdraw = true;
+            m = new Map(sides, pictureBox1.Width / 2);
+            m.BakeHeights();
             pictureBox1.Invalidate();
         }
         bool firstdraw = true;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            m = new Map(sides, pictureBox1.Width / 2);
+            if (m == null)
+            {
+                return;
+            }
             Stopwatch s = new Stopwatch();
             s.Start();
-
-            //CurvedShape shape = new(Extensions.CreateShape(5, 50));
-
-            m.AddShape(Shape.CreateShape(5, 25, new PointF(200, 200)));
-
+            
             if (firstdraw)
             {
                 xchange = -m.squaresize * (Map.extracells / 2);
                 ychange = -m.squaresize * (Map.extracells / 2);
-                m.GenerateVolume(scale, xchange, ychange, infinitemovement);
                 firstdraw = false;
             }
 
@@ -126,7 +126,7 @@ namespace HyperbolicRenderer
                     }
                     else
                     {
-                        //trapezium.Draw(fastbmp, e.Graphics, true, result, m);
+                        trapezium.Draw(fastbmp, e.Graphics, true, result, m);
                         trapezium.Draw(fastbmp, e.Graphics, true, Color.White, m, false);
                     }
                     //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });

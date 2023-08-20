@@ -33,7 +33,7 @@ namespace HyperbolicRenderer
         }
         public List<Trapezium> volume = new List<Trapezium>();
         public List<Trapezium> unadjustedvolume = new List<Trapezium>();
-        public float radius;
+        public int radius;
         public PointF[] connections;
         public PointF[] oldconnections;
         public Line[] sideconnections;
@@ -42,7 +42,7 @@ namespace HyperbolicRenderer
         List<Line> shapelines = new List<Line>();
 
 
-        public Map(int pointcount, float radius)
+        public Map(int pointcount, int radius)
         {
             shape = Shape.CreateShape(pointcount, radius, new PointF(radius, radius));
             
@@ -302,6 +302,48 @@ namespace HyperbolicRenderer
             }
 
             return result;
+        }
+
+        PointF[,] heights;
+        bool baked = false;
+        internal void BakeHeights()
+        {
+            heights = new PointF[radius*2, radius*2];
+            for (int x = 0; x < radius*2; ++x)
+            {
+                for (int y = 0; y < radius * 2; ++y)
+                {
+                    heights[x, y] = SinScale(0.6f, new PointF(x,y));
+                }
+            }
+            baked = true;
+        }
+        public PointF GetBakedHeights(PointF relativepoint)
+        {
+            if (!baked)
+            {
+                return new PointF(0,0);
+            }
+            double xloc = relativepoint.X;
+            while (xloc < 0)
+            {
+                xloc += radius * 2;
+            }
+            while (xloc >= radius * 2)
+            {
+                xloc -= radius * 2;
+            }
+
+            double yloc = relativepoint.Y;
+            while (yloc < 0)
+            {
+                yloc += radius * 2;
+            }
+            while (yloc >= radius * 2)
+            {
+                yloc -= radius * 2;
+            }
+            return heights[(int)xloc, (int)yloc];
         }
     }
 }

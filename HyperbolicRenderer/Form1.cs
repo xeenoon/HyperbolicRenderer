@@ -29,6 +29,7 @@ namespace HyperbolicRenderer
             ychange = 0;
             firstdraw = true;
             m = new Map(sides, pictureBox1.Width / 2);
+            m.GenerateVolume(scale, xchange, ychange, infinitemovement);
             m.BakeHeights();
             pictureBox1.Invalidate();
         }

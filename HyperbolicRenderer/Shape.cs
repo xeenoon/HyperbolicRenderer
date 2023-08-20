@@ -77,7 +77,7 @@ namespace HyperbolicRenderer
         public static PointF[] SinCurvePoints(PointF start, PointF end, Map map)
         {
             double mapsize = map.radius * 2;
-            if (start.X < 0 || start.X > mapsize || start.Y < 0 || start.Y > mapsize)
+            if (end.X < 0 || start.X > mapsize || end.Y < 0 || start.Y > mapsize)
             {
                 return new PointF[0];
             }
@@ -106,12 +106,10 @@ namespace HyperbolicRenderer
             }
 
             PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
-            double a = Math.PI / (distance);
             distance = Math.Ceiling(distance);
             for (float i = 0; i < distance; ++i)
             {
                 int workingvar = (int)(i + startidx);
-
 
                 double normalheight;
                 if (horizontal)
@@ -158,7 +156,6 @@ namespace HyperbolicRenderer
 
                 sin_height *= y;
 
-
                 //Use pythag to get distance to centre
 
                 sin_height = axisdist < 0 ? -sin_height : sin_height;
@@ -175,7 +172,7 @@ namespace HyperbolicRenderer
 
                 if (i == distance - 1)
                 {
-                    curveheight = (int)normalheight;
+                    //curveheight = (int)normalheight;
                 }
 
                 if (horizontal)

@@ -313,7 +313,7 @@ namespace HyperbolicRenderer
             {
                 for (int y = 0; y < radius * 2; ++y)
                 {
-                    heights[x, y] = SinScale(0.6f, new PointF(x,y));
+                    heights[x, y] = SinScale(squaresize, new PointF(x,y));
                 }
             }
             baked = true;

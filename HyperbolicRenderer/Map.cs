@@ -45,7 +45,7 @@ namespace HyperbolicRenderer
 
         public Map(int pointcount, float radius)
         {
-            shape = Shape.CreateShape(pointcount, radius, new PointF(200, 200));
+            shape = Shape.CreateShape(pointcount, radius, new PointF(radius, radius));
             
             for (int i = 0; i < points.Count(); i++)
             {
@@ -226,19 +226,17 @@ namespace HyperbolicRenderer
 
             //Wrap bounds around shapelines to only deal with relavent ones
             List<Line> lines = shapelines;
+
+            double estimatedangle = Math.Atan(relativepoint.Y / relativepoint.X);
+            
+
             if (relativepoint.X > radius)
             {
                 //Only change for larger shapes, otherwise small shapes may be deformed
                 if (lines.Count() >= 20)
                 {
-                    if (relativepoint.Y > radius)
-                    {
-                        lines = shapelines.Take(new Range(shapelines.Count() / 4, shapelines.Count() / 2)).ToList();
-                    }
-                    else
-                    {
-                        lines = shapelines.Take(new Range(0, shapelines.Count() / 4)).ToList();
-                    }
+                    //Get the lines a quarter of the distance away
+                    
                 }
                 else
                 {
@@ -249,87 +247,18 @@ namespace HyperbolicRenderer
             {
                 if (lines.Count() >= 20)
                 {
-                    if (relativepoint.Y > radius)
-                    {
-                        lines = shapelines.Take(new Range(shapelines.Count() / 2, (int)(shapelines.Count() * (3f / 4f)))).ToList();
-                    }
-                    else
-                    {
-                        lines = shapelines.Take(new Range((int)(shapelines.Count() * (3f / 4f)), shapelines.Count())).ToList();
-                    }
+                    
                 }
                 else
                 {
                     lines = shapelines.Take(new Range(shapelines.Count() / 2, shapelines.Count())).ToList();
                 }
             }
-            lines = new List<Line>();
 
-            double xlookfor = relativepoint.X - radius;
-            xlookfor = Math.Max(-radius, xlookfor);
-            xlookfor = Math.Min(radius, xlookfor);
-
-            //x^2 + y^2 = radius^2
-            //yresult = sqrt(radius^2-x^2)
-            //angle = Atan(yresult/xlookfor)
-            double ylocation = Math.Sqrt(radius * radius - xlookfor * xlookfor);
-            double radiansstepsize = Math.Tau / shape.points.Count();
-            double angle1 = Math.Atan(ylocation / xlookfor);
-            double angle2 = Math.PI - angle1;
-            if (angle1 < 0)
-            {
-                angle1 += Math.Tau;
-            }
-            if (angle2 < 0)
-            {
-                angle2 += Math.Tau;
-            }
-            angle1 /= radiansstepsize;
-            angle2 /= radiansstepsize;
-            angle1 = Math.Min(angle1, shapelines.Count() - 1);
-            angle2 = Math.Min(angle2, shapelines.Count() - 1);
-            angle1 = Math.Max(angle1, 1);
-            angle2 = Math.Max(angle2, 1);
-            lines.Add(shapelines[(int)Math.Floor(angle1)]);
-            lines.Add(shapelines[(int)Math.Floor(angle1)-1]);
-            lines.Add(shapelines[(int)Math.Ceiling(angle1)]);
-            lines.Add(shapelines[(int)Math.Floor(angle2)]);
-            lines.Add(shapelines[(int)Math.Floor(angle2)-1]);
-            lines.Add(shapelines[(int)Math.Ceiling(angle2)]);
-
-
-
-            double ylookfor = relativepoint.Y - radius;
-            ylookfor = Math.Max(-radius, ylookfor);
-            ylookfor = Math.Min(radius, ylookfor);
-
-            //x^2 + y^2 = radius^2
-            //xresult = sqrt(radius^2 - y^2)
-            //angle = Atan(y/xresult)
-
-            double xlocation = Math.Sqrt(radius * radius - ylookfor * ylookfor);
-            double angle3 = Math.Atan(ylookfor / xlocation);
-            double angle4 = angle3 + (Math.PI/2);
-            if (angle3 < 0)
-            {
-                angle3 += Math.Tau;
-            }
-            if (angle4 < 0)
-            {
-                angle4 += Math.Tau;
-            }
-            angle3 /= radiansstepsize;
-            angle4 /= radiansstepsize;
-            angle3 = Math.Min(angle3, shapelines.Count() - 1);
-            angle4 = Math.Min(angle4, shapelines.Count() - 1);
-            angle3 = Math.Max(angle3, 1);
-            angle4 = Math.Max(angle4, 1);
-            lines.Add(shapelines[(int)Math.Floor(angle3)]);
-            lines.Add(shapelines[(int)Math.Floor(angle3)-1]);
-            lines.Add(shapelines[(int)Math.Ceiling(angle3)]);
-            lines.Add(shapelines[(int)Math.Floor(angle4)]);
-            lines.Add(shapelines[(int)Math.Floor(angle3)-1]);
-            lines.Add(shapelines[(int)Math.Ceiling(angle4)]);
+            double radiansstepsize = Math.Tau / points.Count();
+            double lowestxdistance = Math.Abs((points[1].X - points[0].X)); //find the average x distance of the points in the shape
+            double lowestydistance = Math.Abs(points[(points.Count()/4) + 1].Y - points[points.Count() / 4].Y); //find the average y distance of the points in the shape
+            lines = shapelines.Where(s=>Math.Abs(relativepoint.DistanceTo(s).X) < lowestxdistance || Math.Abs(relativepoint.DistanceTo(s).Y) < lowestydistance).ToList();
 
             foreach (var line in lines)
             {

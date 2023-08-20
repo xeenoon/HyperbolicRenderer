@@ -39,7 +39,7 @@ namespace HyperbolicRenderer
 
             //CurvedShape shape = new(Extensions.CreateShape(5, 50));
 
-            m.AddShape(Shape.CreateShape(5, 25, new PointF(200, 200)));
+            m.AddShape(Shape.CreateShape(5, 25, new PointF(pictureBox1.Width / 2, pictureBox1.Width / 2)));
 
             if (firstdraw)
             {
@@ -162,9 +162,9 @@ namespace HyperbolicRenderer
                         e.Graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
                     }
                 }
-                foreach (var point in m.debugpoints) 
+                foreach (var point in m.debugpoints)
                 {
-                    e.Graphics.FillEllipse(new Pen(Color.SaddleBrown).Brush, point.X-2, point.Y-2, 4, 4);
+                    e.Graphics.FillEllipse(new Pen(Color.SaddleBrown).Brush, point.X - 2, point.Y - 2, 4, 4);
                 }
             }
 

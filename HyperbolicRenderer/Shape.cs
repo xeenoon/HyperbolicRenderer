@@ -81,28 +81,35 @@ namespace HyperbolicRenderer
             {
                 return new PointF[0];
             }
-
             bool horizontal;
             double distance;
             double m;
             double c;
             int startidx;
 
-            if (end.X - start.X > end.Y - start.Y)
+            if (Math.Abs(end.X - start.X) > Math.Abs(end.Y - start.Y))
             {
                 startidx = (int)start.X;
                 horizontal = true;
-                distance = end.X - start.X;
+                distance = Math.Abs(end.X - start.X);
                 m = (end.Y - start.Y) / distance;
                 c = end.Y - m * end.X;
+                if (start.X > end.X)
+                {
+                    start = new PointF(end.X, end.Y);
+                }
             }
             else
             {
                 startidx = (int)start.Y;
                 horizontal = false;
-                distance = end.Y - start.Y;
+                distance = Math.Abs(end.Y - start.Y);
                 m = distance / (end.X - start.X);
                 c = end.Y - m * end.X;
+                if (start.Y > end.Y)
+                {
+                    start = new PointF(end.X, end.Y);
+                }
             }
 
             PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
@@ -238,13 +245,20 @@ namespace HyperbolicRenderer
                 {
                     continue;
                 }
-                if (horizontal)
+                try
                 {
-                    image.SetPixel(workingvar, resultheight, color);
+                    if (horizontal)
+                    {
+                        image.SetPixel(workingvar, resultheight, color);
+                    }
+                    else
+                    {
+                        image.SetPixel(resultheight, workingvar, color);
+                    }
                 }
-                else
+                catch
                 {
-                    image.SetPixel(resultheight, workingvar, color);
+
                 }
             }
         }

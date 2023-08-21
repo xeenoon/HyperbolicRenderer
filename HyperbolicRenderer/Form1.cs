@@ -37,6 +37,7 @@ namespace HyperbolicRenderer
         bool firstdraw = true;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+
             Bitmap tempimage = new Bitmap(pictureBox1.Width * 2, pictureBox1.Height * 2);
             Graphics graphics = e.Graphics;
             if (m == null)

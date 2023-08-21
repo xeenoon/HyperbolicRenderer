@@ -53,10 +53,6 @@ namespace HyperbolicRenderer
             }
             this.radius = radius;
         }
-        public void GenerateShape()
-        {
-
-        }
         public void AddShape(Shape shape)
         {
             shapes.Add(shape);
@@ -193,7 +189,7 @@ namespace HyperbolicRenderer
         {
             float turningtime = squaresize;
             int debugidx = (int)((relativepoint.X - offsetx) / squaresize + ((relativepoint.Y - offsety) / squaresize) * volumewidth);
-            PointF scalar = SinScale(turningtime, relativepoint, true, debugidx);
+            PointF scalar = SinScale(relativepoint, true, debugidx);
 
             float ay = (relativepoint.Y - offsety) / squaresize;
             float ax = (relativepoint.X - offsetx) / squaresize;
@@ -213,8 +209,9 @@ namespace HyperbolicRenderer
             return new PointF(ax, ay);
         }
 
-        public PointF SinScale(double turningtime, PointF relativepoint, bool showdebug = false, int debugidx = 0)
+        public PointF SinScale(PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
+            double turningtime = squaresize*(0.55);
             float y_scale;
             float x_scale;
 
@@ -320,7 +317,7 @@ namespace HyperbolicRenderer
                                  int x = (int)(xi + threadindex*(radius/(threadcount/2f)));
                                  for (int y = 0; y < radius * 2; ++y)
                                  {
-                                     heights[x, y] = SinScale(squaresize, new PointF(x, y));
+                                     heights[x, y] = SinScale(new PointF(x, y));
                                  }
                              }
                              baked = true;

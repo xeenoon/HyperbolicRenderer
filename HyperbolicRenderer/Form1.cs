@@ -28,7 +28,7 @@ namespace HyperbolicRenderer
             xchange = 0;
             ychange = 0;
             firstdraw = true;
-            m = new Map(sides, pictureBox1.Width);
+            m = new Map(sides, pictureBox1.Width/2);
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
             m.BakeHeights(10);
 
@@ -38,7 +38,7 @@ namespace HyperbolicRenderer
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             Bitmap tempimage = new Bitmap(pictureBox1.Width*2, pictureBox1.Height*2);
-            Graphics tempgraphics = Graphics.FromImage(tempimage);
+            Graphics graphics = e.Graphics;
             if (m == null)
             {
                 return;
@@ -54,7 +54,6 @@ namespace HyperbolicRenderer
             }
 
             double gentime = 0;
-            m.GenerateShape();
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
 
             s.Stop();
@@ -68,20 +67,20 @@ namespace HyperbolicRenderer
             {
                 return;
             }
-            tempgraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             if (showdebugdata && showgrid)
             {
                 for (int y = 0; y < m.volumewidth; ++y)
                 {
-                    tempgraphics.DrawLine(new Pen(Color.Orange), new PointF(0, y * m.squaresize), new PointF(pictureBox1.Width * 2, y * m.squaresize));
+                    graphics.DrawLine(new Pen(Color.Orange), new PointF(0, y * m.squaresize), new PointF(pictureBox1.Width, y * m.squaresize));
                 }
                 for (int x = 0; x < m.volumewidth; ++x)
                 {
-                    tempgraphics.DrawLine(new Pen(Color.Orange), new PointF(x * m.squaresize, 0), new PointF(x * m.squaresize, pictureBox1.Width * 2));
+                    graphics.DrawLine(new Pen(Color.Orange), new PointF(x * m.squaresize, 0), new PointF(x * m.squaresize, pictureBox1.Width));
                 }
             }
 
-            tempgraphics.FillPolygon(new Pen(Color.DarkBlue).Brush, m.points);
+            graphics.FillPolygon(new Pen(Color.DarkBlue).Brush, m.points);
 
             for (int i = 0; i < m.volume.Count; i++)
             {
@@ -119,24 +118,24 @@ namespace HyperbolicRenderer
 
                 if (showdebugdata && straighlines)
                 {
-                    trapezium.Draw(tempgraphics, false, Color.White, m, false);
+                    trapezium.Draw(graphics, false, Color.White, m, false);
                 }
                 else if (showdebugdata && !showbackground)
                 {
-                    trapezium.Draw(tempgraphics, true, result, m);
-                    trapezium.Draw(tempgraphics, true, Color.White, m, false);
+                    trapezium.Draw(graphics, true, result, m);
+                    trapezium.Draw(graphics, true, Color.White, m, false);
                 }
                 else
                 {
                     //trapezium.Draw(e.Graphics, true, result, m);
-                    trapezium.Draw(tempgraphics, true, Color.White, m, false);
+                    trapezium.Draw(graphics, true, Color.White, m, false);
                 }
                 //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
             }
 
             foreach (var shape in m.adjustedshapes)
             {
-                shape.Draw(tempgraphics, Color.Brown, m);
+                shape.Draw(graphics, Color.Brown, m);
             }
 
             if (showdebugdata)
@@ -147,25 +146,25 @@ namespace HyperbolicRenderer
                     PointF oldconnection = m.oldconnections[i];
                     if (showpointmovement)
                     {
-                        tempgraphics.DrawLine(new Pen(Color.Green, 2), m.connections[i], m.oldconnections[i]);
+                        graphics.DrawLine(new Pen(Color.Green, 2), m.connections[i], m.oldconnections[i]);
                     }
                     if (showclosestedge)
                     {
-                        tempgraphics.DrawLine(new Pen(Color.Magenta, 1), m.sideconnections[i].start, m.sideconnections[i].end);
-                        tempgraphics.FillEllipse(new Pen(Color.Magenta).Brush, m.sideconnections[i].end.X - 2, m.sideconnections[i].end.Y - 2, 4, 4);
+                        graphics.DrawLine(new Pen(Color.Magenta, 1), m.sideconnections[i].start, m.sideconnections[i].end);
+                        graphics.FillEllipse(new Pen(Color.Magenta).Brush, m.sideconnections[i].end.X - 2, m.sideconnections[i].end.Y - 2, 4, 4);
                     }
                     if (showmodifiedpoints)
                     {
-                        tempgraphics.FillEllipse(new Pen(Color.Red).Brush, connection.X - 2, connection.Y - 2, 4, 4);
+                        graphics.FillEllipse(new Pen(Color.Red).Brush, connection.X - 2, connection.Y - 2, 4, 4);
                     }
                     if (showgridpoints)
                     {
-                        tempgraphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
+                        graphics.FillEllipse(new Pen(Color.Orange).Brush, oldconnection.X - 2, oldconnection.Y - 2, 4, 4);
                     }
                 }
                 foreach (var point in m.debugpoints)
                 {
-                    tempgraphics.FillEllipse(new Pen(Color.SaddleBrown).Brush, point.X - 2, point.Y - 2, 4, 4);
+                    graphics.FillEllipse(new Pen(Color.SaddleBrown).Brush, point.X - 2, point.Y - 2, 4, 4);
                 }
             }
 
@@ -177,15 +176,15 @@ namespace HyperbolicRenderer
                     path.AddPolygon(m.points);
 
                     // Uncomment this to invert:
-                    path.AddRectangle(new Rectangle(0,0,pictureBox1.Width*2, pictureBox1.Height*2));
+                    path.AddRectangle(new Rectangle(0,0,pictureBox1.Width, pictureBox1.Height));
 
                     using (var brush = new SolidBrush(Color.Black))
                     {
-                        tempgraphics.FillPath(brush, path);
+                        graphics.FillPath(brush, path);
                     }
                 }
             }
-            e.Graphics.DrawImage(tempimage, new PointF(-pictureBox1.Width / 2, -pictureBox1.Width / 2));
+            //e.Graphics.DrawImage(tempimage, new PointF(-pictureBox1.Width / 2, -pictureBox1.Width / 2));
             //e.Graphics.DrawImage(tempimage, new Rectangle(0, 0, pictureBox1.Width, pictureBox1.Height));
 
             s.Stop();

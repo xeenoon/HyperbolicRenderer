@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -306,16 +307,25 @@ namespace HyperbolicRenderer
 
         PointF[,] heights;
         bool baked = false;
-        internal void BakeHeights()
+        public double elapsedtime;
+        internal void BakeHeights(int threadcount)
         {
             heights = new PointF[radius*2, radius*2];
-            for (int x = 0; x < radius*2; ++x)
-            {
-                for (int y = 0; y < radius * 2; ++y)
-                {
-                    heights[x, y] = SinScale(squaresize, new PointF(x,y));
-                }
-            }
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            Parallel.For(0, threadcount,
+                         threadindex => {
+                             for (int xi = 0; xi < radius / (threadcount/2f); ++xi)
+                             {
+                                 int x = (int)(xi + threadindex*(radius/(threadcount/2f)));
+                                 for (int y = 0; y < radius * 2; ++y)
+                                 {
+                                     heights[x, y] = SinScale(squaresize, new PointF(x, y));
+                                 }
+                             }
+                             baked = true;
+                         });
+            elapsedtime = s.ElapsedMilliseconds;
             baked = true;
         }
         public PointF GetBakedHeights(PointF relativepoint)

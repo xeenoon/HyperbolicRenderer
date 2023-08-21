@@ -28,7 +28,7 @@ namespace HyperbolicRenderer
             xchange = 0;
             ychange = 0;
             firstdraw = true;
-            m = new Map(sides, pictureBox1.Width/2);
+            m = new Map(sides, pictureBox1.Width / 2);
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
             m.BakeHeights(10);
 
@@ -37,7 +37,7 @@ namespace HyperbolicRenderer
         bool firstdraw = true;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            Bitmap tempimage = new Bitmap(pictureBox1.Width*2, pictureBox1.Height*2);
+            Bitmap tempimage = new Bitmap(pictureBox1.Width * 2, pictureBox1.Height * 2);
             Graphics graphics = e.Graphics;
             if (m == null)
             {
@@ -45,7 +45,7 @@ namespace HyperbolicRenderer
             }
             Stopwatch s = new Stopwatch();
             s.Start();
-            
+
             if (firstdraw)
             {
                 xchange = -m.squaresize * (Map.extracells / 2);
@@ -176,7 +176,7 @@ namespace HyperbolicRenderer
                     path.AddPolygon(m.points);
 
                     // Uncomment this to invert:
-                    path.AddRectangle(new Rectangle(0,0,pictureBox1.Width, pictureBox1.Height));
+                    path.AddRectangle(new Rectangle(0, 0, pictureBox1.Width, pictureBox1.Height));
 
                     using (var brush = new SolidBrush(Color.Black))
                     {

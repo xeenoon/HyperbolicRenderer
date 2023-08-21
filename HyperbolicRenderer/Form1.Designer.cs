@@ -114,7 +114,7 @@
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 5;
-            textBox2.Text = "0.77";
+            textBox2.Text = "0.769";
             // 
             // checkBox1
             // 

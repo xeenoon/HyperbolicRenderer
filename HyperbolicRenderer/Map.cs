@@ -211,7 +211,7 @@ namespace HyperbolicRenderer
 
         public PointF SinScale(PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
-            double turningtime = squaresize*(0.55);
+            double turningtime = squaresize*(0.545);
             float y_scale;
             float x_scale;
 

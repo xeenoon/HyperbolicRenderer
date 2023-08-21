@@ -32,7 +32,6 @@ namespace HyperbolicRenderer
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
             m.BakeHeights(10);
 
-            MessageBox.Show(totaldata);
             pictureBox1.Invalidate();
         }
         bool firstdraw = true;

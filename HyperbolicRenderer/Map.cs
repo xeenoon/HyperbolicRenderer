@@ -282,7 +282,7 @@ namespace HyperbolicRenderer
         private static double SmootheCutoff(double distance, double turningtime)
         {
             double result = 1;
-            const double cutoff = 0.6f;
+            const double cutoff = 0.3f;
             if (Math.Abs(distance) < turningtime)
             {
                 //Should equal zero when distancetocentre == 0

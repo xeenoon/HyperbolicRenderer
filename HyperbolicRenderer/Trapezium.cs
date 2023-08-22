@@ -47,26 +47,26 @@ namespace HyperbolicRenderer
                 elapseddrawtime += s.ElapsedTicks;
             }
 
-            if (polygonpoints.Count() >= 3)
+            List<PointF> finalpoints = new List<PointF>();
+            foreach (PointF p in polygonpoints)
+            {
+                if (p.X > 0 && p.X < map.radius*2 && p.Y > 0 && p.Y < map.radius*2)
+                {
+                    finalpoints.Add(p);
+                }
+            }
+
+            if (finalpoints.Count() >= 3)
             {
                 if (fill)
                 {
-                    graphics.FillPolygon(new Pen(color).Brush, polygonpoints.ToArray());
+                    graphics.FillPolygon(new Pen(color).Brush, finalpoints.ToArray());
                 }
                 else
                 {
-                    graphics.DrawPolygon(new Pen(color), polygonpoints.ToArray());
+                    graphics.DrawPolygon(new Pen(color), finalpoints.ToArray());
                 }
             }
         }        
-    }
-    public class CurvedShape
-    {
-        PointF[] originalpoints;
-        PointF[] adjustedpoints;
-        public CurvedShape(PointF[] points)
-        {
-            originalpoints = points;
-        }
     }
 }

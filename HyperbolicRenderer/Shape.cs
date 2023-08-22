@@ -131,13 +131,7 @@ namespace HyperbolicRenderer
                 {
                     workingpoint = new PointF((float)normalheight, workingvar);
                 }
-                PointF correctpoint = map.SinScale(workingpoint);
-                PointF oldpoint = new PointF(workingpoint.X, workingpoint.Y);
                 workingpoint = map.GetBakedHeights(workingpoint);
-                if ((Math.Abs(correctpoint.X - workingpoint.X) > 0.3f || Math.Abs(correctpoint.Y - workingpoint.Y) > 0.3f) && oldpoint.X > 0 && oldpoint.Y > 0 && oldpoint.X < mapsize && oldpoint.Y < mapsize)
-                {
-                    workingpoint = new PointF(0, 0);
-                }
                 double sin_height;
                 if (horizontal)
                 {
@@ -158,18 +152,19 @@ namespace HyperbolicRenderer
 
                 //Use pythag to get distance to centre
 
-                sin_height = axisdist < 0 ? -sin_height : sin_height;
-
                 double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
+                if (scalingfactor > 1)
+                {
+                    scalingfactor = 1;
+                }
                 scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
                 scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
 
                 int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
-                curveheight = (int)Math.Min(curveheight, mapsize - 1);
-                workingvar = (int)Math.Min(workingvar, mapsize - 1);
-                workingvar = (int)Math.Max(workingvar, 0);
-                curveheight = (int)Math.Max(curveheight, 0);
-
+                if (curveheight < 0)
+                {
+                    curveheight = 0;
+                }
                 if (i == distance - 1)
                 {
                     curveheight = (int)normalheight;
@@ -241,7 +236,10 @@ namespace HyperbolicRenderer
                     linepoints[(int)i] = new PointF(resultheight, workingvar);
                 }
             }
-            g.DrawLines(new Pen(color, 5), linepoints);
+            if (linepoints.Count() >= 2)
+            {
+                g.DrawLines(new Pen(color, 5), linepoints);
+            }
         }
 
     }

@@ -53,13 +53,9 @@ namespace HyperbolicRenderer
             }
             this.radius = radius;
         }
-        public void AddShape(Shape shape)
-        {
-            shapes.Add(shape);
-        }
         public int volumewidth = 0;
         public float squaresize = 0;
-        public static int extracells = 4;
+        public static int extracells = 0;
         public List<PointF> debugpoints = new List<PointF>();
         public void GenerateVolume(float scale, float offsetx, float offsety, bool infinitevolume) //Scale of 1 will have squares of 20% size, 0.5 = 10% size...
         {
@@ -187,7 +183,6 @@ namespace HyperbolicRenderer
 
         public PointF StretchPoint(PointF relativepoint, float offsetx, float offsety)
         {
-            float turningtime = squaresize;
             int debugidx = (int)((relativepoint.X - offsetx) / squaresize + ((relativepoint.Y - offsety) / squaresize) * volumewidth);
             PointF scalar = SinScale(relativepoint, true, debugidx);
 
@@ -211,56 +206,25 @@ namespace HyperbolicRenderer
 
         public PointF SinScale(PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
-            double turningtime = squaresize*(0.545);
-            float y_scale;
-            float x_scale;
-
-            float neg_x_scale = float.MinValue;
-            float pos_x_scale = float.MaxValue;
-
-            float neg_y_scale = float.MinValue;
-            float pos_y_scale = float.MaxValue;
+            double turningtime = squaresize*(0.585);
+            float y_scale = float.MaxValue;
+            float x_scale = float.MaxValue;
 
             foreach (var line in shapelines)
             {
                 PointF linedistance = relativepoint.DistanceTo(line);
 
-                if (linedistance.Y > neg_y_scale && linedistance.Y < 0 && linedistance.Y != 0)
+                if (Math.Abs(linedistance.Y) < Math.Abs(y_scale) && (linedistance.Y != 0 || (points.Count() % 4 != 2)))
                 {
-                    neg_y_scale = linedistance.Y;
-                }
-                if (linedistance.Y < pos_y_scale && linedistance.Y > 0 && linedistance.Y != 0)
-                {
-                    pos_y_scale = linedistance.Y;
+                    y_scale = linedistance.Y;
                 }
 
-                if (linedistance.X > neg_x_scale && linedistance.X < 0 && linedistance.X != 0)
+                if (Math.Abs(linedistance.X) < Math.Abs(x_scale) && (linedistance.X != 0 || (points.Count() % 4!=2)))
                 {
-                    neg_x_scale = linedistance.X;
-                }
-                if (linedistance.X < pos_x_scale && linedistance.X > 0 && linedistance.X != 0)
-                {
-                    pos_x_scale = linedistance.X;
+                    x_scale = linedistance.X;
                 }
             }
 
-            if (Math.Abs(neg_y_scale) < pos_y_scale)
-            {
-                y_scale = neg_y_scale;
-            }
-            else
-            {
-                y_scale = pos_y_scale;
-            }
-
-            if (Math.Abs(neg_x_scale) < pos_x_scale)
-            {
-                x_scale = neg_x_scale;
-            }
-            else
-            {
-                x_scale = pos_x_scale;
-            }
             if (showdebug)
             {
                 sideconnections[debugidx] = new Line(relativepoint, new PointF(x_scale + relativepoint.X, y_scale + relativepoint.Y)); //debugdata
@@ -303,51 +267,34 @@ namespace HyperbolicRenderer
         }
 
         PointF[,] heights;
-        bool baked = false;
         public double elapsedtime;
         internal void BakeHeights(int threadcount)
         {
-            heights = new PointF[radius*2, radius*2];
+            int adjustedradius = (int)((radius + (squaresize * extracells)) * 2);
+            
+            heights = new PointF[adjustedradius, adjustedradius];
             Stopwatch s = new Stopwatch();
             s.Start();
             Parallel.For(0, threadcount,
                          threadindex => {
-                             for (int xi = 0; xi < radius / (threadcount/2f); ++xi)
+                             for (int xi = 0; xi < adjustedradius / (threadcount); ++xi)
                              {
-                                 int x = (int)(xi + threadindex*(radius/(threadcount/2f)));
-                                 for (int y = 0; y < radius * 2; ++y)
+                                 int x = (int)(xi + threadindex*(adjustedradius / (threadcount)));
+                                 for (int y = 0; y < adjustedradius; ++y)
                                  {
                                      heights[x, y] = SinScale(new PointF(x, y));
                                  }
                              }
                          });
             elapsedtime = s.ElapsedMilliseconds;
-            baked = true;
         }
         public PointF GetBakedHeights(PointF relativepoint)
         {
-            if (!baked)
-            {
-                return new PointF(0,0);
-            }
             double xloc = Math.Round(relativepoint.X);
-            while (xloc < 0)
-            {
-                xloc += (radius * 2);
-            }
-            while (xloc >= radius * 2)
-            {
-                xloc -= (radius * 2);
-            }
-
             double yloc = Math.Round(relativepoint.Y);
-            while (yloc < 0)
+            if (heights == null || xloc < 0 || xloc >= heights.GetLength(0) || yloc < 0 || yloc >= heights.GetLength(1))
             {
-                yloc += radius * 2;
-            }
-            while (yloc >= radius * 2)
-            {
-                yloc -= radius * 2;
+                return new PointF(0, 0);
             }
             return heights[(int)xloc, (int)yloc];
         }

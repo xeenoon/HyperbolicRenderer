@@ -13,14 +13,15 @@ namespace HyperbolicRenderer
         float scale = 0.77f;
 
         Map m;
-
+        int mapradius;
         private void button1_Click(object sender, EventArgs e)
         {
             int.TryParse(textBox1.Text, out sides);
             float.TryParse(textBox2.Text, out scale);
             int inputsize;
             int.TryParse(textBox4.Text, out inputsize);
-            Map.extracells = inputsize + 4;
+            Map.extracells = inputsize;
+            mapradius = pictureBox1.Height / 4;
             if (sides == -1 || scale == -1)
             {
                 return;
@@ -28,7 +29,7 @@ namespace HyperbolicRenderer
             xchange = 0;
             ychange = 0;
             firstdraw = true;
-            m = new Map(sides, pictureBox1.Width / 2);
+            m = new Map(sides, mapradius);
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
             m.BakeHeights(10);
 
@@ -37,9 +38,10 @@ namespace HyperbolicRenderer
         bool firstdraw = true;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            Bitmap tempimage = new Bitmap(pictureBox1.Width, pictureBox1.Height);
 
-            Bitmap tempimage = new Bitmap(pictureBox1.Width * 2, pictureBox1.Height * 2);
-            Graphics graphics = e.Graphics;
+            //Graphics graphics = e.Graphics;
+            Graphics graphics = Graphics.FromImage(tempimage);
             if (m == null)
             {
                 return;
@@ -73,11 +75,11 @@ namespace HyperbolicRenderer
             {
                 for (int y = 0; y < m.volumewidth; ++y)
                 {
-                    graphics.DrawLine(new Pen(Color.Orange), new PointF(0, y * m.squaresize), new PointF(pictureBox1.Width, y * m.squaresize));
+                    graphics.DrawLine(new Pen(Color.Orange), new PointF(0, y * m.squaresize), new PointF(mapradius*2, y * m.squaresize));
                 }
                 for (int x = 0; x < m.volumewidth; ++x)
                 {
-                    graphics.DrawLine(new Pen(Color.Orange), new PointF(x * m.squaresize, 0), new PointF(x * m.squaresize, pictureBox1.Width));
+                    graphics.DrawLine(new Pen(Color.Orange), new PointF(x * m.squaresize, 0), new PointF(x * m.squaresize, mapradius*2));
                 }
             }
 
@@ -128,10 +130,8 @@ namespace HyperbolicRenderer
                 }
                 else
                 {
-                    //trapezium.Draw(e.Graphics, true, result, m);
                     trapezium.Draw(graphics, true, Color.White, m, false);
                 }
-                //e.Graphics.DrawPolygon(new Pen(Color.White), new PointF[4] { trapezium.top_left, trapezium.bottom_left, trapezium.bottom_right, trapezium.top_right });
             }
 
             foreach (var shape in m.adjustedshapes)
@@ -185,8 +185,7 @@ namespace HyperbolicRenderer
                     }
                 }
             }
-            //e.Graphics.DrawImage(tempimage, new PointF(-pictureBox1.Width / 2, -pictureBox1.Width / 2));
-            //e.Graphics.DrawImage(tempimage, new Rectangle(0, 0, pictureBox1.Width, pictureBox1.Height));
+            e.Graphics.DrawImage(tempimage, new PointF(pictureBox1.Width / 4, pictureBox1.Width / 4));
 
             s.Stop();
             finaldraw = s.ElapsedMilliseconds;

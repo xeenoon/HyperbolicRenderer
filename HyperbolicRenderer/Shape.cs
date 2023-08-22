@@ -77,10 +77,6 @@ namespace HyperbolicRenderer
         public static PointF[] SinCurvePoints(PointF start, PointF end, Map map)
         {
             double mapsize = map.radius * 2;
-            if (end.X < 0 || start.X > mapsize || end.Y < 0 || start.Y > mapsize)
-            {
-                return new PointF[0];
-            }
 
             bool horizontal;
             double distance;
@@ -135,9 +131,13 @@ namespace HyperbolicRenderer
                 {
                     workingpoint = new PointF((float)normalheight, workingvar);
                 }
+                PointF correctpoint = map.SinScale(workingpoint);
+                PointF oldpoint = new PointF(workingpoint.X, workingpoint.Y);
                 workingpoint = map.GetBakedHeights(workingpoint);
-
-
+                if ((Math.Abs(correctpoint.X - workingpoint.X) > 0.3f || Math.Abs(correctpoint.Y - workingpoint.Y) > 0.3f) && oldpoint.X > 0 && oldpoint.Y > 0 && oldpoint.X < mapsize && oldpoint.Y < mapsize)
+                {
+                    workingpoint = new PointF(0, 0);
+                }
                 double sin_height;
                 if (horizontal)
                 {
@@ -172,7 +172,7 @@ namespace HyperbolicRenderer
 
                 if (i == distance - 1)
                 {
-                    //curveheight = (int)normalheight;
+                    curveheight = (int)normalheight;
                 }
 
                 if (horizontal)
@@ -231,10 +231,6 @@ namespace HyperbolicRenderer
                     {
                         resultheight = (int)start.X;
                     }
-                }
-                if (workingvar >= mapsize || workingvar < 0 || resultheight >= mapsize || resultheight < 0)
-                {
-                    continue;
                 }
                 if (horizontal)
                 {

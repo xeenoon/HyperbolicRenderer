@@ -320,7 +320,6 @@ namespace HyperbolicRenderer
                                      heights[x, y] = SinScale(new PointF(x, y));
                                  }
                              }
-                             baked = true;
                          });
             elapsedtime = s.ElapsedMilliseconds;
             baked = true;
@@ -331,17 +330,17 @@ namespace HyperbolicRenderer
             {
                 return new PointF(0,0);
             }
-            double xloc = relativepoint.X;
+            double xloc = Math.Round(relativepoint.X);
             while (xloc < 0)
             {
-                xloc += radius * 2;
+                xloc += (radius * 2);
             }
             while (xloc >= radius * 2)
             {
-                xloc -= radius * 2;
+                xloc -= (radius * 2);
             }
 
-            double yloc = relativepoint.Y;
+            double yloc = Math.Round(relativepoint.Y);
             while (yloc < 0)
             {
                 yloc += radius * 2;

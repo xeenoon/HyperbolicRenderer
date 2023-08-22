@@ -33,16 +33,6 @@ namespace HyperbolicRenderer
             polygonpoints.Clear();
             if (curved)
             {
-                var rightdistance = bottom_right.Y - top_right.Y;
-                var topdistance = top_right.X - top_left.X;
-
-                double t_m = (top_right.Y - top_left.Y) / topdistance;
-                double t_c = top_right.Y - t_m * top_right.X;
-
-                double r_m = rightdistance / (bottom_right.X - top_right.X);
-                double r_c = bottom_right.Y - r_m * bottom_right.X;
-
-
                 polygonpoints.AddRange(Shape.SinCurvePoints(top_left, top_right, map));
                 polygonpoints.AddRange(Shape.SinCurvePoints(top_right, bottom_right, map));
                 polygonpoints.AddRange(Shape.SinCurvePoints(bottom_left, bottom_right, map).Reverse());

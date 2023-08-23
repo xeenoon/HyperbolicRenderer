@@ -56,7 +56,7 @@ namespace GameUI
             int mapsize = (int)(height/2);
             int xoffset = (width - height)/2;
             m = new Map(4, mapsize);
-            int extrasize = 12;
+            int extrasize = 100;
             Map.extracells = extrasize;
             m.GenerateVolume(0.769f, 0, 0, false);
             //xoffset += (int)(m.squaresize * 5);
@@ -104,7 +104,6 @@ namespace GameUI
         }
 
         double rendertime;
-        bool first = true;
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkBlue);

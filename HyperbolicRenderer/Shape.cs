@@ -211,6 +211,11 @@ namespace HyperbolicRenderer
                 c = end.Y - m * end.X;
             }
 
+            if (startidx < 0 || startidx >= mapsize)
+            {
+                return Array.Empty<Vector3>();
+            }
+
             Vector3[] polygonpoints = new Vector3[(int)Math.Ceiling(distance)];
             distance = Math.Ceiling(distance);
             for (float i = 0; i < distance; ++i)

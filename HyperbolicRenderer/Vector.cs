@@ -29,8 +29,8 @@ namespace HyperbolicRenderer
         {
             this.i = i;
             this.j = j;
-            CreateVectorline();
         }
+
 
         public static Vector operator *(Vector a, double s)
         {
@@ -60,7 +60,7 @@ namespace HyperbolicRenderer
             CreateVectorline();
         }
 
-        private void CreateVectorline()
+        public void CreateVectorline()
         {
             //Generate ymc vectorline
             //Convert into a y = mx + c equation
@@ -111,7 +111,7 @@ namespace HyperbolicRenderer
             return vectorLine.SubstituteX(x);
         }
 
-        internal PointF Intersection(Vector rt)
+        internal PointF Intersection(Vector rt, PointF point)
         {
             //Convert to cartesian and compare
             var line1 = vectorLine;
@@ -133,12 +133,12 @@ namespace HyperbolicRenderer
 
             if ((j == 0 || rt.j == 0) && line1.c != 0)
             {
-                x = rt.A.X;
+                x = point.X;
                 return new PointF((float)x, (float)line1.SubstituteX(x));
             }
             if (i == 0 || rt.i == 0)
             {
-                double y = rt.A.Y;
+                double y = point.Y;
 
                 return new PointF((float)line1.SubstituteY(y), (float)y);
             }

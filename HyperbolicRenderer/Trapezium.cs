@@ -34,6 +34,11 @@ namespace HyperbolicRenderer
         }
         public void Draw(Graphics graphics, bool curved, System.Drawing.Color color, Map map, bool fill=true)
         {
+            if (top_left.X > map.radius * 2 || top_right.X < 0 || top_left.Y < 0 || bottom_left.Y > map.radius * 2)
+            {
+                return;
+            }
+
             graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             polygonpoints.Clear();
             if (curved)
@@ -76,6 +81,11 @@ namespace HyperbolicRenderer
 
         public Vector3[] GetPoints(Map map)
         {
+            if (top_left.X > map.radius*2 || top_right.X < 0 || top_left.Y < 0 || bottom_left.Y > map.radius*2)
+            {
+                return Array.Empty<Vector3>();
+            }
+
             List<Vector3> vertices = new List<Vector3>();
 
             vertices.AddRange(Shape.SinCurvePoints(top_left.ToVector(), top_right.ToVector(), map));

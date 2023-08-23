@@ -33,10 +33,11 @@ namespace HyperbolicRenderer
         public static PointF DistanceTo(this PointF p, Line line)
         {
             Vector normalvector = new Vector(line.start, line.end);
-            Vector perpindicular = normalvector.GetPerpindicular().GetUnitVector();
-            perpindicular = new Vector(p, new PointF((float)(perpindicular.i + p.X), (float)(perpindicular.j+ p.Y)));
+            Vector perpindicular = normalvector.GetPerpindicular();
+            perpindicular.A = p;
+            perpindicular.CreateVectorline();
 
-            PointF intersection = normalvector.Intersection(perpindicular);
+            PointF intersection = normalvector.Intersection(perpindicular, p);
 
             intersection = new PointF(intersection.X - p.X, intersection.Y - p.Y);
             return intersection;

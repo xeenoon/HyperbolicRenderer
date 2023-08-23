@@ -16,6 +16,10 @@ namespace HyperbolicRenderer
             this.top_right = top_right;
             this.bottom_right = bottom_right;
         }
+        public Trapezium()
+        {
+
+        }
         public static double elapseddrawtime;
         public static double elapsedtrigtime;
         Stopwatch s = new Stopwatch();

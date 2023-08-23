@@ -22,16 +22,26 @@ namespace GameUI
 
         BasicEffect effect;
 
-        public ShapeBatcher(GraphicsDevice graphicsDevice, Texture2D drawingtexture)
+        public ShapeBatcher(GraphicsDevice graphicsDevice)
         {
+            effect = new BasicEffect(graphicsDevice);
             this.graphicsDevice = graphicsDevice;
-            this.shapetexture = drawingtexture;
-        }
-        Texture2D shapetexture;
 
+            vBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColor), 1000000, BufferUsage.WriteOnly);
+            iBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.ThirtyTwoBits, 1000000, BufferUsage.None);
+
+        }
+        public double buffercopytime = 0;
         public void Render()
         {
+            vBuffer.SetData(vertices.ToArray());
+            iBuffer.SetData(indices.ToArray());
 
+
+            if (vertices.Count() == 0)
+            {
+                return;
+            }
             effect.World = Matrix.Identity;
             Matrix projection = Matrix.CreateOrthographicOffCenter(0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height, 0, 0, 1);
 
@@ -41,11 +51,23 @@ namespace GameUI
 
             effect.CurrentTechnique.Passes[0].Apply();
 
-            graphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices.ToArray(), 0, vertices.Count, indices.ToArray(), 0, indices.Count/3);
-        }
+            stopwatch.Restart();
 
+            graphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices.ToArray(), 0, vertices.Count, indices.ToArray(), 0, indices.Count / 3);
+
+            stopwatch.Stop();
+            buffercopytime += stopwatch.ElapsedMilliseconds;
+        }
+        public double drawtime = 0;
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
         public void Draw(Vector3[] points, Color color)
         {
+            stopwatch.Restart();
+            if (points.Count() <= 2)
+            {
+                return;
+            }
+
             int vertexstart = vertices.Count();
             //int indicestart = indices.Count();
             //Start at point[0] and step around clockwize, create triangles
@@ -59,16 +81,8 @@ namespace GameUI
                 //Add the triangle to the list
                 indices.AddRange(new int[3] { vertexstart, vertexstart + (i - 1), vertexstart + i });
             }
-            //indices.AddRange(new int[3] { 0, points.Length - 1, points.Length - 2 });
-            // vertices.Add(new VertexPosition(new Vector3(points[points.Length-1].X, points[points.Length-1].Y, 0)));
-
-            effect = new BasicEffect(graphicsDevice);
-
-            vBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColor), vertices.Count, BufferUsage.WriteOnly);
-            iBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.ThirtyTwoBits, indices.Count, BufferUsage.None);
-
-            vBuffer.SetData(vertices.ToArray());
-            iBuffer.SetData(indices.ToArray());
+            stopwatch.Stop();
+            drawtime += stopwatch.ElapsedMilliseconds;
         }
     }
 }

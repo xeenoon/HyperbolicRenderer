@@ -290,6 +290,10 @@ namespace HyperbolicRenderer
         }
         public PointF GetBakedHeights(PointF relativepoint)
         {
+            if (heights == null)
+            {
+                return SinScale(relativepoint);
+            }
             double xloc = Math.Round(relativepoint.X);
             double yloc = Math.Round(relativepoint.Y);
             if (heights == null || xloc < 0 || xloc >= heights.GetLength(0) || yloc < 0 || yloc >= heights.GetLength(1))

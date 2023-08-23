@@ -33,8 +33,10 @@ namespace GameUI
         {
 
             effect.World = Matrix.Identity;
-            effect.View = Matrix.CreateLookAt(new Vector3(0, 0, -10), new Vector3(0, 0, -9), Vector3.Up);
-            effect.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver2, graphicsDevice.Viewport.AspectRatio, 0.1f, 1000f);
+            Matrix projection = Matrix.CreateOrthographicOffCenter(0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height, 0, 0, 1);
+
+            effect.Projection = projection;
+
             effect.VertexColorEnabled = true;
 
             effect.CurrentTechnique.Passes[0].Apply();

@@ -27,7 +27,7 @@ namespace HyperbolicRenderer
                 return new PointF[4] {top_left, top_right, bottom_right, bottom_left};
             }
         }
-        internal void Draw(Graphics graphics, bool curved, Color color, Map map, bool fill=true)
+        public void Draw(Graphics graphics, bool curved, Color color, Map map, bool fill=true)
         {
             graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             polygonpoints.Clear();
@@ -67,6 +67,27 @@ namespace HyperbolicRenderer
                     graphics.DrawPolygon(new Pen(color), finalpoints.ToArray());
                 }
             }
-        }        
+        }
+
+        public PointF[] GetPoints(Map map)
+        {
+            polygonpoints.Clear();
+
+            polygonpoints.AddRange(Shape.SinCurvePoints(top_left, top_right, map));
+            polygonpoints.AddRange(Shape.SinCurvePoints(top_right, bottom_right, map));
+            polygonpoints.AddRange(Shape.SinCurvePoints(bottom_left, bottom_right, map).Reverse());
+            polygonpoints.AddRange(Shape.SinCurvePoints(top_left, bottom_left, map).Reverse());
+            return polygonpoints.ToArray();
+
+            List<PointF> finalpoints = new List<PointF>();
+            foreach (PointF p in polygonpoints)
+            {
+                if (p.X > 0 && p.X < map.radius * 2 && p.Y > 0 && p.Y < map.radius * 2)
+                {
+                    finalpoints.Add(p);
+                }
+            }
+            return finalpoints.ToArray();
+        }
     }
 }

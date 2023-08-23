@@ -268,7 +268,7 @@ namespace HyperbolicRenderer
 
         PointF[,] heights;
         public double elapsedtime;
-        internal void BakeHeights(int threadcount)
+        public void BakeHeights(int threadcount)
         {
             int adjustedradius = (int)((radius + (squaresize * extracells)) * 2);
             

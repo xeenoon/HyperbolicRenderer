@@ -1,9 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using HyperbolicRenderer;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 
 namespace GameUI
@@ -28,9 +31,11 @@ namespace GameUI
             _width = Window.ClientBounds.Width;
             _height = Window.ClientBounds.Height;
 
+            width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
-            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            graphics.PreferredBackBufferWidth = width;
+            graphics.PreferredBackBufferHeight = height;
             graphics.HardwareModeSwitch = false;
 
             graphics.IsFullScreen = true;
@@ -41,10 +46,12 @@ namespace GameUI
 
             base.Initialize();
         }
-
+        Map m;
+        int width;
+        int height;
         protected override void LoadContent()
         {
-            List<Shape> drawingshapes = new List<Shape>
+            /*List<Shape> drawingshapes = new List<Shape>
             {
                 Shape.CreateShape(50, 4.5f, new Vector3(0, -2, 0), Color.Black),
                 Shape.CreateShape(50, 4.4f, new Vector3(0, -2, 0), Color.White),
@@ -68,6 +75,60 @@ namespace GameUI
             foreach (var shape in drawingshapes)
             {
                 batcher.Draw(shape.points, shape.color);
+            }
+
+            */ //Snowman
+            int mapsize = (int)(height/2);
+            int xoffset = (width - height)/2;
+            m = new Map(4, mapsize);
+            Map.extracells = 10;
+            m.GenerateVolume(0.769f, 0, 0, false);
+            m.BakeHeights(10);
+
+            for (int i = 0; i < m.volume.Count; i++)
+            {
+                Trapezium trapezium = m.volume[i];
+                //Scale with a red to green to blue gradient
+                double scalingfactor = ((((i % Math.Sqrt(m.volume.Count)) * (i / (float)Math.Sqrt(m.volume.Count))) / (float)(m.volume.Count)));
+
+                if (scalingfactor < 0 || scalingfactor > 1)
+                {
+                    continue;
+                }
+
+                double red = 0;
+                double green = 0;
+                double blue = 0;
+                if (scalingfactor < 0.33f)
+                {
+                    blue = 255 - ((scalingfactor) * 255 * 3);
+                    red = scalingfactor * 3 * 255;
+                }
+                else if (scalingfactor < 0.66f)
+                {
+                    red = 255 - ((scalingfactor - 0.33f) * 3 * 255);
+                    green = (scalingfactor - 0.33f) * 3 * 255;
+                }
+                else
+                {
+                    green = 255 - ((scalingfactor - 0.66f) * 3 * 255);
+                    blue = (scalingfactor - 0.66f) * 3 * 255;
+                }
+
+
+                Color result = new Color((int)red, (int)green, (int)blue);
+                var points = trapezium.GetPoints(m);
+                if (points.Count() <= 2)
+                {
+                    continue;
+                }
+                Vector3[] vertices = new Vector3[points.Count()];
+                for (int i1 = 0; i1 < points.Length; i1++)
+                {
+                    System.Drawing.PointF point = points[i1];
+                    vertices[i1] = new Vector3((point.X) + xoffset, (point.Y), 0);
+                }
+                batcher.Draw(vertices, result);
             }
         }
 

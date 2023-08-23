@@ -26,7 +26,7 @@ namespace HyperbolicRenderer
         }
 
 
-        public static Shape CreateShape(int points, float radius, PointF position, bool flip = true)
+        public static Shape CreateShape(int points, float radius, PointF position)
         {
             PointF[] result = new PointF[points];
             double radiansstepsize = Math.Tau / points;
@@ -34,19 +34,12 @@ namespace HyperbolicRenderer
             {
                 //Draw a ray from the centre until it hits the edge of the square
                 //Make this a vector
-                double angle;
-                if (flip)
-                {
-                    angle = (3 * (Math.PI / 2)) + (radiansstepsize * i);
-                }
-                else
-                {
-                    angle = (Math.PI / 2) + radiansstepsize * i;
-                }
+                double angle = (3 * (Math.PI / 2)) + (radiansstepsize * i);
 
                 float x = (float)(Math.Cos(angle) * radius);
 
                 float y = (float)(Math.Sin(angle) * radius);
+
                 result[i] = new PointF(x + position.X, y + position.Y);
             }
             return new Shape(result, position, radius);

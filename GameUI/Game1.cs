@@ -53,7 +53,6 @@ namespace GameUI
         Stopwatch s = new Stopwatch();
         protected override void LoadContent()
         {
-            
             int mapsize = (int)(height/2);
             int xoffset = (width - height)/2;
             m = new Map(4, mapsize);
@@ -83,26 +82,9 @@ namespace GameUI
                 {
                     continue;
                 }
-                Vector3[] outervertices = new Vector3[outerpoints.Count()];
-                Vector3[] innervertices = new Vector3[innerpoints.Count()];
-                for (int i1 = 0; i1 < outervertices.Length; i1++)
-                {
-                    System.Drawing.PointF outerpoint = outerpoints[i1];
-                    outervertices[i1] = new Vector3((outerpoint.X) + xoffset, (outerpoint.Y), 0);
-                }
-                if (innerpoints.Count() <= 2)
-                {
-                    continue;
-                }
-                for (int i1 = 0; i1 < innerpoints.Length; i1++)
-                {
-                    System.Drawing.PointF innerpoint = innerpoints[i1];
-                    innervertices[i1] = new Vector3((innerpoint.X) + xoffset, (innerpoint.Y), 0);
-                }
                 
-                batcher.Draw(outervertices, new Color(0, 84, 22));
-                batcher.Draw(innervertices, Color.DarkBlue);
-
+                batcher.Draw(outerpoints, new Color(0, 84, 22));
+                batcher.Draw(innerpoints, Color.DarkBlue);
             }
             s.Stop();
             rendertime += s.ElapsedMilliseconds;
@@ -125,12 +107,11 @@ namespace GameUI
         bool first = true;
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.DarkBlue);
+            GraphicsDevice.Clear(Color.DarkBlue);
             s.Restart();
             batcher.Render();
             s.Stop();
-            rendertime = s.ElapsedMilliseconds;
-            rendertime = batcher.buffercopytime;
+            rendertime += s.ElapsedMilliseconds;
 
             base.Draw(gameTime);
         }

@@ -53,5 +53,14 @@ namespace HyperbolicRenderer
         {
             return Math.Sqrt(p.X * p.X + p.Y * p.Y);
         }
+
+        public static PointF ToPoint(this Microsoft.Xna.Framework.Vector3 pos)
+        {
+            return new PointF(pos.X, pos.Y);
+        }
+        public static Microsoft.Xna.Framework.Vector3 ToVector(this PointF point)
+        {
+            return new Microsoft.Xna.Framework.Vector3(point.X, point.Y, 0);
+        }
     }
 }

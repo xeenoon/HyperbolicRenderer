@@ -21,7 +21,7 @@ namespace HyperbolicRenderer
             int inputsize;
             int.TryParse(textBox4.Text, out inputsize);
             Map.extracells = inputsize;
-            mapradius = pictureBox1.Height / 4;
+            mapradius = pictureBox1.Height / 2;
             if (sides == -1 || scale == -1)
             {
                 return;
@@ -33,11 +33,14 @@ namespace HyperbolicRenderer
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
             m.BakeHeights(10);
 
-            pictureBox1.Invalidate();
+            pictureBox1.Refresh();
         }
         bool firstdraw = true;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            Stopwatch s = new Stopwatch();
+            s.Start();
+
             Bitmap tempimage = new Bitmap(pictureBox1.Width, pictureBox1.Height);
 
             //Graphics graphics = e.Graphics;
@@ -46,8 +49,6 @@ namespace HyperbolicRenderer
             {
                 return;
             }
-            Stopwatch s = new Stopwatch();
-            s.Start();
 
             if (firstdraw)
             {
@@ -185,7 +186,7 @@ namespace HyperbolicRenderer
                     }
                 }
             }
-            e.Graphics.DrawImage(tempimage, new PointF(pictureBox1.Width / 4, pictureBox1.Width / 4));
+            e.Graphics.DrawImage(tempimage, new PointF(0, 0));
 
             s.Stop();
             finaldraw = s.ElapsedMilliseconds;

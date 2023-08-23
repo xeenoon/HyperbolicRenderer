@@ -27,21 +27,23 @@ namespace GameUI
             effect = new BasicEffect(graphicsDevice);
             this.graphicsDevice = graphicsDevice;
 
-            vBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColor), 1000000, BufferUsage.WriteOnly);
-            iBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.ThirtyTwoBits, 1000000, BufferUsage.None);
+
 
         }
         public double buffercopytime = 0;
         public void Render()
         {
-            vBuffer.SetData(vertices.ToArray());
-            iBuffer.SetData(indices.ToArray());
-
-
             if (vertices.Count() == 0)
             {
                 return;
             }
+
+            vBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColor), vertices.Count, BufferUsage.WriteOnly);
+            iBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.ThirtyTwoBits, indices.Count, BufferUsage.None);
+
+            vBuffer.SetData(vertices.ToArray());
+            iBuffer.SetData(indices.ToArray());
+            
             effect.World = Matrix.Identity;
             Matrix projection = Matrix.CreateOrthographicOffCenter(0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height, 0, 0, 1);
 
@@ -53,7 +55,12 @@ namespace GameUI
 
             stopwatch.Restart();
 
-            graphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices.ToArray(), 0, vertices.Count, indices.ToArray(), 0, indices.Count / 3);
+            graphicsDevice.Indices = iBuffer;
+            graphicsDevice.SetVertexBuffer(vBuffer);
+
+            graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertices.Count, 0, indices.Count / 3);
+
+
 
             stopwatch.Stop();
             buffercopytime += stopwatch.ElapsedMilliseconds;

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace HyperbolicRenderer
 {
@@ -31,7 +32,7 @@ namespace HyperbolicRenderer
                 return new PointF[4] {top_left, top_right, bottom_right, bottom_left};
             }
         }
-        public void Draw(Graphics graphics, bool curved, Color color, Map map, bool fill=true)
+        public void Draw(Graphics graphics, bool curved, System.Drawing.Color color, Map map, bool fill=true)
         {
             graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             polygonpoints.Clear();
@@ -73,25 +74,28 @@ namespace HyperbolicRenderer
             }
         }
 
-        public PointF[] GetPoints(Map map)
+        public Vector3[] GetPoints(Map map)
         {
-            polygonpoints.Clear();
+            List<Vector3> vertices = new List<Vector3>();
 
-            polygonpoints.AddRange(Shape.SinCurvePoints(top_left, top_right, map));
-            polygonpoints.AddRange(Shape.SinCurvePoints(top_right, bottom_right, map));
-            polygonpoints.AddRange(Shape.SinCurvePoints(bottom_left, bottom_right, map).Reverse());
-            polygonpoints.AddRange(Shape.SinCurvePoints(top_left, bottom_left, map).Reverse());
-            return polygonpoints.ToArray();
+            vertices.AddRange(Shape.SinCurvePoints(top_left.ToVector(), top_right.ToVector(), map));
+            vertices.AddRange(Shape.SinCurvePoints(top_right.ToVector(), bottom_right.ToVector(), map));
+            vertices.AddRange(Shape.SinCurvePoints(bottom_left.ToVector(), bottom_right.ToVector(), map).Reverse());
+            vertices.AddRange(Shape.SinCurvePoints(top_left.ToVector(), bottom_left.ToVector(), map).Reverse());
 
-            List<PointF> finalpoints = new List<PointF>();
-            foreach (PointF p in polygonpoints)
+
+            List<Vector3> finalpoints = new List<Vector3>();
+            foreach (Vector3 p in vertices)
             {
                 if (p.X > 0 && p.X < map.radius * 2 && p.Y > 0 && p.Y < map.radius * 2)
                 {
                     finalpoints.Add(p);
                 }
             }
+
             return finalpoints.ToArray();
+
+           // return finalpoints.ToArray();
         }
     }
 }

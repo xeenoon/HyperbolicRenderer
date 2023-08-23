@@ -1,8 +1,10 @@
-﻿using HyperbolicRenderer;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Net.Http;
 
 namespace GameUI
 {
@@ -22,7 +24,7 @@ namespace GameUI
         int _height = 0;
         protected override void Initialize()
         {
-            batcher = new ShapeBatcher(GraphicsDevice);
+            batcher = new ShapeBatcher(GraphicsDevice, Content.Load<Texture2D>("download"));
             _width = Window.ClientBounds.Width;
             _height = Window.ClientBounds.Height;
 
@@ -33,15 +35,40 @@ namespace GameUI
 
             graphics.IsFullScreen = true;
             graphics.ApplyChanges();
+            IsMouseVisible = true;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
 
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            Shape shape = Shape.CreateShape(5, 4, new System.Drawing.PointF(10,10));
+            List<Shape> drawingshapes = new List<Shape>
+            {
+                Shape.CreateShape(50, 4.5f, new Vector3(0, -2, 0), Color.Black),
+                Shape.CreateShape(50, 4.4f, new Vector3(0, -2, 0), Color.White),
+                Shape.CreateShape(50, 3f, new Vector3(0, 3, 0), Color.Black),
+                Shape.CreateShape(50, 2.9f, new Vector3(0, 3, 0), Color.White),
+                Shape.CreateShape(50, 2f, new Vector3(0, 7, 0), Color.Black),
+                Shape.CreateShape(50, 1.9f, new Vector3(0, 7, 0), Color.White),
 
-            batcher.Draw(shape.points);
+
+                Shape.CreateShape(50, 1.5f, new Vector3(0, 7f, 0), Color.Black),
+                Shape.CreateShape(50, 1.45f, new Vector3(0, 7.2f, 0), Color.White),
+
+                Shape.CreateShape(50, 0.25f, new Vector3(1, 8f, 0), Color.Black),
+                Shape.CreateShape(50, 0.25f, new Vector3(-1, 8f, 0), Color.Black),
+                Shape.CreateShape(3, 0.5f, new Vector3(0,7,0), Color.Orange),
+
+                Shape.CreateShape(3, 0.5f, new Vector3(-0.4f,5,0), Color.Red, 0),
+                Shape.CreateShape(3, 0.5f, new Vector3(0.4f,5,0), Color.Red, Math.PI),
+            };
+
+            foreach (var shape in drawingshapes)
+            {
+                batcher.Draw(shape.points, shape.color);
+            }
         }
 
         protected override void UnloadContent()
@@ -60,7 +87,7 @@ namespace GameUI
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
             batcher.Render();
             base.Draw(gameTime);
         }

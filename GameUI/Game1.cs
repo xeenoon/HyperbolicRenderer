@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using HyperbolicRenderer;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Globalization;
@@ -17,16 +18,30 @@ namespace GameUI
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
-
+        int _width = 0;
+        int _height = 0;
         protected override void Initialize()
         {
             batcher = new ShapeBatcher(GraphicsDevice);
+            _width = Window.ClientBounds.Width;
+            _height = Window.ClientBounds.Height;
+
+
+            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            graphics.HardwareModeSwitch = false;
+
+            graphics.IsFullScreen = true;
+            graphics.ApplyChanges();
+
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            batcher.Draw();
+            Shape shape = Shape.CreateShape(5, 4, new System.Drawing.PointF(10,10));
+
+            batcher.Draw(shape.points);
         }
 
         protected override void UnloadContent()

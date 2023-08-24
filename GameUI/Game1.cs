@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SharpDX.Direct2D1.Effects;
+using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +19,10 @@ namespace GameUI
     {
         GraphicsDeviceManager graphics;
         ShapeBatcher batcher;
+
+        public SpriteBatch spriteBatch;
+        public GameManager gameManager;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -28,6 +32,7 @@ namespace GameUI
         int _height = 0;
         protected override void Initialize()
         {
+            gameManager = new GameManager(this);
             batcher = new ShapeBatcher(GraphicsDevice);
             _width = Window.ClientBounds.Width;
             _height = Window.ClientBounds.Height;
@@ -44,15 +49,19 @@ namespace GameUI
             IsMouseVisible = true;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-
             base.Initialize();
         }
         Map m;
         int width;
         int height; 
         Stopwatch s = new Stopwatch();
+        Texture2D background;
         protected override void LoadContent()
         {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            background = Content.Load<Texture2D>("spacebackground");
+
+            return;
             int mapsize = (int)(height/2);
             int xoffset = (width - height)/2;
             m = new Map(4, mapsize);
@@ -99,18 +108,30 @@ namespace GameUI
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-
+            totalseconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            gameManager.Update();
             base.Update(gameTime);
         }
 
         double rendertime;
+        public float totalseconds;
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkBlue);
+
+
+            spriteBatch.Begin();
+            spriteBatch.Draw(background, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 1);
+            gameManager.Draw();
+            spriteBatch.End();
+
+
             s.Restart();
             batcher.Render();
             s.Stop();
             rendertime += s.ElapsedMilliseconds;
+
+
 
             base.Draw(gameTime);
         }

@@ -271,36 +271,53 @@ namespace HyperbolicRenderer
         public void BakeHeights(int threadcount)
         {
             int adjustedradius = (int)((radius + (squaresize * extracells)) * 2);
-            
             heights = new PointF[adjustedradius, adjustedradius];
+
             Stopwatch s = new Stopwatch();
             s.Start();
-            Parallel.For(0, threadcount,
-                         threadindex => {
-                             for (int xi = 0; xi < adjustedradius / (threadcount); ++xi)
+            Task.Run(() =>
+            {
+                Parallel.For(0, threadcount,
+                             threadindex =>
                              {
-                                 int x = (int)(xi + threadindex*(adjustedradius / (threadcount)));
-                                 for (int y = 0; y < adjustedradius; ++y)
+                                 for (int xi = 0; xi < adjustedradius / (threadcount); ++xi)
                                  {
-                                     heights[x, y] = SinScale(new PointF(x, y));
+                                     int x = (int)(xi + threadindex * (adjustedradius / (threadcount)));
+                                     for (int y = 0; y < adjustedradius; ++y)
+                                     {
+                                         if (heights[x, y].IsEmpty)
+                                         {
+                                             heights[x, y] = SinScale(new PointF(x, y)); //Ignore already set heights
+                                         }
+                                     }
                                  }
-                             }
-                         });
-            elapsedtime = s.ElapsedMilliseconds;
+                             });
+                elapsedtime = s.ElapsedMilliseconds;
+            });
         }
         public PointF GetBakedHeights(PointF relativepoint)
         {
             if (heights == null)
             {
-                return SinScale(relativepoint);
+                int adjustedradius = (int)((radius + (squaresize * extracells)) * 2);
+                heights = new PointF[adjustedradius, adjustedradius];
             }
-            double xloc = Math.Round(relativepoint.X);
-            double yloc = Math.Round(relativepoint.Y);
+
+            var xloc = (int)Math.Round(relativepoint.X);
+            var yloc = (int)Math.Round(relativepoint.Y);
             if (heights == null || xloc < 0 || xloc >= heights.GetLength(0) || yloc < 0 || yloc >= heights.GetLength(1))
             {
                 return new PointF(0, 0);
             }
-            return heights[(int)xloc, (int)yloc];
+
+            PointF height = heights[xloc, yloc];
+            if (height.IsEmpty)
+            {
+                height = SinScale(relativepoint);
+                heights[xloc, yloc] = height; //Update the array in-case we need this one in the future
+            }
+
+            return height;
         }
     }
 }

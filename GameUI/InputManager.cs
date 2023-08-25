@@ -21,6 +21,8 @@ namespace GameUI
         }
         public static bool mouseClicked;
 
+        static double lasttime = Game1.game.totalseconds;
+
         public static void Update()
         {
             var keyboardState = Keyboard.GetState();
@@ -36,7 +38,7 @@ namespace GameUI
             }
             if (keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.Down))
             {
-                direction.Y--;
+                direction.Y-=0.2f;
             }
             if (keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right))
             {
@@ -44,7 +46,17 @@ namespace GameUI
             }
             if (keyboardState.IsKeyDown(Keys.LeftShift))
             {
-                direction.Y *= 1.5f;
+                if (direction.Y > 0) //Positive
+                {
+                    direction.Y *= 1.5f;
+                }
+            }
+
+            const double reloadtime = 0.25;
+            if (Game1.game.totalseconds - lasttime >= reloadtime && keyboardState.IsKeyDown(Keys.Space))
+            {
+                lasttime = Game1.game.totalseconds;
+                Game1.projectiles.Add(new Bullet(Game1.bullettexture, Game1.player.position));
             }
 
             mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (lastMouseState.LeftButton == ButtonState.Released);

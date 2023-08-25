@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace HyperbolicRenderer
 {
@@ -29,6 +30,11 @@ namespace HyperbolicRenderer
         {
             this.i = i;
             this.j = j;
+        }
+        public Vector(double angle)
+        {
+            i = Math.Cos(angle);
+            j = Math.Sin(angle);
         }
 
 

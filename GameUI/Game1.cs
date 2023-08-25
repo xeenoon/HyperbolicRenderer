@@ -32,7 +32,8 @@ namespace GameUI
         int _height = 0;
         protected override void Initialize()
         {
-            gameManager = new GameManager(this);
+            game = this;
+            gameManager = new GameManager();
             batcher = new ShapeBatcher(GraphicsDevice);
             _width = Window.ClientBounds.Width;
             _height = Window.ClientBounds.Height;
@@ -56,10 +57,15 @@ namespace GameUI
         int height; 
         Stopwatch s = new Stopwatch();
         Texture2D background;
+        public static Texture2D bullettexture;
+        public static Ship player;
+        public static List<Bullet> projectiles = new List<Bullet>();
+        public static Game1 game;
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = Content.Load<Texture2D>("spacebackground");
+            bullettexture = Content.Load<Texture2D>("Fireball");
 
             return;
             int mapsize = (int)(height/2);
@@ -108,13 +114,15 @@ namespace GameUI
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            totalseconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            totalseconds += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            looptime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             gameManager.Update();
             base.Update(gameTime);
         }
 
         double rendertime;
         public float totalseconds;
+        public float looptime;
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkBlue);
@@ -130,8 +138,6 @@ namespace GameUI
             batcher.Render();
             s.Stop();
             rendertime += s.ElapsedMilliseconds;
-
-
 
             base.Draw(gameTime);
         }

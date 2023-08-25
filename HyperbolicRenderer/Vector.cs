@@ -15,12 +15,18 @@ namespace HyperbolicRenderer
 
         public PointF A;
         public PointF B; //Where vector = ->
-        internal double angle //Is in radians
+        public double angle //Is in radians
         {
             //theta = arctan(j/i)
             get
             {
-                return Math.Atan(j / i);
+                double angle = Math.Atan(j / i);
+                if (i < 0)
+                {
+                    angle = Math.PI + angle;
+                }
+
+                return angle;
             }
         }
 

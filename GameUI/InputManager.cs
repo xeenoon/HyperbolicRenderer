@@ -11,7 +11,8 @@ namespace GameUI
     public static class InputManager
     {
         private static MouseState lastMouseState;
-        public static Vector2 direction;
+        public static bool moving = false;
+        public static bool boosting = false;
         public static Vector2 MousePosition
         {
             get
@@ -26,34 +27,21 @@ namespace GameUI
         public static void Update()
         {
             var keyboardState = Keyboard.GetState();
+            boosting = false;
+            moving = false;
+            if (keyboardState.IsKeyDown(Keys.Space))
+            {
+                moving = true;
+            }
 
-            direction = Vector2.Zero;
-            if (keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.Up))
-            {
-                direction.Y++;
-            }
-            if (keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left))
-            {
-                direction.X--;
-            }
-            if (keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.Down))
-            {
-                direction.Y-=0.2f;
-            }
-            if (keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right))
-            {
-                direction.X++;
-            }
             if (keyboardState.IsKeyDown(Keys.LeftShift))
             {
-                if (direction.Y > 0) //Positive
-                {
-                    direction.Y *= 1.5f;
-                }
+                boosting = true;
             }
 
+
             const double reloadtime = 0.25;
-            if (Game1.game.totalseconds - lasttime >= reloadtime && keyboardState.IsKeyDown(Keys.Space))
+            if (Game1.game.totalseconds - lasttime >= reloadtime && Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 lasttime = Game1.game.totalseconds;
                 Game1.projectiles.Add(new Bullet(Game1.bullettexture, Game1.player.position));

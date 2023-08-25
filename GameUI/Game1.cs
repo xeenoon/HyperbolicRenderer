@@ -64,7 +64,7 @@ namespace GameUI
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            background = Content.Load<Texture2D>("spacebackground");
+            background = Content.Load<Texture2D>("spaceimage");
             bullettexture = Content.Load<Texture2D>("Fireball");
 
             return;
@@ -114,15 +114,15 @@ namespace GameUI
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            totalseconds += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            looptime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            totalseconds += gameTime.ElapsedGameTime.TotalSeconds;
+            looptime = gameTime.ElapsedGameTime.TotalSeconds;
             gameManager.Update();
             base.Update(gameTime);
         }
 
         double rendertime;
-        public float totalseconds;
-        public float looptime;
+        public double totalseconds;
+        public double looptime;
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkBlue);

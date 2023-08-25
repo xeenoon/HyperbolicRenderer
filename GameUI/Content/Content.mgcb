@@ -13,18 +13,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin _527f1822-a25c-46df-8b4a-9937301bd343-removebg-preview (1).png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:_527f1822-a25c-46df-8b4a-9937301bd343-removebg-preview (1).png;ship.png
-
 #begin Fireball.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -37,7 +25,7 @@
 /processorParam:TextureFormat=Color
 /build:Fireball.png
 
-#begin spacebackground.jpg
+#begin Shipmodel.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -47,9 +35,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:spacebackground.jpg
+/build:Shipmodel.png
 
-#begin spacebackground2.jpg
+#begin spaceimage.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -59,5 +47,5 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:spacebackground2.jpg
+/build:spaceimage.jpg
 

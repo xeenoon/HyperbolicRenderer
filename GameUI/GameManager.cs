@@ -12,7 +12,7 @@ namespace GameUI
 
         public GameManager()
         {
-            Game1.player = new(Game1.game.Content.Load<Texture2D>("ship"), new(0, 0));
+            Game1.player = new(Game1.game.Content.Load<Texture2D>("Shipmodel"), new(0, 0));
         }
 
         public void Update()

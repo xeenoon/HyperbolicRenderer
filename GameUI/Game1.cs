@@ -50,8 +50,17 @@ namespace GameUI
             IsMouseVisible = true;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
+
+            InitializeParticles();
+
             base.Initialize();
         }
+
+        public StaticEmitter _staticEmitter = new(new(300, 300));
+        void InitializeParticles()
+        {
+        }
+
         Map m;
         int width;
         int height; 

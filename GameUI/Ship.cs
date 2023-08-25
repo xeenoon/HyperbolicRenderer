@@ -19,10 +19,16 @@ namespace GameUI
         double speed;
         float acceleration = 150f;
         bool forcestop;
+        bool wasmoving = false;
 
         public Ship(Texture2D tex, Vector2 pos) : base(tex, pos)
         {
         }
+
+        public StaticEmitter _staticEmitter2 = new StaticEmitter(new Vector2(500, 500));
+        public static Vector2 backend;
+        EngineEmitter engineEmitter = new EngineEmitter();
+        ParticleEmitter enginehandler;
         public void Update()
         {
             Vector traveldirection = new Vector(new System.Drawing.PointF(position.X, position.Y), new System.Drawing.PointF(InputManager.MousePosition.X, InputManager.MousePosition.Y)).GetUnitVector();
@@ -60,30 +66,19 @@ namespace GameUI
                 }
             }
 
+            var cockpitdirection = new Vector(Game1.player.rotation - Math.PI / 2).GetUnitVector();
+            double distanceaway = Game1.player.texture.Height * 0.5f;
+            Vector shippoint = cockpitdirection * distanceaway;
+            Vector shipengine = (cockpitdirection * -1) * distanceaway;
+            backend = new Vector2((float)(position.X + shipengine.i), (float)(position.Y + shipengine.j));
 
             if (InputManager.moving || speed > 0)
             {
                 Vector mousedirection = new Vector(rotation - Math.PI / 2);
-                double acceleration = this.acceleration;
-
-
-                var cockpitdirection = new Vector(Game1.player.rotation - Math.PI / 2).GetUnitVector();
-                double distanceaway = Game1.player.texture.Height * 0.5f;
-                Vector shippoint = cockpitdirection * distanceaway;
-
-
                 double distancetoend = Vector2.Distance(InputManager.MousePosition, new Vector2((float)(position.X + shippoint.i), (float)(position.Y + shippoint.j)));
-                //v^2 = u^2 + 2as
-                //0 = speed^2 + 2*-150*4*distance
-                //distance = ((speed^2))/1200
-                if (distancetoend <= speed * speed / 1200)
-                {
-                    forcestop = true;
-                }
-                else if(distancetoend >= 5) //Dont restart if we just finished stopping
-                {
-                    forcestop = false;
-                }
+
+                AutoDecelerate(distancetoend);
+                UpdateParticles();
 
                 double extraspeed = acceleration * Game1.game.looptime * (InputManager.boosting ? 2 : 1);
                 if (InputManager.moving && !forcestop)
@@ -113,17 +108,69 @@ namespace GameUI
 
                 position = new Vector2((float)((mousedirection.i * speed * Game1.game.looptime) + position.X), (float)((mousedirection.j * speed * Game1.game.looptime) + position.Y));
             }
-        }
-        private static bool TurnDirection(double myangle, double turntowards)
-        {
-            if (turntowards - myangle < Math.PI && myangle < turntowards)
-            {
-                return true; //Turn right
-            }
             else
             {
-                return false;
+                ParticleManager.particleEmitters.Remove(enginehandler);
+                wasmoving = false;
             }
+        }
+
+        private void AutoDecelerate(double distancetoend)
+        {
+            //v^2 = u^2 + 2as
+            //0 = speed^2 + 2*-150*4*distance
+            //distance = ((speed^2))/1200
+            if (distancetoend <= speed * speed / 1200)
+            {
+                ParticleManager.particleEmitters.Remove(enginehandler);
+                wasmoving = true;
+                forcestop = true;
+            }
+            else if (distancetoend >= 5) //Dont restart if we just finished stopping
+            {
+                wasmoving = false;
+                forcestop = false;
+            }
+        }
+
+        private void UpdateParticles()
+        {
+            if (!wasmoving && !ParticleManager.particleEmitters.Contains(enginehandler))
+            {
+                int count = 6;
+                float variance = 15f;
+                float sizemultipler = 1;
+                if (InputManager.boosting)
+                {
+                    count = 20;
+                    variance = 90f;
+                    sizemultipler = 2;
+                }
+                ParticleEmitterData ped2 = new()
+                {
+                    interval = 0.01f,
+                    emitCount = count,
+                    lifespanMax = 0.6f,
+                    angleVariance = variance,
+                    particleData = new ParticleData()
+                    {
+                        colorStart = Color.DarkBlue,
+                        colorEnd = Color.LightBlue,
+                        sizeStart = 8f * sizemultipler,
+                        sizeEnd = 4f * sizemultipler,
+                    },
+                };
+
+                enginehandler = new ParticleEmitter(engineEmitter, ped2);
+                ParticleManager.AddParticleEmitter(enginehandler);
+            }
+            wasmoving = true;
+        }
+        public void UpdateBoostParticles()
+        {
+            ParticleManager.particleEmitters.Remove(enginehandler);
+            wasmoving = false;
+            UpdateParticles();
         }
 
         public override void Draw()

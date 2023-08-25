@@ -9,12 +9,17 @@ namespace GameUI
 {
     public class GameManager
     {
-
+        static Random r;
         public GameManager()
         {
+            r = new Random();
             Game1.player = new(Game1.game.Content.Load<Texture2D>("Shipmodel"), new(0, 0));
         }
 
+        public static float RandomFloat(float min, float max)
+        {
+            return (float)(r.NextDouble() * (max - min)) + min;
+        }
         public void Update()
         {
             InputManager.Update();
@@ -23,6 +28,7 @@ namespace GameUI
             {
                 bullet.Update();
             }
+            ParticleManager.Update();
         }
 
         public void Draw()
@@ -32,6 +38,7 @@ namespace GameUI
             {
                 bullet.Draw();
             }
+            ParticleManager.Draw();
         }
     }
 }

@@ -13,30 +13,41 @@ namespace GameUI
         private static MouseState lastMouseState;
         public static bool moving = false;
         public static bool boosting = false;
-        public static Vector2 MousePosition
-        {
-            get
-            {
-                return Mouse.GetState().Position.ToVector2();
-            }
-        }
+        public static Vector2 MousePosition;
+
+        private static MouseState _lastMouseState;
+        public static bool HasClicked;
+
         public static bool mouseClicked;
 
         static double lasttime = Game1.game.totalseconds;
 
         public static void Update()
         {
+            var mouseState = Mouse.GetState();
+
+            HasClicked = mouseState.LeftButton == ButtonState.Pressed && _lastMouseState.LeftButton == ButtonState.Released;
+            MousePosition = mouseState.Position.ToVector2();
+
+            _lastMouseState = mouseState;
+
             var keyboardState = Keyboard.GetState();
-            boosting = false;
             moving = false;
             if (keyboardState.IsKeyDown(Keys.Space))
             {
                 moving = true;
             }
 
+            if (!keyboardState.IsKeyDown(Keys.LeftShift) && boosting) //Just lifted key?
+            {
+                boosting = false;
+                Game1.player.UpdateBoostParticles();
+            }
+            boosting = false;
             if (keyboardState.IsKeyDown(Keys.LeftShift))
             {
                 boosting = true;
+                Game1.player.UpdateBoostParticles();
             }
 
 

@@ -28,15 +28,13 @@ namespace GameUI
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
-        int _width = 0;
-        int _height = 0;
         protected override void Initialize()
         {
             game = this;
             gameManager = new GameManager();
             batcher = new ShapeBatcher(GraphicsDevice);
-            _width = Window.ClientBounds.Width;
-            _height = Window.ClientBounds.Height;
+            width = Window.ClientBounds.Width;
+            height = Window.ClientBounds.Height;
 
             width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
@@ -67,7 +65,9 @@ namespace GameUI
         Stopwatch s = new Stopwatch();
         Texture2D background;
         public static Texture2D bullettexture;
+        public static Texture2D asteroidtexture;
         public static Ship player;
+        public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
         public static Game1 game;
         protected override void LoadContent()
@@ -75,6 +75,7 @@ namespace GameUI
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = Content.Load<Texture2D>("spaceimage");
             bullettexture = Content.Load<Texture2D>("Fireball");
+            asteroidtexture = Content.Load<Texture2D>("Asteroid1");
 
             return;
             int mapsize = (int)(height/2);
@@ -131,11 +132,38 @@ namespace GameUI
 
         double rendertime;
         public double totalseconds;
+        private double lastasteroidtime;
         public double looptime;
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkBlue);
 
+            if (totalseconds - lastasteroidtime > 1) //1 asteroid per second
+            {
+                lastasteroidtime = totalseconds;
+                //Generate random place on edge
+                float edge = GameManager.RandomInt(0, 4); //0:left, 1:top, 2:right, 3:bottom
+                Vector2 startposition = new Vector2(0, 0);
+                if (edge == 0)
+                {
+                    startposition.Y = GameManager.RandomFloat(0, height);
+                }
+                else if (edge == 1) 
+                {
+                    startposition.X = GameManager.RandomFloat(0, width);
+                }
+                if (edge == 2)
+                {
+                    startposition.X = width;
+                    startposition.Y = GameManager.RandomFloat(0, height);
+                }
+                else if (edge == 3)
+                {
+                    startposition.Y = height;
+                    startposition.X = GameManager.RandomFloat(0, width);
+                }
+                asteroids.Add(new Asteroid(asteroidtexture, startposition, new Vector(GameManager.RandomDouble()-0.5, GameManager.RandomDouble()-0.5).GetUnitVector(), GameManager.RandomFloat(200,500)));
+            }
 
             spriteBatch.Begin();
             spriteBatch.Draw(background, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 1);

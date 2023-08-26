@@ -20,6 +20,14 @@ namespace GameUI
         {
             return (float)(r.NextDouble() * (max - min)) + min;
         }
+        public static float RandomInt(int min, int max)
+        {
+            return r.Next(min,max);
+        }
+        public static double RandomDouble()
+        {
+            return r.NextDouble();
+        }
         public void Update()
         {
             InputManager.Update();
@@ -28,16 +36,24 @@ namespace GameUI
             {
                 bullet.Update();
             }
+            foreach (var asteroid in Game1.asteroids)
+            {
+                asteroid.Update();
+            }
             ParticleManager.Update();
         }
 
         public void Draw()
         {
-            Game1.player.Draw();
             foreach (var bullet in Game1.projectiles)
             {
                 bullet.Draw();
             }
+            foreach (var asteroid in Game1.asteroids)
+            {
+                asteroid.Draw();
+            }
+            Game1.player.Draw();
             ParticleManager.Draw();
         }
     }

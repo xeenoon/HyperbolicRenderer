@@ -34,7 +34,6 @@ namespace GameUI
 
             if (data.speed != 0)
             {
-                _data.angle = MathHelper.ToRadians(_data.angle);
                 _direction = new Vector2((float)Math.Sin(_data.angle), -(float)Math.Cos(_data.angle));
             }
             else
@@ -114,7 +113,7 @@ namespace GameUI
     {
         public ParticleData particleData = new ParticleData();
         public float angle = 0f;
-        public float angleVariance = 45f;
+        public float angleVariance = 0.3f;
         public float lifespanMin = 0.1f;
         public float lifespanMax = 2f;
         public float speedMin = 10f;

@@ -138,12 +138,11 @@ namespace GameUI
             if (!wasmoving && !ParticleManager.particleEmitters.Contains(enginehandler))
             {
                 int count = 6;
-                float variance = 15f;
+                float variance = 0.3f;
                 float sizemultipler = 1;
                 if (InputManager.boosting)
                 {
                     count = 20;
-                    variance = 90f;
                     sizemultipler = 2;
                 }
                 ParticleEmitterData ped2 = new()
@@ -152,6 +151,7 @@ namespace GameUI
                     emitCount = count,
                     lifespanMax = 0.6f,
                     angleVariance = variance,
+                    angle = (float)(rotation - Math.PI),
                     particleData = new ParticleData()
                     {
                         colorStart = Color.DarkBlue,

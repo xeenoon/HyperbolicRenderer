@@ -60,8 +60,8 @@ namespace GameUI
         }
 
         Map m;
-        int width;
-        int height; 
+        public int width;
+        public int height; 
         Stopwatch s = new Stopwatch();
         Texture2D background;
         public static Texture2D bullettexture;

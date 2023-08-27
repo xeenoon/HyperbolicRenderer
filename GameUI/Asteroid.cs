@@ -15,6 +15,7 @@ namespace GameUI
         public Vector direction;
         double rotation;
         double rotationspeed;
+        public bool disappear;
 
         public Asteroid(Texture2D tex, Vector2 pos, Vector direction, double speed) : base(tex, pos)
         {
@@ -32,9 +33,9 @@ namespace GameUI
         {
             rotation += (rotationspeed * Game1.game.looptime);
             position = new Vector2 (position.X + (float)(speed*Game1.game.looptime*direction.i), position.Y + (float)(speed * Game1.game.looptime * direction.j));
-            if (position.X < -100 || position.Y < -100)
+            if (position.X < -100 || position.Y < -100 || position.X > (Game1.game.width + 100) || position.Y > (Game1.game.height+100))
             {
-                //Game1.asteroids.Remove(this); //Disappear
+                disappear = true;
             }
         }
     }

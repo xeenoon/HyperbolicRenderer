@@ -75,13 +75,9 @@ namespace ImageCollider
                                     continue;
                                 }
                                 Color color = lookup.GetPixel((int)x, (int)y);
-                                if (color.R > 200 && color.G > 200 && color.B > 200)
+                                if (color.A > 0 && color.A < 255)
                                 {
                                     writebmp.SetPixel((int)x, (int)y, Color.Red);
-                                }
-                                else
-                                {
-                                    writebmp.SetPixel((int)x, (int)y, color);
                                 }
                             }
                         }

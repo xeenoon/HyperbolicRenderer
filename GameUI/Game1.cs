@@ -18,7 +18,7 @@ namespace GameUI
     public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
-        ShapeBatcher batcher;
+        public ShapeBatcher batcher;
 
         public SpriteBatch spriteBatch;
         public GameManager gameManager;
@@ -170,10 +170,8 @@ namespace GameUI
             gameManager.Draw();
             spriteBatch.End();
 
-
-            s.Restart();
             batcher.Render();
-            s.Stop();
+
             rendertime += s.ElapsedMilliseconds;
 
             base.Draw(gameTime);

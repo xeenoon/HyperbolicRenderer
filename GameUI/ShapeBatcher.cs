@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GameUI
 {
-    internal class ShapeBatcher
+    public class ShapeBatcher
     {
         GraphicsDevice graphicsDevice;
 
@@ -67,7 +67,7 @@ namespace GameUI
         }
         public double drawtime = 0;
         System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-        public void Draw(Vector3[] points, Color color)
+        public void Draw(Vector2[] points, Color color)
         {
             stopwatch.Restart();
             if (points.Count() <= 2)

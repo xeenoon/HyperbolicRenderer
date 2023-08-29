@@ -41,6 +41,7 @@ namespace GameUI
                 asteroid.Update();
             }
             ParticleManager.Update();
+            Collider.Update();
         }
 
         public void Draw()

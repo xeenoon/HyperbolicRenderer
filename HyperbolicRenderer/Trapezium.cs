@@ -79,14 +79,14 @@ namespace HyperbolicRenderer
             }
         }
 
-        public Vector3[] GetPoints(Map map)
+        public Vector2[] GetPoints(Map map)
         {
             if (top_left.X > map.radius*2 || top_right.X < 0 || top_left.Y < 0 || bottom_left.Y > map.radius*2)
             {
-                return Array.Empty<Vector3>();
+                return Array.Empty<Vector2>();
             }
 
-            List<Vector3> vertices = new List<Vector3>();
+            List<Vector2> vertices = new List<Vector2>();
 
             vertices.AddRange(Shape.SinCurvePoints(top_left.ToVector(), top_right.ToVector(), map));
             vertices.AddRange(Shape.SinCurvePoints(top_right.ToVector(), bottom_right.ToVector(), map));
@@ -94,8 +94,8 @@ namespace HyperbolicRenderer
             vertices.AddRange(Shape.SinCurvePoints(top_left.ToVector(), bottom_left.ToVector(), map).Reverse());
 
 
-            List<Vector3> finalpoints = new List<Vector3>();
-            foreach (Vector3 p in vertices)
+            List<Vector2> finalpoints = new List<Vector2>();
+            foreach (Vector2 p in vertices)
             {
                 if (p.X > 0 && p.X < map.radius * 2 && p.Y > 0 && p.Y < map.radius * 2)
                 {
@@ -104,8 +104,6 @@ namespace HyperbolicRenderer
             }
 
             return finalpoints.ToArray();
-
-           // return finalpoints.ToArray();
         }
     }
 }

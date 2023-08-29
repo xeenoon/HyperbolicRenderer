@@ -184,7 +184,7 @@ namespace HyperbolicRenderer
 
             return polygonpoints;
         }
-        public static Vector3[] SinCurvePoints(Vector3 start, Vector3 end, Map map)
+        public static Vector2[] SinCurvePoints(Vector3 start, Vector3 end, Map map)
         {
             double mapsize = map.radius * 2;
 
@@ -213,10 +213,10 @@ namespace HyperbolicRenderer
 
             if (startidx < 0 || startidx >= mapsize)
             {
-                return Array.Empty<Vector3>();
+                return Array.Empty<Vector2>();
             }
 
-            Vector3[] polygonpoints = new Vector3[(int)Math.Ceiling(distance)];
+            Vector2[] polygonpoints = new Vector2[(int)Math.Ceiling(distance)];
             distance = Math.Ceiling(distance);
             for (float i = 0; i < distance; ++i)
             {
@@ -287,11 +287,11 @@ namespace HyperbolicRenderer
 
                 if (horizontal)
                 {
-                    polygonpoints[(int)i] = new Vector3(workingvar, curveheight, 0);
+                    polygonpoints[(int)i] = new Vector2(workingvar, curveheight);
                 }
                 else
                 {
-                    polygonpoints[(int)i] = new Vector3(curveheight, workingvar, 0);
+                    polygonpoints[(int)i] = new Vector2(curveheight, workingvar);
                 }
             }
 

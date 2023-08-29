@@ -1,6 +1,7 @@
 ﻿using HyperbolicRenderer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct2D1.Effects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +24,21 @@ namespace GameUI
         {
             this.speed = speed;
             this.direction = direction;
-            rotation = GameManager.RandomFloat(0, 50);
-            rotationspeed = GameManager.RandomFloat(0, 5);
+            //rotation = GameManager.RandomFloat(0, 50);
+            //rotationspeed = GameManager.RandomFloat(0, 5);
 
-            collider = new Collider(new List<Vector2>() { new Vector2(pos.X - 10, pos.Y - 10), new Vector2(pos.X + 10, pos.Y - 10), new Vector2(pos.X + 10, pos.Y + 10), new Vector2(pos.X - 10, pos.Y + 10) }, OnCollision, pos);
-            shapedrawidx = Game1.game.batcher.AddMoveableShape(collider.points.ToArray(), Color.White, position);
+            collider = new Collider(
+                new List<Vector2>() { 
+                    new Vector2(-50, -50),
+                    new Vector2(+50, -50), 
+                    new Vector2(+50, +50), 
+                    new Vector2(-50, +50), 
+                }, 
+                
+                OnCollision, pos);
+
+            shapedrawidx = Game1.game.batcher.AddMoveableShape(collider.points.ToArray(), Color.White, Vector2.Zero);
+            Game1.game.batcher.shapes[shapedrawidx].Move(position);
         }
         public bool OnCollision()
         {

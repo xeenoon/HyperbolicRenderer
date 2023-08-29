@@ -17,6 +17,7 @@ namespace GameUI
         double rotationspeed;
         public bool disappear;
         public Collider collider;
+        public int shapedrawidx = 0;
 
         public Asteroid(Texture2D tex, Vector2 pos, Vector direction, double speed) : base(tex, pos)
         {
@@ -26,6 +27,7 @@ namespace GameUI
             rotationspeed = GameManager.RandomFloat(0, 5);
 
             collider = new Collider(new List<Vector2>() { new Vector2(pos.X - 10, pos.Y - 10), new Vector2(pos.X + 10, pos.Y - 10), new Vector2(pos.X + 10, pos.Y + 10), new Vector2(pos.X - 10, pos.Y + 10) }, OnCollision, pos);
+            shapedrawidx = Game1.game.batcher.AddMoveableShape(collider.points.ToArray(), Color.White, position);
         }
         public bool OnCollision()
         {
@@ -34,7 +36,6 @@ namespace GameUI
         public override void Draw()
         {
             Game1.game.spriteBatch.Draw(texture, position, null, Color.White, (float)rotation, origin, 1f, SpriteEffects.None, 1);
-            Game1.game.batcher.Draw(collider.points.ToArray(), Color.White);
         }
         public void Update()
         {
@@ -44,6 +45,7 @@ namespace GameUI
             {
                 disappear = true;
             }
+            Game1.game.batcher.shapes[shapedrawidx].Move(position);
         }
     }
 }

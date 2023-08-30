@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HyperbolicRenderer", "Hyper
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameUI", "GameUI\GameUI.csproj", "{085C32D1-EEA9-4343-B766-DE0450EBE4B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageCollider", "ImageCollider\ImageCollider.csproj", "{A52BA76D-30EF-4858-903C-7D209BE329B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageCollider", "ImageCollider\ImageCollider.csproj", "{A52BA76D-30EF-4858-903C-7D209BE329B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

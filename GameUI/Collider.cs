@@ -26,6 +26,17 @@ namespace GameUI
                 longestdistance = Math.Max(longestdistance, Vector2.Distance(centre, point));
             }
         }
+        public Collider(Vector2[] points, Func<bool> OnCollision, Vector2 centre)
+        {
+            this.points = points.ToList();
+            this.OnCollision = OnCollision;
+            location = centre;
+
+            foreach (var point in points)
+            {
+                longestdistance = Math.Max(longestdistance, Vector2.Distance(centre, point));
+            }
+        }
 
         struct Collision
         {

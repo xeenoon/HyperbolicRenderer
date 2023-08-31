@@ -13,7 +13,7 @@ namespace GameUI
     {
         private readonly ParticleData _data;
         private Vector2 _position;
-        private float _lifespanLeft;
+        public float _lifespanLeft;
         private float _lifespanAmount;
         private Color _color;
         private float _opacity;

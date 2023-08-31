@@ -151,5 +151,23 @@ namespace GameUI
 
             base.Draw(gameTime);
         }
+
+        internal void Reset()
+        {
+            foreach (var asteroid in asteroids)
+            {
+                asteroid.disappear = true;
+            }
+            foreach (var bullet in projectiles)
+            {
+                bullet.Dispose();
+            }
+            foreach (var particle in ParticleManager.particles)
+            {
+                particle._lifespanLeft = 0;
+            }
+            ParticleManager.particleEmitters.Remove(player.enginehandler);
+            player.position = new Vector2(width / 2, height / 2);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HyperbolicRenderer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace GameUI
         public StaticEmitter _staticEmitter2 = new StaticEmitter(new Vector2(500, 500));
         public static Vector2 backend;
         EngineEmitter engineEmitter = new EngineEmitter();
-        ParticleEmitter enginehandler;
+        public ParticleEmitter enginehandler;
         public void Update()
         {
             Vector traveldirection = new Vector(new System.Drawing.PointF(position.X, position.Y), new System.Drawing.PointF(InputManager.MousePosition.X, InputManager.MousePosition.Y)).GetUnitVector();
@@ -218,7 +219,16 @@ namespace GameUI
         }
         public override void Draw()
         {
-            Game1.game.spriteBatch.Draw(texture, position, null, Color.White, 0, origin, 0.02f, SpriteEffects.None, 1);
+            if (!disappear)
+            {
+                Game1.game.spriteBatch.Draw(texture, position, null, Color.White, 0, origin, 0.02f, SpriteEffects.None, 1);
+            }
+        }
+        public bool disappear;
+        public override void Dispose()
+        {
+            disappear = true;
+            base.Dispose();
         }
     }
 }

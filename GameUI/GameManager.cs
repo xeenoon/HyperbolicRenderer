@@ -26,10 +26,21 @@ namespace GameUI
             return r.NextDouble();
         }
         static double lastasteroidtime;
+        static double crashtime = 0;
         public static void Update()
         {
             if (stop)
             {
+                if (crashtime == 0)
+                {
+                    crashtime = Game1.game.totalseconds;
+                }
+                if (Game1.game.totalseconds - crashtime >= 5) //5 seconds for respawn
+                {
+                    Game1.game.Reset();
+                    crashtime = 0;
+                    stop = false;
+                }
                 return;
             }
 

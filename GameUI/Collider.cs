@@ -41,8 +41,6 @@ namespace GameUI
                 longestdistance = Math.Max(longestdistance, Vector2.Distance(centre, point));
             }
 
-            longestdistance = double.MaxValue;
-
             this.tag = tag;
             location = new Vector2(0, 0);
             Move(centre);

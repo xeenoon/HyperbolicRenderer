@@ -144,25 +144,38 @@ namespace GameUI
                 //Generate random place on edge
                 float edge = GameManager.RandomInt(0, 4); //0:left, 1:top, 2:right, 3:bottom
                 Vector2 startposition = new Vector2(0, 0);
+                double xdirection = GameManager.RandomDouble()-0.5;
+                double ydirection = GameManager.RandomDouble()-0.5;
+
+
                 if (edge == 0)
                 {
                     startposition.Y = GameManager.RandomFloat(0, height);
+                    //Spawn on left, can only move right
+                    xdirection += 0.5;
                 }
                 else if (edge == 1) 
                 {
                     startposition.X = GameManager.RandomFloat(0, width);
+                    //Spawn on top, can only move down
+                    ydirection += 0.5;
                 }
                 if (edge == 2)
                 {
                     startposition.X = width;
                     startposition.Y = GameManager.RandomFloat(0, height);
+                    //Spawn on right, can only move left
+                    xdirection -= 0.5;
                 }
                 else if (edge == 3)
                 {
                     startposition.Y = height;
                     startposition.X = GameManager.RandomFloat(0, width);
+                    //Spawn on bottom, can only move up
+                    ydirection -= 0.5;
                 }
-                asteroids.Add(new Asteroid(asteroidtexture, startposition, new Vector(GameManager.RandomDouble()-0.5, GameManager.RandomDouble()-0.5).GetUnitVector(), GameManager.RandomFloat(200,500)));
+
+                asteroids.Add(new Asteroid(asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(200,500)));
             }
 
             spriteBatch.Begin();

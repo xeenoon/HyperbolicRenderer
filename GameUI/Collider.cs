@@ -62,16 +62,17 @@ namespace GameUI
         }
         public static void Update()
         {
-            //Potential collisions will only occur if the centres of each object are in the range of:
-            //obj1.longestdistance + obj2.longestdistance
-            //Since no points are further away from the centre, remove all colliders which are too far away
-
+            
             List<Collision> collisions = new List<Collision>();
 
             foreach (var collider in colliders)
             {
                 foreach (var potentialcollision in colliders.Where(c=>c!=collider))
                 {
+                    //Potential collisions will only occur if the centres of each object are in the range of:
+                    //obj1.longestdistance + obj2.longestdistance
+                    //Since no points are further away from the centre, remove all colliders which are too far away
+
                     if (Vector2.Distance(potentialcollision.location, collider.location) < potentialcollision.longestdistance + collider.longestdistance)
                     {
                         if (!collisions.Any(c=>c.a==potentialcollision && c.b == collider))

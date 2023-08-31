@@ -61,6 +61,30 @@
 /processorParam:TextureFormat=Color
 /build:ShootheAsteroid1.png;Asteroid1.png
 
+#begin smallasteroid2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:smallasteroid2.png;Asteroid2.png
+
+#begin smallasteroid3.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:smallasteroid3.png;Asteroid3.png
+
 #begin spaceimage.jpg
 /importer:TextureImporter
 /processor:TextureProcessor

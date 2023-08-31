@@ -65,7 +65,9 @@ namespace GameUI
         Stopwatch s = new Stopwatch();
         Texture2D background;
         public static Texture2D bullettexture;
-        public static Texture2D asteroidtexture;
+        public static Texture2D large_asteroidtexture;
+        public static Texture2D medium_asteroidtexture;
+        public static Texture2D small_asteroidtexture;
         public static Ship player;
         public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
@@ -75,7 +77,9 @@ namespace GameUI
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = Content.Load<Texture2D>("spaceimage");
             bullettexture = Content.Load<Texture2D>("Fireball");
-            asteroidtexture = Content.Load<Texture2D>("Asteroid1");
+            large_asteroidtexture = Content.Load<Texture2D>("Asteroid1");
+            medium_asteroidtexture = Content.Load<Texture2D>("Asteroid2");
+            small_asteroidtexture = Content.Load<Texture2D>("Asteroid3");
 
             return;
             int mapsize = (int)(height/2);
@@ -138,7 +142,7 @@ namespace GameUI
         {
             GraphicsDevice.Clear(Color.DarkBlue);
 
-            if (totalseconds - lastasteroidtime > 1) //1 asteroid per second
+            if (totalseconds - lastasteroidtime > 0.2) //1 asteroid per second
             {
                 lastasteroidtime = totalseconds;
                 //Generate random place on edge
@@ -175,7 +179,19 @@ namespace GameUI
                     ydirection -= 0.5;
                 }
 
-                asteroids.Add(new Asteroid(asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(200,500)));
+                double randomsize = GameManager.RandomDouble();
+                if (randomsize > 0.7)
+                {
+                    asteroids.Add(new Asteroid(large_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(200, 500), AsteroidType.Large));
+                }
+                else if(randomsize > 0.3)
+                {
+                    asteroids.Add(new Asteroid(medium_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(400, 800), AsteroidType.Medium));
+                }
+                else
+                {
+                    asteroids.Add(new Asteroid(small_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(600, 1000), AsteroidType.Small));
+                }
             }
 
             spriteBatch.Begin();

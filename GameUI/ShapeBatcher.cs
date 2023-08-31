@@ -87,14 +87,15 @@ namespace GameUI
                 indices.AddRange(new int[3] { vertexstart, vertexstart + (i - 1), vertexstart + i });
             }
         }
-        public int AddMoveableShape(Vector2[] points, Color color, Vector2 centre) //Returns the index of the shape
+        public MoveableShape AddMoveableShape(Vector2[] points, Color color, Vector2 centre) //Returns the index of the shape
         {
             int vertexstart = vertices.Count; //inclusive
             AddShape(points, color);
             int vertexend = vertices.Count; //exclusive
 
-            shapes.Add(new MoveableShape(vertexstart, vertexend, centre, this));
-            return shapes.Count-1;
+            MoveableShape moveableshape = new MoveableShape(vertexstart, vertexend, centre, this, color);
+            shapes.Add(moveableshape);
+            return moveableshape;
         }
     }
 
@@ -105,18 +106,20 @@ namespace GameUI
                                 //Since we dont add vertices, we dont need an index of indices
         public Vector2 location;
         public ShapeBatcher batcher;
+        public Color color;
 
-        public MoveableShape(int vertexstart, int vertexend, Vector2 location, ShapeBatcher batcher)
+        public MoveableShape(int vertexstart, int vertexend, Vector2 location, ShapeBatcher batcher, Color color)
         {
             this.vertexstart = vertexstart;
             this.vertexend = vertexend;
             this.location = location;
             this.batcher = batcher;
+            this.color = color;
         }
 
         public void Move(Vector2 newlocation)
         {
-            Vector3 change = new Vector3((newlocation - location).X, (newlocation - location).Y, 0);
+            Vector3 change = new Vector3((newlocation.X - location.X), (newlocation.Y - location.Y), 0);
             if (change == Vector3.Zero)
             {
                 return;
@@ -124,7 +127,7 @@ namespace GameUI
             for (int i = vertexstart; i < vertexend; ++i)
             {
                 Vector3 oldlocation = batcher.vertices[i].Position;
-                batcher.vertices[i] = new VertexPositionColor(oldlocation + change, batcher.vertices[i].Color); //Move all the vertices
+                batcher.vertices[i] = new VertexPositionColor(oldlocation + change, color); //Move all the vertices
             }
             location = newlocation;
         }
@@ -133,7 +136,7 @@ namespace GameUI
             for (int i = vertexstart; i < vertexend; ++i)
             {
                 Vector3 v = batcher.vertices[i].Position;
-                batcher.vertices[i] = new VertexPositionColor(v.Rotate(location.X, location.Y, rotation),batcher.vertices[i].Color);
+                batcher.vertices[i] = new VertexPositionColor(v.Rotate(location.X, location.Y, rotation), color);
             }
         }
     }

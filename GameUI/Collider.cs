@@ -9,15 +9,16 @@ using System.Threading.Tasks;
 
 namespace GameUI
 {
-    public class Collider
+    public class Collider : IDisposable
     {
         public List<Vector2> points = new List<Vector2>();
         public Vector2 location;
         double longestdistance = double.NegativeInfinity;
-        public Func<bool> OnCollision;
+        public Func<string, bool> OnCollision;
         public static List<Collider> colliders = new List<Collider>();
+        public string tag;
 
-        public Collider(List<Vector2> points, Func<bool> OnCollision, Vector2 centre)
+        public Collider(List<Vector2> points, Func<string, bool> OnCollision, Vector2 centre, string tag)
         {
             this.points = points;
             this.OnCollision = OnCollision;
@@ -27,17 +28,27 @@ namespace GameUI
             {
                 longestdistance = Math.Max(longestdistance, Vector2.Distance(centre, point));
             }
+
+            this.tag = tag;
         }
-        public Collider(Vector2[] points, Func<bool> OnCollision, Vector2 centre)
+        public Collider(Vector2[] points, Func<string, bool> OnCollision, Vector2 centre, string tag)
         {
             this.points = points.Copy();
             this.OnCollision = OnCollision;
-            location = centre;
 
             foreach (var point in points)
             {
                 longestdistance = Math.Max(longestdistance, Vector2.Distance(centre, point));
             }
+
+            longestdistance = double.MaxValue;
+
+            this.tag = tag;
+            location = new Vector2(0, 0);
+            Move(centre);
+
+            colliders.Add(this);
+
         }
 
         struct Collision
@@ -61,7 +72,7 @@ namespace GameUI
 
             foreach (var collider in colliders)
             {
-                foreach (var potentialcollision in colliders)
+                foreach (var potentialcollision in colliders.Where(c=>c!=collider))
                 {
                     if (Vector2.Distance(potentialcollision.location, collider.location) < potentialcollision.longestdistance + collider.longestdistance)
                     {
@@ -73,8 +84,8 @@ namespace GameUI
                                 {
                                     //There is a collision, add it
                                     collisions.Add(new Collision(collider, potentialcollision));
-                                    collider.OnCollision();
-                                    potentialcollision.OnCollision();
+                                    collider.OnCollision(potentialcollision.tag);
+                                    potentialcollision.OnCollision(collider.tag);
                                 }
                             }
                         }
@@ -94,7 +105,7 @@ namespace GameUI
 
         internal void Move(Vector2 newlocation)
         {
-            Vector2 change = new Vector2((newlocation - location).X, (newlocation - location).Y);
+            Vector2 change = new Vector2((newlocation.X - location.X), (newlocation.Y - location.Y));
             if (change == Vector2.Zero)
             {
                 return;
@@ -105,6 +116,11 @@ namespace GameUI
                 points[i] = oldlocation + change; //Move all the vertices
             }
             location = newlocation;
+        }
+
+        public void Dispose()
+        {
+            colliders.Remove(this);
         }
     }
 }

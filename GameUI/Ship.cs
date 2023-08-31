@@ -19,24 +19,23 @@ namespace GameUI
         bool forcestop;
         bool wasmoving = false;
         public Collider collider;
-        public int shapedrawidx = 0;
+        //public MoveableShape graphicalcollider;
 
 
-        //Centre -34,-27
+        //Centre -34,-27 
         //Resolution 0.3
 
         public static Vector2[] colliderpoints = new Vector2[74] { new Vector2(3, 17), new Vector2(2, 15), new Vector2(3, 14), new Vector2(1, 13), new Vector2(-1, 13), new Vector2(-4, 14), new Vector2(-5, 12), new Vector2(-7, 15), new Vector2(-7, 18), new Vector2(-7, 21), new Vector2(-7, 24), new Vector2(-10, 26), new Vector2(-11, 24), new Vector2(-12, 22), new Vector2(-14, 21), new Vector2(-14, 18), new Vector2(-16, 17), new Vector2(-18, 16), new Vector2(-21, 16), new Vector2(-24, 16), new Vector2(-26, 15), new Vector2(-29, 15), new Vector2(-32, 15), new Vector2(-34, 14), new Vector2(-34, 10), new Vector2(-33, 9), new Vector2(-32, 6), new Vector2(-31, 5), new Vector2(-29, 4), new Vector2(-27, 2), new Vector2(-25, 1), new Vector2(-24, 0), new Vector2(-22, -3), new Vector2(-20, -4), new Vector2(-19, -5), new Vector2(-17, -6), new Vector2(-16, -7), new Vector2(-14, -10), new Vector2(-12, -11), new Vector2(-10, -13), new Vector2(-9, -14), new Vector2(-9, -16), new Vector2(-9, -18), new Vector2(-8, -19), new Vector2(-6, -20), new Vector2(-6, -24), new Vector2(-5, -25), new Vector2(-4, -26), new Vector2(-1, -26), new Vector2(0, -25), new Vector2(1, -22), new Vector2(4, -19), new Vector2(4, -16), new Vector2(5, -13), new Vector2(8, -10), new Vector2(10, -9), new Vector2(13, -6), new Vector2(16, -3), new Vector2(18, -2), new Vector2(21, 1), new Vector2(24, 4), new Vector2(26, 5), new Vector2(28, 8), new Vector2(29, 11), new Vector2(29, 14), new Vector2(26, 15), new Vector2(23, 15), new Vector2(20, 16), new Vector2(17, 16), new Vector2(14, 16), new Vector2(11, 17), new Vector2(9, 20), new Vector2(7, 23), new Vector2(5, 26), };
 
         public Ship(Texture2D tex, Vector2 pos) : base(tex, pos)
         {
-            collider = new Collider(colliderpoints, OnCollision, pos);
+            collider = new Collider(colliderpoints, OnCollision, pos, "PLAYER");
 
-            shapedrawidx = Game1.game.batcher.AddMoveableShape(collider.points.ToArray(), Color.White, Vector2.Zero);
-            Game1.game.batcher.shapes[shapedrawidx].Move(position);
-            collider.Move(position);
+            //graphicalcollider = Game1.game.batcher.AddMoveableShape(collider.points.ToArray(), Color.White, Vector2.Zero);
+            //graphicalcollider.Move(position);
         }
 
-        public bool OnCollision()
+        public bool OnCollision(string tag)
         {
             return false;
         }
@@ -130,8 +129,8 @@ namespace GameUI
                 wasmoving = false;
             }
 
-            Game1.game.batcher.shapes[shapedrawidx].Move(position);
-            Game1.game.batcher.shapes[shapedrawidx].Rotate(rotationchange);
+            //graphicalcollider.Move(position);
+            //graphicalcollider.Rotate(rotationchange);
             collider.Move(position);
             collider.Rotate(rotationchange);
         }

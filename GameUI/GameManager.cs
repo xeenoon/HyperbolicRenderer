@@ -57,7 +57,7 @@ namespace GameUI
 
             foreach (var asteroid in Game1.asteroids.Where(a=>a.disappear).ToList())
             {
-                Game1.asteroids.Remove(asteroid);
+                asteroid.Dispose();
             }
             Game1.player.Draw();
             ParticleManager.Draw();

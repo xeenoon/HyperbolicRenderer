@@ -67,7 +67,6 @@ namespace GameUI
         System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
         public void AddShape(Vector2[] points, Color color)
         {
-            stopwatch.Restart();
             if (points.Count() <= 2)
             {
                 return;
@@ -87,9 +86,6 @@ namespace GameUI
                 //Add the triangle to the list
                 indices.AddRange(new int[3] { vertexstart, vertexstart + (i - 1), vertexstart + i });
             }
-            
-            stopwatch.Stop();
-            drawtime += stopwatch.ElapsedMilliseconds;
         }
         public int AddMoveableShape(Vector2[] points, Color color, Vector2 centre) //Returns the index of the shape
         {

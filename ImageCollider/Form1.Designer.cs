@@ -37,6 +37,8 @@
             textBox2 = new TextBox();
             label2 = new Label();
             label3 = new Label();
+            label4 = new Label();
+            textBox3 = new TextBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -64,7 +66,7 @@
             // button2
             // 
             button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button2.Location = new Point(663, 53);
+            button2.Location = new Point(658, 64);
             button2.Name = "button2";
             button2.Size = new Size(85, 23);
             button2.TabIndex = 2;
@@ -75,10 +77,10 @@
             // textBox1
             // 
             textBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            textBox1.Location = new Point(470, 125);
+            textBox1.Location = new Point(470, 135);
             textBox1.Multiline = true;
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(318, 313);
+            textBox1.Size = new Size(318, 303);
             textBox1.TabIndex = 3;
             // 
             // label1
@@ -86,7 +88,7 @@
             label1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(473, 95);
+            label1.Location = new Point(473, 108);
             label1.Name = "label1";
             label1.Size = new Size(62, 21);
             label1.TabIndex = 4;
@@ -97,7 +99,7 @@
             comboBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             comboBox1.FormattingEnabled = true;
             comboBox1.Items.AddRange(new object[] { "Vector2", "Point", "PointF" });
-            comboBox1.Location = new Point(541, 95);
+            comboBox1.Location = new Point(541, 108);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(121, 23);
             comboBox1.TabIndex = 5;
@@ -105,7 +107,7 @@
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(542, 54);
+            textBox2.Location = new Point(542, 37);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 7;
@@ -114,7 +116,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(473, 57);
+            label2.Location = new Point(473, 40);
             label2.Name = "label2";
             label2.Size = new Size(63, 15);
             label2.TabIndex = 8;
@@ -126,17 +128,36 @@
             label3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(474, 20);
+            label3.Location = new Point(474, 12);
             label3.Name = "label3";
             label3.Size = new Size(165, 21);
             label3.TabIndex = 9;
             label3.Text = "Generation Settings:";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(493, 67);
+            label4.Name = "label4";
+            label4.Size = new Size(42, 15);
+            label4.TabIndex = 10;
+            label4.Text = "Centre";
+            // 
+            // textBox3
+            // 
+            textBox3.Location = new Point(542, 64);
+            textBox3.Name = "textBox3";
+            textBox3.Size = new Size(100, 23);
+            textBox3.TabIndex = 11;
+            textBox3.Text = "0,0";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(textBox3);
+            Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(textBox2);
@@ -164,5 +185,7 @@
         private TextBox textBox2;
         private Label label2;
         private Label label3;
+        private Label label4;
+        private TextBox textBox3;
     }
 }

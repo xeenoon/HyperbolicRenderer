@@ -42,7 +42,7 @@ namespace GameUI
                 {
                     rotation -= Math.Tau;
                 }
-                if ((mouseangle - rotation < Math.PI && rotation < mouseangle))
+                if ((mouseangle - rotation <= Math.PI && rotation < mouseangle))
                 {
                     if (rotation + rotationamount <= mouseangle)
                     {
@@ -50,7 +50,7 @@ namespace GameUI
                     }
                     else
                     {
-                        rotation = mouseangle;
+                       // rotation = mouseangle;
                     }
                 }
                 else
@@ -61,7 +61,8 @@ namespace GameUI
                     }
                     else
                     {
-                        rotation = mouseangle; //Reset the circle
+                        rotation += Math.Tau;
+                      //  rotation = mouseangle; //Reset the circle
                     }
                 }
             }

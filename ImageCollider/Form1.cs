@@ -10,6 +10,7 @@ namespace ImageCollider
     {
         Bitmap image;
         float resolution = 1;
+        PointF centre = new PointF(0, 0);
 
         public Form1()
         {
@@ -128,13 +129,16 @@ namespace ImageCollider
 
 
             GrahamsAlgorithm(points[0].position, points.Select(p => p.position).ToList(), ref highdefpoints);
+            highdefpoints.Reverse();
             for (int i = 0; i < highdefpoints.Count; i++)
             {
                 PointF p = highdefpoints[i];
                 if (i % resolution == 0) //Incrementally remove points to decrease resolution
                 {
+                    PointF adjustedpoint = new PointF(centre.X + p.X, centre.Y + p.Y);
+                    
                     polygonpoints.Add(p);
-                    data += string.Format("new {0}({1},{2}),", comboBox1.SelectedItem, p.X, image.Height - p.Y);
+                    data += string.Format("new {0}({1},{2}),", comboBox1.SelectedItem, adjustedpoint.X, adjustedpoint.Y);
                 }
             }
 
@@ -205,6 +209,20 @@ namespace ImageCollider
                 }
                 resolution = (int)(1 / (userinput));
             }
+
+            string[] centredata = textBox3.Text.Split(',');
+            if (centredata.Count() != 2)
+            {
+                MessageBox.Show("Invalid centre");
+                return;
+            }
+            float x;
+            float y;
+            float.TryParse(centredata[0], out x);
+            float.TryParse(centredata[1], out y);
+            centre = new PointF(x,y);
+            
+
             repaintrequired = true;
             pictureBox1.Invalidate();
         }

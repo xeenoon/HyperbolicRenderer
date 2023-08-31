@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +30,7 @@ namespace GameUI
         }
         public Collider(Vector2[] points, Func<bool> OnCollision, Vector2 centre)
         {
-            this.points = points.ToList();
+            this.points = points.Copy();
             this.OnCollision = OnCollision;
             location = centre;
 
@@ -79,6 +81,30 @@ namespace GameUI
                     }
                 }
             }
+        }
+
+        internal void Rotate(double rotation)
+        {
+            for (int i = 0; i < points.Count; i++)
+            {
+                Vector2 v = points[i];
+                points[i] = v.Rotate(location.X,location.Y,rotation);
+            }
+        }
+
+        internal void Move(Vector2 newlocation)
+        {
+            Vector2 change = new Vector2((newlocation - location).X, (newlocation - location).Y);
+            if (change == Vector2.Zero)
+            {
+                return;
+            }
+            for (int i = 0; i < points.Count; ++i)
+            {
+                Vector2 oldlocation = points[i];
+                points[i] = oldlocation + change; //Move all the vertices
+            }
+            location = newlocation;
         }
     }
 }

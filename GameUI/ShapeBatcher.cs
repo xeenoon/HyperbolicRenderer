@@ -128,5 +128,13 @@ namespace GameUI
             }
             location = newlocation;
         }
+        public void Rotate(double rotation)
+        {
+            for (int i = vertexstart; i < vertexend; ++i)
+            {
+                Vector3 v = batcher.vertices[i].Position;
+                batcher.vertices[i] = new VertexPositionColor(v.Rotate(location.X, location.Y, rotation),batcher.vertices[i].Color);
+            }
+        }
     }
 }

@@ -33,6 +33,7 @@ namespace GameUI
 
             shapedrawidx = Game1.game.batcher.AddMoveableShape(collider.points.ToArray(), Color.White, Vector2.Zero);
             Game1.game.batcher.shapes[shapedrawidx].Move(position);
+            collider.Move(position);
         }
 
         public bool OnCollision()
@@ -50,6 +51,7 @@ namespace GameUI
 
             double mouseangle = (traveldirection.angle + Math.PI / 2);
             double rotationamount = (_rotationSpeed * Game1.game.looptime);
+            double rotationchange = 0;
 
             if (Math.Abs(rotation - mouseangle) > (rotationamount) || rotation < 0) //Stops snappy movement
             {
@@ -61,26 +63,24 @@ namespace GameUI
                 {
                     if (rotation + rotationamount <= mouseangle)
                     {
-                        rotation += rotationamount;
+                        rotationchange = rotationamount;
                     }
-                    else
-                    {
-                       // rotation = mouseangle;
-                    }
+
                 }
                 else
                 {
                     if ((rotation - rotationamount) + Math.Tau >= mouseangle)
                     {
-                        rotation -= rotationamount;
+                        rotationchange = -rotationamount;
+                        
                     }
                     else
                     {
                         rotation += Math.Tau;
-                      //  rotation = mouseangle; //Reset the circle
                     }
                 }
             }
+            rotation += rotationchange;
 
             var cockpitdirection = new Vector(Game1.player.rotation - Math.PI / 2).GetUnitVector();
             double distanceaway = Game1.player.texture.Height * 0.5f;
@@ -131,6 +131,9 @@ namespace GameUI
             }
 
             Game1.game.batcher.shapes[shapedrawidx].Move(position);
+            Game1.game.batcher.shapes[shapedrawidx].Rotate(rotationchange);
+            collider.Move(position);
+            collider.Rotate(rotationchange);
         }
 
         private void AutoDecelerate(double distancetoend)

@@ -48,7 +48,6 @@ namespace ImageCollider
             }
         }
 
-        public List<RectangleF> imageAreas = new List<RectangleF>();
         bool repaintrequired = false;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
@@ -57,7 +56,6 @@ namespace ImageCollider
                 return;
             }
             repaintrequired = false;
-            imageAreas.Clear();
             if (image == null)
             {
                 return;
@@ -70,20 +68,6 @@ namespace ImageCollider
 
             float new_width = finalscale * image.Width;
             float new_height = finalscale * image.Height;
-
-            //e.Graphics.DrawImage(image, 0, 0, new_width, new_height);
-
-
-            float cellsize = Math.Min(image.Width, image.Height) / resolution;
-
-            for (int x = 0; x < image.Width / cellsize; ++x)
-            {
-                for (int y = 0; y < image.Height / cellsize; ++y)
-                {
-
-                    imageAreas.Add(new RectangleF(x * cellsize, y * cellsize, cellsize, cellsize));
-                }
-            }
 
             List<PointAngle> points = new List<PointAngle>();
             PointF startpoint = new PointF(-1, -1);
@@ -126,7 +110,6 @@ namespace ImageCollider
             List<PointF> highdefpoints = new List<PointF>();
 
             PointF lastpoint = startpoint;
-
 
             GrahamsAlgorithm(points[0].position, points.Select(p => p.position).ToList(), ref highdefpoints);
             highdefpoints.Reverse();

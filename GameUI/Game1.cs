@@ -31,8 +31,8 @@ namespace GameUI
         protected override void Initialize()
         {
             game = this;
-            gameManager = new GameManager();
             batcher = new ShapeBatcher(GraphicsDevice);
+            gameManager = new GameManager();
             width = Window.ClientBounds.Width;
             height = Window.ClientBounds.Height;
 

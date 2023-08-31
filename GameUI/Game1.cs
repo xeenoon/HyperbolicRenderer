@@ -21,7 +21,6 @@ namespace GameUI
         public ShapeBatcher batcher;
 
         public SpriteBatch spriteBatch;
-        public GameManager gameManager;
 
         public Game1()
         {
@@ -32,12 +31,12 @@ namespace GameUI
         {
             game = this;
             batcher = new ShapeBatcher(GraphicsDevice);
-            gameManager = new GameManager();
-            width = Window.ClientBounds.Width;
-            height = Window.ClientBounds.Height;
-
+            
             width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+
+            player = new Ship(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
+
 
             graphics.PreferredBackBufferWidth = width;
             graphics.PreferredBackBufferHeight = height;
@@ -130,7 +129,7 @@ namespace GameUI
 
             totalseconds += gameTime.ElapsedGameTime.TotalSeconds;
             looptime = gameTime.ElapsedGameTime.TotalSeconds;
-            gameManager.Update();
+            GameManager.Update();
             base.Update(gameTime);
         }
 
@@ -141,62 +140,9 @@ namespace GameUI
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkBlue);
-
-            if (totalseconds - lastasteroidtime > 0.2) //1 asteroid per second
-            {
-                lastasteroidtime = totalseconds;
-                //Generate random place on edge
-                float edge = GameManager.RandomInt(0, 4); //0:left, 1:top, 2:right, 3:bottom
-                Vector2 startposition = new Vector2(0, 0);
-                double xdirection = GameManager.RandomDouble()-0.5;
-                double ydirection = GameManager.RandomDouble()-0.5;
-
-
-                if (edge == 0)
-                {
-                    startposition.Y = GameManager.RandomFloat(0, height);
-                    //Spawn on left, can only move right
-                    xdirection += 0.5;
-                }
-                else if (edge == 1) 
-                {
-                    startposition.X = GameManager.RandomFloat(0, width);
-                    //Spawn on top, can only move down
-                    ydirection += 0.5;
-                }
-                if (edge == 2)
-                {
-                    startposition.X = width;
-                    startposition.Y = GameManager.RandomFloat(0, height);
-                    //Spawn on right, can only move left
-                    xdirection -= 0.5;
-                }
-                else if (edge == 3)
-                {
-                    startposition.Y = height;
-                    startposition.X = GameManager.RandomFloat(0, width);
-                    //Spawn on bottom, can only move up
-                    ydirection -= 0.5;
-                }
-
-                double randomsize = GameManager.RandomDouble();
-                if (randomsize > 0.7)
-                {
-                    asteroids.Add(new Asteroid(large_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(200, 500), AsteroidType.Large));
-                }
-                else if(randomsize > 0.3)
-                {
-                    asteroids.Add(new Asteroid(medium_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(400, 800), AsteroidType.Medium));
-                }
-                else
-                {
-                    asteroids.Add(new Asteroid(small_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(600, 1000), AsteroidType.Small));
-                }
-            }
-
             spriteBatch.Begin();
             spriteBatch.Draw(background, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 1);
-            gameManager.Draw();
+            GameManager.Draw();
             spriteBatch.End();
 
             batcher.Render();

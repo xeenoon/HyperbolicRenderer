@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,14 +9,9 @@ using System.Threading.Tasks;
 
 namespace GameUI
 {
-    public class GameManager
+    public static class GameManager
     {
-        static Random r;
-        public GameManager()
-        {
-            r = new Random();
-            Game1.player = new(Game1.game.Content.Load<Texture2D>("Shipmodel"), new(0, 0));
-        }
+        static Random r = new Random();
 
         public static float RandomFloat(float min, float max)
         {
@@ -28,8 +25,21 @@ namespace GameUI
         {
             return r.NextDouble();
         }
-        public void Update()
+        static double lastasteroidtime;
+        public static void Update()
         {
+            if (stop)
+            {
+                return;
+            }
+
+            if (Game1.game.totalseconds - lastasteroidtime > 0.4) //1 asteroid per second
+            {
+                lastasteroidtime = Game1.game.totalseconds;
+                Asteroid.CreateRandomAsteroid();
+            }
+
+
             InputManager.Update();
             Game1.player.Update();
             foreach (var bullet in Game1.projectiles)
@@ -44,7 +54,7 @@ namespace GameUI
             Collider.Update();
         }
 
-        public void Draw()
+        public static void Draw()
         {
             foreach (var bullet in Game1.projectiles)
             {
@@ -61,6 +71,11 @@ namespace GameUI
             }
             Game1.player.Draw();
             ParticleManager.Draw();
+        }
+        static bool stop;
+        internal static void Stop()
+        {
+            stop = true;
         }
     }
 }

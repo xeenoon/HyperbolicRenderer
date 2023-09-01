@@ -32,6 +32,10 @@ namespace GameUI
             {
                 disappear = true;
             }
+            if (tag == "ASTEROID")
+            {
+                disappear = true;
+            }
             return false;
         }
         public override void Update() //Allows for player movement

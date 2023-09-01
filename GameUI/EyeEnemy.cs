@@ -24,7 +24,7 @@ namespace GameUI
             //graphicalcollider = Game1.game.batcher.AddMoveableShape(colliderpoints.Copy().ToArray(), Color.White, Vector2.Zero);
             //graphicalcollider.Move(position);
 
-            engineEmitData = new EngineEmitData(this, Color.Lavender, Color.LightPink, 12, 1f, 3);
+            engineEmitData = new EngineEmitData(this, Color.Lavender, Color.LightPink, 12, 6.2f, 3);
 
             maxspeed = 300;
             _rotationSpeed = 1;
@@ -90,7 +90,7 @@ namespace GameUI
                 lasttime = Game1.game.totalseconds;
             }
 
-            Vector shipengine = (cockpitdirection * -1) * distanceaway;
+            Vector shipengine = (cockpitdirection * -1 * 0.7f) * distanceaway;
             emitpositions[0] = new Vector2((float)(position.X + shipengine.i), (float)(position.Y + shipengine.j));
 
 
@@ -147,7 +147,7 @@ namespace GameUI
                 if (timebetweenframes > 1)
                 {
                     timebetweenframes -= 1;
-                    if (GameManager.RandomDouble() > 0.9) //Blind 10% of the time
+                    if (GameManager.RandomDouble() > 0.0) //Blind 10% of the time
                     {
                         blinking = true;
                         framedirection = true;

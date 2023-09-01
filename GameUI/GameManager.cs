@@ -82,6 +82,7 @@ namespace GameUI
 
         public static void Draw()
         {
+            ParticleManager.Draw();
             foreach (var bullet in Game1.projectiles)
             {
                 bullet.Draw();
@@ -115,7 +116,6 @@ namespace GameUI
                 Game1.eyeenemies.Remove(enemy);
             }
             Game1.player.Draw();
-            ParticleManager.Draw();
         }
         static bool stop;
         internal static void Stop()

@@ -80,7 +80,20 @@ namespace GameUI
             large_asteroidtexture = Content.Load<Texture2D>("Asteroid1");
             medium_asteroidtexture = Content.Load<Texture2D>("Asteroid2");
             small_asteroidtexture = Content.Load<Texture2D>("Asteroid3");
+
             enemyship_texture = Content.Load<Texture2D>("enemyship");
+
+            EyeEnemy.frames[0] = Content.Load<Texture2D>("bosseyeframe_1");
+            EyeEnemy.frames[1] = Content.Load<Texture2D>("bosseyeframe_2");
+            EyeEnemy.frames[2] = Content.Load<Texture2D>("bosseyeframe_3");
+            EyeEnemy.frames[3] = Content.Load<Texture2D>("bosseyeframe_4");
+            EyeEnemy.frames[4] = Content.Load<Texture2D>("bosseyeframe_5");
+            EyeEnemy.frames[5] = Content.Load<Texture2D>("bosseyeframe_6");
+            EyeEnemy.frames[6] = Content.Load<Texture2D>("bosseyeframe_7");
+            EyeEnemy.frames[7] = Content.Load<Texture2D>("bosseyeframe_8");
+            EyeEnemy.frames[8] = Content.Load<Texture2D>("bosseyeframe_9");
+            EyeEnemy.frames[9] = Content.Load<Texture2D>("bosseyeframe_10");
+
             player = new PlayerShip(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
 
             return;
@@ -140,8 +153,10 @@ namespace GameUI
         public double totalseconds;
         private double lastasteroidtime;
         public double looptime;
+        public double drawlooptime;
         protected override void Draw(GameTime gameTime)
         {
+            drawlooptime = gameTime.ElapsedGameTime.TotalSeconds;
             GraphicsDevice.Clear(Color.DarkBlue);
             spriteBatch.Begin();
             spriteBatch.Draw(background, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 1);

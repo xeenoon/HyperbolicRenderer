@@ -166,8 +166,15 @@ namespace GameUI
                 startposition.Y = Game1.game.height;
                 startposition.X = GameManager.RandomFloat(0, Game1.game.width);
             }
-
-            Game1.enemies.Add(new EnemyShip(Game1.enemyship_texture, startposition));
+            double shiptype = GameManager.RandomDouble();
+            if (shiptype < 0.5)
+            {
+                Game1.enemies.Add(new EnemyShip(Game1.enemyship_texture, startposition));
+            }
+            else
+            {
+                Game1.enemies.Add(new EyeEnemy(startposition));
+            }
         }
         public override void Dispose()
         {

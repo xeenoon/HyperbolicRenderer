@@ -2,39 +2,61 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Diagnostics;
 
 namespace GameUI
 {
     public class Bullet : Sprite
     {
         public Vector destinationdirection;
-
-        public Bullet(Texture2D tex, Vector2 position, Vector direction) : base(tex, position)
+        public float speed;
+        //centre -7,-7
+        public Vector2[] colliderpoints = new Vector2[4] { new Vector2(-1, 4), new Vector2(-7, 0), new Vector2(-4, -7), new Vector2(4, -4), };
+        Collider collider;
+        //MoveableShape graphicalcollider;
+        public Bullet(Texture2D tex, Vector2 position, Vector direction, float speed) : base(tex, position)
         {
             this.destinationdirection = direction;
-            double distanceaway = Game1.player.texture.Width * 0.5f;
-            Vector startadd = destinationdirection * distanceaway;
-            this.position.X += (float)(startadd.i);
-            this.position.Y += (float)(startadd.j);
+
+            collider = new Collider(colliderpoints, OnCollision, position, "BULLET");
+            this.speed = speed;
+
+            //graphicalcollider = Game1.game.batcher.AddMoveableShape(colliderpoints.Copy().ToArray(), Color.White, Vector2.Zero);
+            //graphicalcollider.Move(position);
+        }
+        public bool OnCollision(string tag)
+        {
+            if (tag == "PLAYER")
+            {
+                GameManager.Stop();
+                return true;
+            }
+            return false;
         }
         public void Update()
         {
-            const int speed = 15;
             position.X += (float)(destinationdirection.i) * speed;
             position.Y += (float)(destinationdirection.j) * speed;
+
+            if (position.X < 0 || position.Y < 0 || position.X > Game1.game.width || position.Y > Game1.game.height)
+            {
+                Dispose();
+            }
+            collider.Move(position);
+            //graphicalcollider.Move(position);
         }
         public override void Draw()
         {
             if (!disappear)
             {
-                Game1.game.spriteBatch.Draw(texture, position, null, Color.White, 0, origin, 0.02f, SpriteEffects.None, 1);
+                Game1.game.spriteBatch.Draw(texture, position, null, Color.White, 0, origin, 1f, SpriteEffects.None, 1);
             }
         }
         public bool disappear;
         public override void Dispose()
         {
             disappear = true;
-            base.Dispose();
+            collider.Dispose();
         }
     }
 }

@@ -66,8 +66,9 @@ namespace GameUI
         public static Texture2D large_asteroidtexture;
         public static Texture2D medium_asteroidtexture;
         public static Texture2D small_asteroidtexture;
+        public static Texture2D enemyship_texture;
         public static PlayerShip player;
-        public static EnemyShip enemy;
+        public static List<EnemyShip> enemies = new List<EnemyShip>();
         public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
         public static Game1 game;
@@ -79,8 +80,8 @@ namespace GameUI
             large_asteroidtexture = Content.Load<Texture2D>("Asteroid1");
             medium_asteroidtexture = Content.Load<Texture2D>("Asteroid2");
             small_asteroidtexture = Content.Load<Texture2D>("Asteroid3");
+            enemyship_texture = Content.Load<Texture2D>("enemyship");
             player = new PlayerShip(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
-            enemy = new EnemyShip(Game1.game.Content.Load<Texture2D>("enemyship"), new Vector2(0, 0));
 
             return;
             int mapsize = (int)(height/2);
@@ -160,6 +161,11 @@ namespace GameUI
             {
                 asteroid.disappear = true;
             }
+            foreach (var enemy in enemies)
+            {
+                enemy.Dispose();
+            }
+            enemies.Clear();
             foreach (var bullet in projectiles)
             {
                 bullet.Dispose();
@@ -168,6 +174,10 @@ namespace GameUI
             {
                 particle._lifespanLeft = 0;
             }
+            var amount = Collider.colliders.Count();
+            GameManager.lastasteroidtime = 0;
+            GameManager.lastenemytime = 0;
+
             ParticleManager.particleEmitters.Remove(player.enginehandler);
             player.position = new Vector2(width / 2, height / 2);
         }

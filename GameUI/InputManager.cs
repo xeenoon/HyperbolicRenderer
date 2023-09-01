@@ -56,7 +56,13 @@ namespace GameUI
             if (Game1.game.totalseconds - lasttime >= reloadtime && Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 lasttime = Game1.game.totalseconds;
-                Game1.projectiles.Add(new Bullet(Game1.bullettexture, Game1.player.position, new Vector(Game1.player.rotation - Math.PI / 2).GetUnitVector()));
+
+                var cockpitdirection = new Vector(Game1.player.rotation - Math.PI / 2).GetUnitVector();
+                double distanceaway = Game1.player.texture.Height * 0.5f;
+                Vector shippointend = cockpitdirection * (distanceaway + Game1.bullettexture.Height);
+                Vector2 shippointendposition = new Vector2((float)(Game1.player.position.X + shippointend.i), (float)(Game1.player.position.Y + shippointend.j));
+
+                Game1.projectiles.Add(new Bullet(Game1.bullettexture, shippointendposition, new Vector(Game1.player.rotation - Math.PI / 2).GetUnitVector(), 20));
             }
 
             mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (lastMouseState.LeftButton == ButtonState.Released);

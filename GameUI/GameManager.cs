@@ -25,8 +25,9 @@ namespace GameUI
         {
             return r.NextDouble();
         }
-        static double lastasteroidtime;
-        static double crashtime = 0;
+        public static double lastasteroidtime;
+        public static double lastenemytime;
+        public static double crashtime = 0;
         public static void Update()
         {
             if (stop)
@@ -44,19 +45,28 @@ namespace GameUI
                 return;
             }
 
-            if (Game1.game.totalseconds - lastasteroidtime > 0.4) //1 asteroid per second
+            if (Game1.game.totalseconds - lastasteroidtime > 0.4) //1 asteroid per second 0.4 seconds
             {
                 lastasteroidtime = Game1.game.totalseconds;
                 Asteroid.CreateRandomAsteroid();
             }
 
+            if (Game1.game.totalseconds - lastenemytime > 5) //1 enemy every 5 seconds
+            {
+                lastenemytime = Game1.game.totalseconds;
+                EnemyShip.SpawnRandom();
+            }
+
 
             InputManager.Update();
             Game1.player.Update();
-            Game1.enemy.Update();
             foreach (var bullet in Game1.projectiles)
             {
                 bullet.Update();
+            }
+            foreach (var enemy in Game1.enemies)
+            {
+                enemy.Update();
             }
             foreach (var asteroid in Game1.asteroids)
             {
@@ -76,13 +86,21 @@ namespace GameUI
             {
                 asteroid.Draw();
             }
+            foreach (var enemy in Game1.enemies)
+            {
+                enemy.Draw();
+            }
 
             foreach (var asteroid in Game1.asteroids.Where(a=>a.disappear).ToList())
             {
                 asteroid.Dispose();
             }
+            foreach (var enemy in Game1.enemies.Where(e => e.disappear).ToList())
+            {
+                enemy.Dispose();
+                Game1.enemies.Remove(enemy);
+            }
             Game1.player.Draw();
-            Game1.enemy.Draw();
             ParticleManager.Draw();
         }
         static bool stop;

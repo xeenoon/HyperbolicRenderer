@@ -25,18 +25,6 @@
 /processorParam:TextureFormat=Color
 /build:enemyship.png
 
-#begin Fireball.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Fireball.png
-
 #begin particle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -96,6 +84,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:smallasteroid3.png;Asteroid3.png
+
+#begin smallfireball.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:smallfireball.png;Fireball.png
 
 #begin spaceimage.jpg
 /importer:TextureImporter

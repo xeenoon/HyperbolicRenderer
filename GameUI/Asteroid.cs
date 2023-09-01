@@ -66,6 +66,11 @@ namespace GameUI
                 //graphicalcollider.color = Color.Red;
                 return true;
             }
+            if (tag == "BULLET")
+            {
+                disappear = true;
+                return true;
+            }
             return false;
         }
         public override void Draw()
@@ -132,15 +137,15 @@ namespace GameUI
             double randomsize = GameManager.RandomDouble();
             if (randomsize > 0.7)
             {
-                Game1.asteroids.Add(new Asteroid(Game1.large_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(200, 500), AsteroidType.Large));
+              //  Game1.asteroids.Add(new Asteroid(Game1.large_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(200, 500), AsteroidType.Large));
             }
             else if (randomsize > 0.3)
             {
-                Game1.asteroids.Add(new Asteroid(Game1.medium_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(400, 800), AsteroidType.Medium));
+              //  Game1.asteroids.Add(new Asteroid(Game1.medium_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(400, 800), AsteroidType.Medium));
             }
             else
             {
-                Game1.asteroids.Add(new Asteroid(Game1.small_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(600, 1000), AsteroidType.Small));
+              //  Game1.asteroids.Add(new Asteroid(Game1.small_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(600, 1000), AsteroidType.Small));
             }
         }
     }

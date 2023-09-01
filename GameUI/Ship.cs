@@ -12,7 +12,7 @@ namespace GameUI
     public class Ship : Sprite
     {
         public double rotation = 0;
-        public const double _rotationSpeed = 3f;
+        public double _rotationSpeed = 3f;
         public double maxspeed = 600;
         public double speed;
         public float acceleration = 150f;
@@ -25,7 +25,7 @@ namespace GameUI
             engineEmitter = new EngineEmitter(this);
         }
 
-        public bool OnCollision(string tag)
+        public virtual bool OnCollision(string tag)
         {
             return false;
         }

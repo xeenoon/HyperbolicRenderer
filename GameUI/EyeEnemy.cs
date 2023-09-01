@@ -24,12 +24,13 @@ namespace GameUI
             //graphicalcollider = Game1.game.batcher.AddMoveableShape(colliderpoints.Copy().ToArray(), Color.White, Vector2.Zero);
             //graphicalcollider.Move(position);
 
-            //engineEmitData = new EngineEmitData(this, Color.Lavender, Color.LightPink, 6, 0.3f, 1);
+            engineEmitData = new EngineEmitData(this, Color.Lavender, Color.LightPink, 12, 1f, 3);
 
             maxspeed = 300;
+            _rotationSpeed = 1;
             boostable = false;
         }
-
+        double rotationdirection;
         public override void Update() //Allows for player movement
         {
             Vector traveldirection = new Vector(new System.Drawing.PointF(position.X, position.Y), new System.Drawing.PointF(Game1.player.position.X, Game1.player.position.Y)).GetUnitVector();
@@ -38,15 +39,15 @@ namespace GameUI
             double rotationamount = (_rotationSpeed * Game1.game.looptime);
             double rotationchange = 0;
 
-            if (Math.Abs(rotation - mouseangle) > (rotationamount) || rotation < 0) //Stops snappy movement
+            if (Math.Abs(rotationdirection - mouseangle) > (rotationamount) || rotationdirection < 0) //Stops snappy movement
             {
-                if (mouseangle < rotation && rotation - mouseangle > Math.PI)
+                if (mouseangle < rotationdirection && rotationdirection - mouseangle > Math.PI)
                 {
-                    rotation -= Math.Tau;
+                    rotationdirection -= Math.Tau;
                 }
-                if ((mouseangle - rotation <= Math.PI && rotation < mouseangle))
+                if ((mouseangle - rotationdirection <= Math.PI && rotationdirection < mouseangle))
                 {
-                    if (rotation + rotationamount <= mouseangle)
+                    if (rotationdirection + rotationamount <= mouseangle)
                     {
                         rotationchange = rotationamount;
                     }
@@ -54,20 +55,21 @@ namespace GameUI
                 }
                 else
                 {
-                    if ((rotation - rotationamount) + Math.Tau >= mouseangle)
+                    if ((rotationdirection - rotationamount) + Math.Tau >= mouseangle)
                     {
                         rotationchange = -rotationamount;
 
                     }
                     else
                     {
-                        rotation += Math.Tau;
+                        rotationdirection += Math.Tau;
                     }
                 }
             }
-            rotation += rotationchange;
+            rotationdirection += rotationchange;
+            rotation += rotationamount;
 
-            var cockpitdirection = new Vector(rotation - Math.PI / 2).GetUnitVector();
+            var cockpitdirection = new Vector(rotationdirection - Math.PI / 2).GetUnitVector();
             double distanceaway = texture.Height * 0.5f;
             Vector shippoint = cockpitdirection * (distanceaway);
             Vector2 shippointposition = new Vector2((float)(position.X + shippoint.i), (float)(position.Y + shippoint.j));
@@ -92,7 +94,7 @@ namespace GameUI
             emitpositions[0] = new Vector2((float)(position.X + shipengine.i), (float)(position.Y + shipengine.j));
 
 
-            Vector mousedirection = new Vector(rotation - Math.PI / 2);
+            Vector mousedirection = new Vector(rotationdirection - Math.PI / 2);
             double distancetoend = Vector2.Distance(Game1.player.position, shippointposition);
 
             AutoDecelerate(distancetoend);

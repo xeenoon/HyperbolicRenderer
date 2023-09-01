@@ -208,7 +208,9 @@ namespace GameUI
             GameManager.lastasteroidtime = 0;
             GameManager.lastenemytime = 0;
 
-            ParticleManager.particleEmitters.Remove(player.enginehandler);
+            ParticleManager.particleEmitters.RemoveRange(player.engineEmitData.enginehandlers);
+
+
             player.position = new Vector2(width / 2, height / 2);
         }
     }

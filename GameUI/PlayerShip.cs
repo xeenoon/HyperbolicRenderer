@@ -19,8 +19,9 @@ namespace GameUI
         public PlayerShip(Texture2D tex, Vector2 pos) : base(tex, pos)
         {
             collider = new Collider(colliderpoints, OnCollision, pos, "PLAYER");
-            startengineemitcolor = Color.DarkBlue;
-            endengineemitcolor = Color.LightBlue;
+
+            engineEmitData = new EngineEmitData(this, Color.DarkBlue, Color.LightBlue, 6, 0.3f, 1);
+
             _rotationSpeed = 4;
         }
 
@@ -65,7 +66,7 @@ namespace GameUI
             double distanceaway = Game1.player.texture.Height * 0.5f;
             Vector shippoint = cockpitdirection * distanceaway;
             Vector shipengine = (cockpitdirection * -1) * distanceaway;
-            backend = new Vector2((float)(position.X + shipengine.i), (float)(position.Y + shipengine.j));
+            emitpositions[0] = new Vector2((float)(position.X + shipengine.i), (float)(position.Y + shipengine.j));
 
             if (InputManager.moving || speed > 0)
             {
@@ -105,7 +106,7 @@ namespace GameUI
             }
             else
             {
-                ParticleManager.particleEmitters.Remove(enginehandler);
+                ParticleManager.particleEmitters.RemoveRange(engineEmitData.enginehandlers);
                 wasmoving = false;
             }
 

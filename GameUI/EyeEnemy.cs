@@ -12,7 +12,7 @@ namespace GameUI
 {
     public class EyeEnemy : Ship
     {
-//        MoveableShape graphicalcollider;
+//      MoveableShape graphicalcollider;
         public static Texture2D[] frames = new Texture2D[10];
 
         //centre -64, -62
@@ -24,8 +24,8 @@ namespace GameUI
             //graphicalcollider = Game1.game.batcher.AddMoveableShape(colliderpoints.Copy().ToArray(), Color.White, Vector2.Zero);
             //graphicalcollider.Move(position);
 
-            startengineemitcolor = Color.Lavender;
-            endengineemitcolor = Color.LightPink;
+            engineEmitData = new EngineEmitData(this, Color.Lavender, Color.LightPink, 6, 0.3f, 1);
+
             maxspeed = 300;
             boostable = false;
         }
@@ -82,7 +82,7 @@ namespace GameUI
             }
 
             Vector shipengine = (cockpitdirection * -1) * distanceaway;
-            backend = new Vector2((float)(position.X + shipengine.i), (float)(position.Y + shipengine.j));
+            emitpositions[0] = new Vector2((float)(position.X + shipengine.i), (float)(position.Y + shipengine.j));
 
 
             Vector mousedirection = new Vector(rotation - Math.PI / 2);
@@ -184,7 +184,7 @@ namespace GameUI
         {
             disappear = true;
             collider.Dispose();
-            ParticleManager.particleEmitters.Remove(enginehandler);
+            ParticleManager.particleEmitters.RemoveRange(engineEmitData.enginehandlers);
 
             //foreach (var particle in ParticleManager.particles)
             //{

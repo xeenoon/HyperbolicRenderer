@@ -151,12 +151,20 @@ namespace GameUI
     }
     public class EngineEmitter : IEmitter
     {
-        public EngineEmitter(Ship ship)
+        public EngineEmitter(Ship sender, int vectoridx)
         {
-            this.ship = ship;
+            this.ship = sender;
+            this.vectoridx = vectoridx;
         }
         Ship ship;
-        public Vector2 EmitPosition => ship.backend;
+        int vectoridx;
+        public Vector2 EmitPosition
+        {
+            get
+            {
+                return ship.emitpositions[vectoridx];
+            }
+        }
     }
     public interface IEmitter
     {

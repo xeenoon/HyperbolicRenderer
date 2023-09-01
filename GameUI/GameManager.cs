@@ -53,6 +53,7 @@ namespace GameUI
 
             InputManager.Update();
             Game1.player.Update();
+            Game1.enemy.Update();
             foreach (var bullet in Game1.projectiles)
             {
                 bullet.Update();
@@ -81,6 +82,7 @@ namespace GameUI
                 asteroid.Dispose();
             }
             Game1.player.Draw();
+            Game1.enemy.Draw();
             ParticleManager.Draw();
         }
         static bool stop;

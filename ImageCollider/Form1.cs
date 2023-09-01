@@ -239,7 +239,7 @@ namespace ImageCollider
                     closestpoint = point;
                 }
             }
-            if (result.Count() > (points.Count()) * 0.6f && last.DistanceTo(points[0]) < 10)
+            if (result.Count() > (points.Count()) * 0.6f && last.DistanceTo(points[0]) < resolution*2)
             {
                 return;
             }

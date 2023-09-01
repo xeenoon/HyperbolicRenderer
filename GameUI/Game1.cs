@@ -35,7 +35,6 @@ namespace GameUI
             width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
-            player = new Ship(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
 
 
             graphics.PreferredBackBufferWidth = width;
@@ -67,7 +66,8 @@ namespace GameUI
         public static Texture2D large_asteroidtexture;
         public static Texture2D medium_asteroidtexture;
         public static Texture2D small_asteroidtexture;
-        public static Ship player;
+        public static PlayerShip player;
+        public static EnemyShip enemy;
         public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
         public static Game1 game;
@@ -79,6 +79,8 @@ namespace GameUI
             large_asteroidtexture = Content.Load<Texture2D>("Asteroid1");
             medium_asteroidtexture = Content.Load<Texture2D>("Asteroid2");
             small_asteroidtexture = Content.Load<Texture2D>("Asteroid3");
+            player = new PlayerShip(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
+            enemy = new EnemyShip(Game1.game.Content.Load<Texture2D>("enemyship"), new Vector2(0, 0));
 
             return;
             int mapsize = (int)(height/2);

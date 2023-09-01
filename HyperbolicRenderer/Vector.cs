@@ -46,7 +46,7 @@ namespace HyperbolicRenderer
 
         public static Vector operator *(Vector a, double s)
         {
-            return new Vector(a.i * s, a.j * s);
+             return new Vector(a.i * s, a.j * s);
         }
         public static Vector operator /(Vector a, double s)
         {

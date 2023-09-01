@@ -9,9 +9,9 @@ namespace GameUI
     {
         public Vector destinationdirection;
 
-        public Bullet(Texture2D tex, Vector2 position) : base(tex, position)
+        public Bullet(Texture2D tex, Vector2 position, Vector direction) : base(tex, position)
         {
-            destinationdirection = new Vector(Game1.player.rotation - Math.PI/2).GetUnitVector();
+            this.destinationdirection = direction;
             double distanceaway = Game1.player.texture.Width * 0.5f;
             Vector startadd = destinationdirection * distanceaway;
             this.position.X += (float)(startadd.i);

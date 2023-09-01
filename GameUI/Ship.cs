@@ -13,7 +13,7 @@ namespace GameUI
     {
         public double rotation = 0;
         public const double _rotationSpeed = 3f;
-        public const double maxspeed = 600;
+        public double maxspeed = 600;
         public double speed;
         public float acceleration = 150f;
         public bool forcestop;
@@ -56,7 +56,8 @@ namespace GameUI
                 forcestop = false;
             }
         }
-
+        protected Color startengineemitcolor;
+        protected Color endengineemitcolor;
         protected void UpdateParticles()
         {
             if (!wasmoving && !ParticleManager.particleEmitters.Contains(enginehandler))
@@ -78,8 +79,8 @@ namespace GameUI
                     angle = (float)(rotation - Math.PI),
                     particleData = new ParticleData()
                     {
-                        colorStart = Color.DarkBlue,
-                        colorEnd = Color.LightBlue,
+                        colorStart = startengineemitcolor,
+                        colorEnd = endengineemitcolor,
                         sizeStart = 8f * sizemultipler,
                         sizeEnd = 4f * sizemultipler,
                     },

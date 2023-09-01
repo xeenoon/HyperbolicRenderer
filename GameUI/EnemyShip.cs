@@ -15,10 +15,23 @@ namespace GameUI
         public EnemyShip(Texture2D tex, Vector2 pos) : base(tex, pos)
         {
             collider = new Collider(colliderpoints, OnCollision, pos, "ENEMY");
+            startengineemitcolor = Color.DarkOrange;
+            endengineemitcolor = Color.LightYellow;
+            maxspeed = 300;
+
         }
+
+        static double lasttime = Game1.game.totalseconds;
 
         public override void Update() //Allows for player movement
         {
+            const double reloadtime = 0.6;
+            if (Game1.game.totalseconds - lasttime >= reloadtime)
+            {
+                lasttime = Game1.game.totalseconds;
+                Game1.projectiles.Add(new Bullet(Game1.bullettexture, position, new Vector(rotation - Math.PI / 2).GetUnitVector()));
+            }
+
             Vector traveldirection = new Vector(new System.Drawing.PointF(position.X, position.Y), new System.Drawing.PointF(Game1.player.position.X, Game1.player.position.Y)).GetUnitVector();
 
             double mouseangle = (traveldirection.angle + Math.PI / 2);

@@ -19,6 +19,8 @@ namespace GameUI
         public PlayerShip(Texture2D tex, Vector2 pos) : base(tex, pos)
         {
             collider = new Collider(colliderpoints, OnCollision, pos, "PLAYER");
+            startengineemitcolor = Color.DarkBlue;
+            endengineemitcolor = Color.LightBlue;
         }
 
         public override void Update() //Allows for player movement

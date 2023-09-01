@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using HyperbolicRenderer;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -55,7 +56,7 @@ namespace GameUI
             if (Game1.game.totalseconds - lasttime >= reloadtime && Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 lasttime = Game1.game.totalseconds;
-                Game1.projectiles.Add(new Bullet(Game1.bullettexture, Game1.player.position));
+                Game1.projectiles.Add(new Bullet(Game1.bullettexture, Game1.player.position, new Vector(Game1.player.rotation - Math.PI / 2).GetUnitVector()));
             }
 
             mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (lastMouseState.LeftButton == ButtonState.Released);

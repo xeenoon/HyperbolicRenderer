@@ -68,7 +68,10 @@ namespace GameUI
         public static Texture2D small_asteroidtexture;
         public static Texture2D enemyship_texture;
         public static PlayerShip player;
-        public static List<EnemyShip> enemies = new List<EnemyShip>();
+
+        public static List<EnemyShip> basicenemies = new List<EnemyShip>();
+        public static List<EyeEnemy> eyeenemies = new List<EyeEnemy>();
+
         public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
         public static Game1 game;
@@ -176,11 +179,23 @@ namespace GameUI
             {
                 asteroid.disappear = true;
             }
-            foreach (var enemy in enemies)
+            foreach (var enemy in basicenemies)
             {
                 enemy.Dispose();
             }
-            enemies.Clear();
+            basicenemies.Clear();
+
+            foreach (var enemy in eyeenemies)
+            {
+                enemy.Dispose();
+            }
+            eyeenemies.Clear();
+
+            foreach (var enemy in basicenemies)
+            {
+                enemy.Dispose();
+            }
+            basicenemies.Clear();
             foreach (var bullet in projectiles)
             {
                 bullet.Dispose();

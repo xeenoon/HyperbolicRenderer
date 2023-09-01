@@ -20,7 +20,7 @@ namespace GameUI
         public bool wasmoving = false;
         public Collider collider;
         public bool boostable = true;
-
+        public bool disappear;
         public Ship(Texture2D tex, Vector2 pos) : base(tex, pos)
         {
             engineEmitter = new EngineEmitter(this);

@@ -71,6 +71,11 @@ namespace GameUI
                 disappear = true;
                 return true;
             }
+            if (tag == "EYEENEMY")
+            {
+                disappear = true;
+                return true;
+            }
             return false;
         }
         public override void Draw()

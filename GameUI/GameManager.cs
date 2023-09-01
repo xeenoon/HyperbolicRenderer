@@ -64,7 +64,11 @@ namespace GameUI
             {
                 bullet.Update();
             }
-            foreach (var enemy in Game1.enemies)
+            foreach (var enemy in Game1.eyeenemies)
+            {
+                enemy.Update();
+            }
+            foreach (var enemy in Game1.basicenemies)
             {
                 enemy.Update();
             }
@@ -86,7 +90,11 @@ namespace GameUI
             {
                 asteroid.Draw();
             }
-            foreach (var enemy in Game1.enemies)
+            foreach (var enemy in Game1.basicenemies)
+            {
+                enemy.Draw();
+            }
+            foreach (var enemy in Game1.eyeenemies)
             {
                 enemy.Draw();
             }
@@ -95,10 +103,16 @@ namespace GameUI
             {
                 asteroid.Dispose();
             }
-            foreach (var enemy in Game1.enemies.Where(e => e.disappear).ToList())
+            foreach (var enemy in Game1.basicenemies.Where(e => e.disappear).ToList())
             {
                 enemy.Dispose();
-                Game1.enemies.Remove(enemy);
+                Game1.basicenemies.Remove(enemy);
+            }
+
+            foreach (var enemy in Game1.eyeenemies.Where(e => e.disappear).ToList())
+            {
+                enemy.Dispose();
+                Game1.eyeenemies.Remove(enemy);
             }
             Game1.player.Draw();
             ParticleManager.Draw();

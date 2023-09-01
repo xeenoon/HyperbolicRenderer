@@ -22,6 +22,7 @@ namespace GameUI
             startengineemitcolor = Color.DarkOrange;
             endengineemitcolor = Color.LightYellow;
             maxspeed = 300;
+            boostable = false;
         }
         public bool disappear;
         double lasttime = Game1.game.totalseconds;

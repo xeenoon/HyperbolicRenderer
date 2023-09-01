@@ -19,7 +19,8 @@ namespace GameUI
         public bool forcestop;
         public bool wasmoving = false;
         public Collider collider;
-        
+        public bool boostable = true;
+
         public Ship(Texture2D tex, Vector2 pos) : base(tex, pos)
         {
             engineEmitter = new EngineEmitter(this);
@@ -65,7 +66,7 @@ namespace GameUI
                 int count = 6;
                 float variance = 0.3f;
                 float sizemultipler = 1;
-                if (InputManager.boosting)
+                if (InputManager.boosting && boostable)
                 {
                     count = 20;
                     sizemultipler = 2;

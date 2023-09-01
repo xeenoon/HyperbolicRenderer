@@ -21,7 +21,7 @@ namespace GameUI
             collider = new Collider(colliderpoints, OnCollision, pos, "PLAYER");
             startengineemitcolor = Color.DarkBlue;
             endengineemitcolor = Color.LightBlue;
-            _rotationSpeed = 7;
+            _rotationSpeed = 4;
         }
 
         public override void Update() //Allows for player movement

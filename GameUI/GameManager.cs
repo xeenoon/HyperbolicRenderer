@@ -36,7 +36,7 @@ namespace GameUI
                 {
                     crashtime = Game1.game.totalseconds;
                 }
-                if (Game1.game.totalseconds - crashtime >= 5) //5 seconds for respawn
+                if (Game1.game.totalseconds - crashtime >= 0) //5 seconds for respawn
                 {
                     Game1.game.Reset();
                     crashtime = 0;

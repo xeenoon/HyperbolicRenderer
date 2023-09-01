@@ -43,7 +43,10 @@ namespace GameUI
             //distance = ((speed^2))/1200
             if (distancetoend <= speed * speed / 1200)
             {
-                ParticleManager.particleEmitters.RemoveRange(engineEmitData.enginehandlers);
+                if (engineEmitData != null)
+                {
+                    ParticleManager.particleEmitters.RemoveRange(engineEmitData.enginehandlers);
+                }
                 wasmoving = true;
                 forcestop = true;
             }
@@ -57,6 +60,10 @@ namespace GameUI
         public List<Vector2> emitpositions = new List<Vector2>() { new Vector2(0,0)};
         protected void UpdateParticles()
         {
+            if (engineEmitData == null)
+            {
+                return;
+            }
             for (int i = 0; i < engineEmitData.engineEmitters.Count; i++)
             {
                 EngineEmitter engineEmitter = engineEmitData.engineEmitters[i];
@@ -106,7 +113,7 @@ namespace GameUI
             Game1.game.spriteBatch.Draw(texture, position, null, Color.White, (float)rotation, origin, 1f, SpriteEffects.None, 1);
         }
     }
-    public struct EngineEmitData
+    public class EngineEmitData
     {
         public StaticEmitter _staticEmitter2 = new StaticEmitter(new Vector2(500, 500));
         public List<EngineEmitter> engineEmitters;

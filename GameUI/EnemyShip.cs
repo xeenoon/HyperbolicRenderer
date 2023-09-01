@@ -69,6 +69,7 @@ namespace GameUI
                     }
                 }
             }
+
             rotation += rotationchange;
 
             var cockpitdirection = new Vector(rotation - Math.PI / 2).GetUnitVector();

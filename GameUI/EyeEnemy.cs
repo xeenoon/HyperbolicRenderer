@@ -24,7 +24,7 @@ namespace GameUI
             //graphicalcollider = Game1.game.batcher.AddMoveableShape(colliderpoints.Copy().ToArray(), Color.White, Vector2.Zero);
             //graphicalcollider.Move(position);
 
-            engineEmitData = new EngineEmitData(this, Color.Lavender, Color.LightPink, 6, 0.3f, 1);
+            //engineEmitData = new EngineEmitData(this, Color.Lavender, Color.LightPink, 6, 0.3f, 1);
 
             maxspeed = 300;
             boostable = false;
@@ -69,16 +69,23 @@ namespace GameUI
 
             var cockpitdirection = new Vector(rotation - Math.PI / 2).GetUnitVector();
             double distanceaway = texture.Height * 0.5f;
-            Vector shippoint = cockpitdirection * distanceaway;
-            Vector shippointend = cockpitdirection * (distanceaway + Game1.bullettexture.Height);
+            Vector shippoint = cockpitdirection * (distanceaway);
             Vector2 shippointposition = new Vector2((float)(position.X + shippoint.i), (float)(position.Y + shippoint.j));
-            Vector2 shippointendposition = new Vector2((float)(position.X + shippointend.i), (float)(position.Y + shippointend.j));
 
             const double reloadtime = 0.6;
             if (Game1.game.totalseconds - lasttime >= reloadtime)
             {
+                for (int i = 0; i < 4; ++i)
+                {
+                    double bulletdirection = (rotation - Math.PI / 4) + ((Math.PI / 2) * i);
+                    var cannondirection = new Vector(bulletdirection).GetUnitVector();
+                    double cannondistanceaway = Math.Sqrt(Math.Pow(texture.Height, 2) + Math.Pow(texture.Width, 2)) * 0.5f;
+                    Vector cannonpoint = cannondirection * cannondistanceaway;
+                    Vector2 cannonpointposition = new Vector2((float)(position.X + cannonpoint.i), (float)(position.Y + cannonpoint.j));
+                    Game1.projectiles.Add(new Bullet(Game1.bullettexture, cannonpointposition, new Vector(bulletdirection).GetUnitVector(), 7));
+                }
+
                 lasttime = Game1.game.totalseconds;
-                Game1.projectiles.Add(new Bullet(Game1.bullettexture, shippointendposition, new Vector(rotation - Math.PI / 2).GetUnitVector(), 7));
             }
 
             Vector shipengine = (cockpitdirection * -1) * distanceaway;
@@ -184,12 +191,10 @@ namespace GameUI
         {
             disappear = true;
             collider.Dispose();
-            ParticleManager.particleEmitters.RemoveRange(engineEmitData.enginehandlers);
-
-            //foreach (var particle in ParticleManager.particles)
-            //{
-            //    particle._lifespanLeft = 0;
-            //}
+            if (engineEmitData != null)
+            {
+                ParticleManager.particleEmitters.RemoveRange(engineEmitData.enginehandlers);
+            }
         }
     }
 }

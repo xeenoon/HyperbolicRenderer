@@ -79,28 +79,39 @@ namespace HyperbolicRenderer
         public static PointF[] SinCurvePoints(PointF start, PointF end, Map map)
         {
             double mapsize = map.radius * 2;
-
+            if (start.X < 0 || start.X > mapsize || start.Y < 0 || start.Y > mapsize)
+            {
+                return new PointF[0];
+            }
             bool horizontal;
             double distance;
             double m;
             double c;
             int startidx;
 
-            if (end.X - start.X > end.Y - start.Y)
+            if (Math.Abs(end.X - start.X) > Math.Abs(end.Y - start.Y))
             {
                 startidx = (int)start.X;
                 horizontal = true;
-                distance = end.X - start.X;
+                distance = Math.Abs(end.X - start.X);
                 m = (end.Y - start.Y) / distance;
                 c = end.Y - m * end.X;
+                if (start.X > end.X)
+                {
+                    start = new PointF(end.X, end.Y);
+                }
             }
             else
             {
                 startidx = (int)start.Y;
                 horizontal = false;
-                distance = end.Y - start.Y;
+                distance = Math.Abs(end.Y - start.Y);
                 m = distance / (end.X - start.X);
                 c = end.Y - m * end.X;
+                if (start.Y > end.Y)
+                {
+                    start = new PointF(end.X, end.Y);
+                }
             }
 
             PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
@@ -344,7 +355,7 @@ namespace HyperbolicRenderer
                 }
                 if (horizontal)
                 {
-                    linepoints[(int)i] = new PointF(workingvar, resultheight);
+                    linepoints[(int)i] = new PointF(workingvar, resultheight);                
                 }
                 else
                 {

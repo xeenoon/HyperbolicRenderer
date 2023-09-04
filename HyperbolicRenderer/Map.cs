@@ -210,7 +210,43 @@ namespace HyperbolicRenderer
             float y_scale = float.MaxValue;
             float x_scale = float.MaxValue;
 
-            foreach (var line in shapelines)
+            //Wrap bounds around shapelines to only deal with relavent ones
+            List<Line> lines = shapelines;
+
+            double estimatedangle = Math.Atan(relativepoint.Y / relativepoint.X);
+            
+
+            if (relativepoint.X > radius)
+            {
+                //Only change for larger shapes, otherwise small shapes may be deformed
+                if (lines.Count() >= 20)
+                {
+                    //Get the lines a quarter of the distance away
+                    
+                }
+                else
+                {
+                    lines = shapelines.Take(shapelines.Count() / 2).ToList();
+                }
+            }
+            else
+            {
+                if (lines.Count() >= 20)
+                {
+                    
+                }
+                else
+                {
+                    lines = shapelines.Take(new Range(shapelines.Count() / 2, shapelines.Count())).ToList();
+                }
+            }
+
+            double radiansstepsize = Math.Tau / points.Count();
+            double lowestxdistance = Math.Abs((points[1].X - points[0].X)); //find the average x distance of the points in the shape
+            double lowestydistance = Math.Abs(points[(points.Count()/4) + 1].Y - points[points.Count() / 4].Y); //find the average y distance of the points in the shape
+            lines = shapelines.Where(s=>Math.Abs(relativepoint.DistanceTo(s).X) < lowestxdistance || Math.Abs(relativepoint.DistanceTo(s).Y) < lowestydistance).ToList();
+
+            foreach (var line in lines)
             {
                 PointF linedistance = relativepoint.DistanceTo(line);
 

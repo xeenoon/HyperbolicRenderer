@@ -25,8 +25,9 @@ namespace GameUI
         {
             return r.NextDouble();
         }
-        static double lastasteroidtime;
-        static double crashtime = 0;
+        public static double lastasteroidtime;
+        public static double lastenemytime;
+        public static double crashtime = 0;
         public static void Update()
         {
             if (stop)
@@ -35,7 +36,7 @@ namespace GameUI
                 {
                     crashtime = Game1.game.totalseconds;
                 }
-                if (Game1.game.totalseconds - crashtime >= 5) //5 seconds for respawn
+                if (Game1.game.totalseconds - crashtime >= 0) //5 seconds for respawn
                 {
                     Game1.game.Reset();
                     crashtime = 0;
@@ -44,10 +45,16 @@ namespace GameUI
                 return;
             }
 
-            if (Game1.game.totalseconds - lastasteroidtime > 0.4) //1 asteroid per second
+            if (Game1.game.totalseconds - lastasteroidtime > 0.4) //1 asteroid per second 0.4 seconds
             {
                 lastasteroidtime = Game1.game.totalseconds;
                 Asteroid.CreateRandomAsteroid();
+            }
+
+            if (Game1.game.totalseconds - lastenemytime > 5) //1 enemy every 5 seconds
+            {
+                lastenemytime = Game1.game.totalseconds;
+                EnemyShip.SpawnRandom();
             }
 
 
@@ -56,6 +63,14 @@ namespace GameUI
             foreach (var bullet in Game1.projectiles)
             {
                 bullet.Update();
+            }
+            foreach (var enemy in Game1.eyeenemies)
+            {
+                enemy.Update();
+            }
+            foreach (var enemy in Game1.basicenemies)
+            {
+                enemy.Update();
             }
             foreach (var asteroid in Game1.asteroids)
             {
@@ -67,6 +82,7 @@ namespace GameUI
 
         public static void Draw()
         {
+            ParticleManager.Draw();
             foreach (var bullet in Game1.projectiles)
             {
                 bullet.Draw();
@@ -75,13 +91,31 @@ namespace GameUI
             {
                 asteroid.Draw();
             }
+            foreach (var enemy in Game1.basicenemies)
+            {
+                enemy.Draw();
+            }
+            foreach (var enemy in Game1.eyeenemies)
+            {
+                enemy.Draw();
+            }
 
             foreach (var asteroid in Game1.asteroids.Where(a=>a.disappear).ToList())
             {
                 asteroid.Dispose();
             }
+            foreach (var enemy in Game1.basicenemies.Where(e => e.disappear).ToList())
+            {
+                enemy.Dispose();
+                Game1.basicenemies.Remove(enemy);
+            }
+
+            foreach (var enemy in Game1.eyeenemies.Where(e => e.disappear).ToList())
+            {
+                enemy.Dispose();
+                Game1.eyeenemies.Remove(enemy);
+            }
             Game1.player.Draw();
-            ParticleManager.Draw();
         }
         static bool stop;
         internal static void Stop()

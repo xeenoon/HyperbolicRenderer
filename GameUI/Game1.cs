@@ -35,7 +35,6 @@ namespace GameUI
             width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
-            player = new Ship(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
 
 
             graphics.PreferredBackBufferWidth = width;
@@ -67,7 +66,12 @@ namespace GameUI
         public static Texture2D large_asteroidtexture;
         public static Texture2D medium_asteroidtexture;
         public static Texture2D small_asteroidtexture;
-        public static Ship player;
+        public static Texture2D enemyship_texture;
+        public static PlayerShip player;
+
+        public static List<EnemyShip> basicenemies = new List<EnemyShip>();
+        public static List<EyeEnemy> eyeenemies = new List<EyeEnemy>();
+
         public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
         public static Game1 game;
@@ -79,6 +83,21 @@ namespace GameUI
             large_asteroidtexture = Content.Load<Texture2D>("Asteroid1");
             medium_asteroidtexture = Content.Load<Texture2D>("Asteroid2");
             small_asteroidtexture = Content.Load<Texture2D>("Asteroid3");
+
+            enemyship_texture = Content.Load<Texture2D>("enemyship");
+
+            EyeEnemy.frames[0] = Content.Load<Texture2D>("bosseyeframe_1");
+            EyeEnemy.frames[1] = Content.Load<Texture2D>("bosseyeframe_2");
+            EyeEnemy.frames[2] = Content.Load<Texture2D>("bosseyeframe_3");
+            EyeEnemy.frames[3] = Content.Load<Texture2D>("bosseyeframe_4");
+            EyeEnemy.frames[4] = Content.Load<Texture2D>("bosseyeframe_5");
+            EyeEnemy.frames[5] = Content.Load<Texture2D>("bosseyeframe_6");
+            EyeEnemy.frames[6] = Content.Load<Texture2D>("bosseyeframe_7");
+            EyeEnemy.frames[7] = Content.Load<Texture2D>("bosseyeframe_8");
+            EyeEnemy.frames[8] = Content.Load<Texture2D>("bosseyeframe_9");
+            EyeEnemy.frames[9] = Content.Load<Texture2D>("bosseyeframe_10");
+
+            player = new PlayerShip(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
 
             return;
             int mapsize = (int)(height/2);
@@ -137,8 +156,10 @@ namespace GameUI
         public double totalseconds;
         private double lastasteroidtime;
         public double looptime;
+        public double drawlooptime;
         protected override void Draw(GameTime gameTime)
         {
+            drawlooptime = gameTime.ElapsedGameTime.TotalSeconds;
             GraphicsDevice.Clear(Color.DarkBlue);
             spriteBatch.Begin();
             spriteBatch.Draw(background, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 1);
@@ -158,6 +179,23 @@ namespace GameUI
             {
                 asteroid.disappear = true;
             }
+            foreach (var enemy in basicenemies)
+            {
+                enemy.Dispose();
+            }
+            basicenemies.Clear();
+
+            foreach (var enemy in eyeenemies)
+            {
+                enemy.Dispose();
+            }
+            eyeenemies.Clear();
+
+            foreach (var enemy in basicenemies)
+            {
+                enemy.Dispose();
+            }
+            basicenemies.Clear();
             foreach (var bullet in projectiles)
             {
                 bullet.Dispose();
@@ -166,7 +204,13 @@ namespace GameUI
             {
                 particle._lifespanLeft = 0;
             }
-            ParticleManager.particleEmitters.Remove(player.enginehandler);
+            var amount = Collider.colliders.Count();
+            GameManager.lastasteroidtime = 0;
+            GameManager.lastenemytime = 0;
+
+            ParticleManager.particleEmitters.RemoveRange(player.engineEmitData.enginehandlers);
+
+
             player.position = new Vector2(width / 2, height / 2);
         }
     }

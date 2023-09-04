@@ -87,5 +87,13 @@ namespace GameUI
             v.Y = (float)(ynew + centrey);
             return v;
         }
+
+        public static void RemoveRange<T>(this List<T> list, IEnumerable<T> toremove)
+        {
+            foreach (var item in toremove)
+            {
+                list.Remove(item);
+            }
+        }
     }
 }

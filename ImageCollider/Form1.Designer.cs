@@ -28,150 +28,235 @@
         /// </summary>
         private void InitializeComponent()
         {
-            pictureBox1 = new PictureBox();
-            button1 = new Button();
-            button2 = new Button();
-            textBox1 = new TextBox();
-            label1 = new Label();
-            comboBox1 = new ComboBox();
-            textBox2 = new TextBox();
-            label2 = new Label();
-            label3 = new Label();
-            label4 = new Label();
-            textBox3 = new TextBox();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
-            SuspendLayout();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.button4 = new System.Windows.Forms.Button();
+            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.panel1.SuspendLayout();
+            this.SuspendLayout();
             // 
             // pictureBox1
             // 
-            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox1.Location = new Point(12, 12);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(430, 426);
-            pictureBox1.TabIndex = 0;
-            pictureBox1.TabStop = false;
-            pictureBox1.Paint += pictureBox1_Paint;
+            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBox1.Location = new System.Drawing.Point(12, 12);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(430, 465);
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
+            this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
             // 
             // button1
             // 
-            button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button1.Location = new Point(332, 408);
-            button1.Name = "button1";
-            button1.Size = new Size(105, 23);
-            button1.TabIndex = 1;
-            button1.Text = "Choose image";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(330, 447);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(105, 23);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "Choose image";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
-            button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button2.Location = new Point(658, 64);
-            button2.Name = "button2";
-            button2.Size = new Size(85, 23);
-            button2.TabIndex = 2;
-            button2.Text = "Generate";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += Generate_Click;
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button2.Location = new System.Drawing.Point(658, 79);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(85, 23);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "Generate";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.Generate_Click);
             // 
             // textBox1
             // 
-            textBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            textBox1.Location = new Point(470, 135);
-            textBox1.Multiline = true;
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(318, 303);
-            textBox1.TabIndex = 3;
+            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox1.Location = new System.Drawing.Point(470, 135);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(318, 342);
+            this.textBox1.TabIndex = 3;
             // 
             // label1
             // 
-            label1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(473, 108);
-            label1.Name = "label1";
-            label1.Size = new Size(62, 21);
-            label1.TabIndex = 4;
-            label1.Text = "Points:";
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label1.Location = new System.Drawing.Point(473, 108);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(62, 21);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Points:";
             // 
             // comboBox1
             // 
-            comboBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Items.AddRange(new object[] { "Vector2", "Point", "PointF" });
-            comboBox1.Location = new Point(541, 108);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(121, 23);
-            comboBox1.TabIndex = 5;
-            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "Vector2",
+            "Point",
+            "PointF"});
+            this.comboBox1.Location = new System.Drawing.Point(541, 108);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 23);
+            this.comboBox1.TabIndex = 5;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(542, 37);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(100, 23);
-            textBox2.TabIndex = 7;
-            textBox2.Text = "1";
+            this.textBox2.Location = new System.Drawing.Point(542, 37);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(100, 23);
+            this.textBox2.TabIndex = 7;
+            this.textBox2.Text = "1";
             // 
             // label2
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(473, 40);
-            label2.Name = "label2";
-            label2.Size = new Size(63, 15);
-            label2.TabIndex = 8;
-            label2.Text = "Resolution";
-            label2.TextAlign = ContentAlignment.TopCenter;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(473, 40);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(63, 15);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Resolution";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // label3
             // 
-            label3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(474, 12);
-            label3.Name = "label3";
-            label3.Size = new Size(165, 21);
-            label3.TabIndex = 9;
-            label3.Text = "Generation Settings:";
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label3.Location = new System.Drawing.Point(474, 12);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(165, 21);
+            this.label3.TabIndex = 9;
+            this.label3.Text = "Generation Settings:";
             // 
             // label4
             // 
-            label4.AutoSize = true;
-            label4.Location = new Point(493, 67);
-            label4.Name = "label4";
-            label4.Size = new Size(42, 15);
-            label4.TabIndex = 10;
-            label4.Text = "Centre";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(493, 67);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(42, 15);
+            this.label4.TabIndex = 10;
+            this.label4.Text = "Centre";
             // 
             // textBox3
             // 
-            textBox3.Location = new Point(542, 64);
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(100, 23);
-            textBox3.TabIndex = 11;
-            textBox3.Text = "0,0";
+            this.textBox3.Location = new System.Drawing.Point(542, 64);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(100, 23);
+            this.textBox3.TabIndex = 11;
+            this.textBox3.Text = "0,0";
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(658, 32);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(85, 23);
+            this.button3.TabIndex = 12;
+            this.button3.Text = "Manual edit";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(660, 56);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(108, 19);
+            this.checkBox1.TabIndex = 13;
+            this.checkBox1.Text = "Custom indices";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.button4);
+            this.panel1.Controls.Add(this.textBox4);
+            this.panel1.Controls.Add(this.label5);
+            this.panel1.Location = new System.Drawing.Point(335, 220);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(200, 57);
+            this.panel1.TabIndex = 14;
+            this.panel1.Visible = false;
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(59, 29);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.TabIndex = 2;
+            this.button4.Text = "Change";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // textBox4
+            // 
+            this.textBox4.Location = new System.Drawing.Point(84, 6);
+            this.textBox4.Name = "textBox4";
+            this.textBox4.Size = new System.Drawing.Size(100, 23);
+            this.textBox4.TabIndex = 1;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(15, 10);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(63, 15);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "New index";
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Controls.Add(textBox3);
-            Controls.Add(label4);
-            Controls.Add(label3);
-            Controls.Add(label2);
-            Controls.Add(textBox2);
-            Controls.Add(comboBox1);
-            Controls.Add(label1);
-            Controls.Add(textBox1);
-            Controls.Add(button2);
-            Controls.Add(button1);
-            Controls.Add(pictureBox1);
-            Name = "Form1";
-            Text = "Generate polygon from image";
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 489);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.pictureBox1);
+            this.Name = "Form1";
+            this.Text = "Generate polygon from image";
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
@@ -187,5 +272,11 @@
         private Label label3;
         private Label label4;
         private TextBox textBox3;
+        private Button button3;
+        private CheckBox checkBox1;
+        private Panel panel1;
+        private TextBox textBox4;
+        private Label label5;
+        private Button button4;
     }
 }

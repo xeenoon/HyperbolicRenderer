@@ -147,7 +147,7 @@ namespace GameUI
                 if (timebetweenframes > 1)
                 {
                     timebetweenframes -= 1;
-                    if (GameManager.RandomDouble() > 0.0) //Blind 10% of the time
+                    if (GameManager.RandomDouble() > 0.6) //Blind 40% of the time
                     {
                         blinking = true;
                         framedirection = true;

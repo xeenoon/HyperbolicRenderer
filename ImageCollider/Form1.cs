@@ -49,6 +49,7 @@ namespace ImageCollider
         }
 
         bool repaintrequired = false;
+        bool autogenerate = true;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             if (!repaintrequired)
@@ -56,6 +57,57 @@ namespace ImageCollider
                 return;
             }
             repaintrequired = false;
+            if (image != null)
+            {
+                e.Graphics.DrawImage(image, 0, 0, pictureBox1.Width - 20, pictureBox1.Height - 20);
+            }
+           // return;
+            if (autogenerate)
+            {
+                AutoGenerateImage(e.Graphics);
+            }
+            else
+            {
+                ManualGenerateImage(e.Graphics);
+            }
+        }
+
+        List<PointF> userdefinedpoints = new List<PointF>();
+        private void ManualGenerateImage(Graphics graphics)
+        {
+            const int pointsize = 10;
+            List<PointF> polygon = new List<PointF>();
+            if (userdefinedpoints.Count >= 3) 
+            {
+                GrahamsAlgorithm(userdefinedpoints.OrderBy(p=>p.Y).First(), userdefinedpoints, ref polygon);
+                graphics.DrawPolygon(new Pen(Color.Orange), polygon.ToArray());
+            }
+            if (userdefinedpoints.Count == 2)
+            {
+                graphics.DrawLine(new Pen(Color.Orange), userdefinedpoints[0], userdefinedpoints[1]);
+            }
+            foreach (PointF p in userdefinedpoints)
+            {
+                graphics.FillEllipse(new Pen(Color.Blue).Brush, p.X - (pointsize/2), p.Y - (pointsize / 2), pointsize, pointsize);
+            }
+
+            //We have a list of points scaled to the current screen, now descale them to the client size
+            float xscale = (float)image.Width / (float)pictureBox1.Width;
+            float yscale = (float)image.Height / (float)pictureBox1.Height;
+
+
+            string data = string.Format("{0}[] colliderpoints = new {0}[{1}]{{", comboBox1.SelectedItem, polygon.Count);
+            foreach (PointF p in polygon)
+            {
+                PointF adjustedpoint = new PointF((float)(Math.Round(xscale * p.X) + centre.X), (float)(Math.Round(yscale * p.Y) + centre.Y));
+                data += string.Format("new {0}({1},{2}),", comboBox1.SelectedItem, adjustedpoint.X, adjustedpoint.Y);
+            }
+            data += "};";
+            textBox1.Text = data;
+        }
+
+        private void AutoGenerateImage(Graphics g)
+        {
             if (image == null)
             {
                 return;
@@ -119,7 +171,7 @@ namespace ImageCollider
                 if (i % resolution == 0) //Incrementally remove points to decrease resolution
                 {
                     PointF adjustedpoint = new PointF(centre.X + p.X, centre.Y + p.Y);
-                    
+
                     polygonpoints.Add(p);
                     data += string.Format("new {0}({1},{2}),", comboBox1.SelectedItem, adjustedpoint.X, adjustedpoint.Y);
                 }
@@ -136,8 +188,7 @@ namespace ImageCollider
 
             textBox1.Text = data;
 
-            e.Graphics.DrawImage(image, 0, 0, pictureBox1.Width - 20, pictureBox1.Height - 20);
-            e.Graphics.DrawImage(result, 0, 0, pictureBox1.Width - 20, pictureBox1.Height - 20);
+            g.DrawImage(result, 0, 0, pictureBox1.Width - 20, pictureBox1.Height - 20);
         }
 
         private static double GetAngle(PointF start, PointF end)
@@ -239,7 +290,7 @@ namespace ImageCollider
                     closestpoint = point;
                 }
             }
-            if (result.Count() > (points.Count()) * 0.6f && last.DistanceTo(points[0]) < 10)
+            if ((result.Count() > (points.Count()) * 0.6f && last.DistanceTo(points[0]) < 10) || movedpoints.Count == points.Count - 1)
             {
                 return;
             }
@@ -248,6 +299,27 @@ namespace ImageCollider
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            repaintrequired = true;
+            pictureBox1.Invalidate();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            autogenerate = false;
+            repaintrequired = true;
+            pictureBox1.Invalidate();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            if (autogenerate)
+            {
+                return;
+            }
+
+            //Add manual mouseclick positions to the points
+            var mpos = pictureBox1.PointToClient(Cursor.Position);
+            userdefinedpoints.Add(mpos);
             repaintrequired = true;
             pictureBox1.Invalidate();
         }

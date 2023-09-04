@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HyperbolicRenderer", "HyperbolicRenderer\HyperbolicRenderer.csproj", "{D6FA8EC8-8421-48FB-90EB-AB442C8C16FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HyperbolicRenderer", "HyperbolicRenderer\HyperbolicRenderer.csproj", "{D6FA8EC8-8421-48FB-90EB-AB442C8C16FC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameUI", "GameUI\GameUI.csproj", "{085C32D1-EEA9-4343-B766-DE0450EBE4B7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageCollider", "ImageCollider\ImageCollider.csproj", "{A52BA76D-30EF-4858-903C-7D209BE329B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{D6FA8EC8-8421-48FB-90EB-AB442C8C16FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6FA8EC8-8421-48FB-90EB-AB442C8C16FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6FA8EC8-8421-48FB-90EB-AB442C8C16FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{085C32D1-EEA9-4343-B766-DE0450EBE4B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{085C32D1-EEA9-4343-B766-DE0450EBE4B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{085C32D1-EEA9-4343-B766-DE0450EBE4B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{085C32D1-EEA9-4343-B766-DE0450EBE4B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A52BA76D-30EF-4858-903C-7D209BE329B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A52BA76D-30EF-4858-903C-7D209BE329B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A52BA76D-30EF-4858-903C-7D209BE329B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A52BA76D-30EF-4858-903C-7D209BE329B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

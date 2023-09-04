@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -34,7 +34,7 @@ namespace HyperbolicRenderer
         }
         public List<Trapezium> volume = new List<Trapezium>();
         public List<Trapezium> unadjustedvolume = new List<Trapezium>();
-        public float radius;
+        public int radius;
         public PointF[] connections;
         public PointF[] oldconnections;
         public Line[] sideconnections;
@@ -43,7 +43,7 @@ namespace HyperbolicRenderer
         List<Line> shapelines = new List<Line>();
 
 
-        public Map(int pointcount, float radius)
+        public Map(int pointcount, int radius)
         {
             shape = Shape.CreateShape(pointcount, radius, new PointF(radius, radius));
             
@@ -53,17 +53,9 @@ namespace HyperbolicRenderer
             }
             this.radius = radius;
         }
-        public void GenerateShape()
-        {
-
-        }
-        public void AddShape(Shape shape)
-        {
-            shapes.Add(shape);
-        }
         public int volumewidth = 0;
         public float squaresize = 0;
-        public static int extracells = 4;
+        public static int extracells = 0;
         public List<PointF> debugpoints = new List<PointF>();
         public void GenerateVolume(float scale, float offsetx, float offsety, bool infinitevolume) //Scale of 1 will have squares of 20% size, 0.5 = 10% size...
         {
@@ -191,9 +183,8 @@ namespace HyperbolicRenderer
 
         public PointF StretchPoint(PointF relativepoint, float offsetx, float offsety)
         {
-            float turningtime = squaresize;
             int debugidx = (int)((relativepoint.X - offsetx) / squaresize + ((relativepoint.Y - offsety) / squaresize) * volumewidth);
-            PointF scalar = SinScale(turningtime, relativepoint, true, debugidx);
+            PointF scalar = SinScale(relativepoint, true, debugidx);
 
             float ay = (relativepoint.Y - offsety) / squaresize;
             float ax = (relativepoint.X - offsetx) / squaresize;
@@ -213,16 +204,11 @@ namespace HyperbolicRenderer
             return new PointF(ax, ay);
         }
 
-        public PointF SinScale(double turningtime, PointF relativepoint, bool showdebug = false, int debugidx = 0)
+        public PointF SinScale(PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
-            float y_scale;
-            float x_scale;
-
-            float neg_x_scale = float.MinValue;
-            float pos_x_scale = float.MaxValue;
-
-            float neg_y_scale = float.MinValue;
-            float pos_y_scale = float.MaxValue;
+            double turningtime = squaresize*(0.585);
+            float y_scale = float.MaxValue;
+            float x_scale = float.MaxValue;
 
             //Wrap bounds around shapelines to only deal with relavent ones
             List<Line> lines = shapelines;
@@ -264,42 +250,17 @@ namespace HyperbolicRenderer
             {
                 PointF linedistance = relativepoint.DistanceTo(line);
 
-                if (linedistance.Y > neg_y_scale && linedistance.Y < 0 && linedistance.Y != 0)
+                if (Math.Abs(linedistance.Y) < Math.Abs(y_scale) && (linedistance.Y != 0 || (points.Count() % 4 != 2)))
                 {
-                    neg_y_scale = linedistance.Y;
-                }
-                if (linedistance.Y < pos_y_scale && linedistance.Y > 0 && linedistance.Y != 0)
-                {
-                    pos_y_scale = linedistance.Y;
+                    y_scale = linedistance.Y;
                 }
 
-                if (linedistance.X > neg_x_scale && linedistance.X < 0 && linedistance.X != 0)
+                if (Math.Abs(linedistance.X) < Math.Abs(x_scale) && (linedistance.X != 0 || (points.Count() % 4!=2)))
                 {
-                    neg_x_scale = linedistance.X;
-                }
-                if (linedistance.X < pos_x_scale && linedistance.X > 0 && linedistance.X != 0)
-                {
-                    pos_x_scale = linedistance.X;
+                    x_scale = linedistance.X;
                 }
             }
 
-            if (Math.Abs(neg_y_scale) < pos_y_scale)
-            {
-                y_scale = neg_y_scale;
-            }
-            else
-            {
-                y_scale = pos_y_scale;
-            }
-
-            if (Math.Abs(neg_x_scale) < pos_x_scale)
-            {
-                x_scale = neg_x_scale;
-            }
-            else
-            {
-                x_scale = pos_x_scale;
-            }
             if (showdebug)
             {
                 sideconnections[debugidx] = new Line(relativepoint, new PointF(x_scale + relativepoint.X, y_scale + relativepoint.Y)); //debugdata
@@ -312,8 +273,8 @@ namespace HyperbolicRenderer
             x_scale *= (float)SmootheCutoff(x_distancetocentre, turningtime);
             y_scale *= (float)SmootheCutoff(y_distancetocentre, turningtime);
 
-            x_scale = (float)Math.Sin((x_scale) / 20) / 2;
-            y_scale = (float)Math.Sin((y_scale) / 20) / 2;
+            x_scale = (float)Math.Sin((x_scale) / (radius / 10)) / 2;
+            y_scale = (float)Math.Sin((y_scale) / (radius / 10)) / 2;
 
             return new PointF(x_scale, y_scale);
         }
@@ -321,7 +282,7 @@ namespace HyperbolicRenderer
         private static double SmootheCutoff(double distance, double turningtime)
         {
             double result = 1;
-            const double cutoff = 0.6f;
+            const double cutoff = 0.3f;
             if (Math.Abs(distance) < turningtime)
             {
                 //Should equal zero when distancetocentre == 0
@@ -339,6 +300,60 @@ namespace HyperbolicRenderer
             }
 
             return result;
+        }
+
+        PointF[,] heights;
+        public double elapsedtime;
+        public void BakeHeights(int threadcount)
+        {
+            int adjustedradius = (int)((radius + (squaresize * extracells)) * 2);
+            heights = new PointF[adjustedradius, adjustedradius];
+
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            Task.Run(() =>
+            {
+                Parallel.For(0, threadcount,
+                             threadindex =>
+                             {
+                                 for (int xi = 0; xi < adjustedradius / (threadcount); ++xi)
+                                 {
+                                     int x = (int)(xi + threadindex * (adjustedradius / (threadcount)));
+                                     for (int y = 0; y < adjustedradius; ++y)
+                                     {
+                                         if (heights[x, y].IsEmpty)
+                                         {
+                                             heights[x, y] = SinScale(new PointF(x, y)); //Ignore already set heights
+                                         }
+                                     }
+                                 }
+                             });
+                elapsedtime = s.ElapsedMilliseconds;
+            });
+        }
+        public PointF GetBakedHeights(PointF relativepoint)
+        {
+            if (heights == null)
+            {
+                int adjustedradius = (int)((radius + (squaresize * extracells)) * 2);
+                heights = new PointF[adjustedradius, adjustedradius];
+            }
+
+            var xloc = (int)Math.Round(relativepoint.X);
+            var yloc = (int)Math.Round(relativepoint.Y);
+            if (heights == null || xloc < 0 || xloc >= heights.GetLength(0) || yloc < 0 || yloc >= heights.GetLength(1))
+            {
+                return new PointF(0, 0);
+            }
+
+            PointF height = heights[xloc, yloc];
+            if (height.IsEmpty)
+            {
+                height = SinScale(relativepoint);
+                heights[xloc, yloc] = height; //Update the array in-case we need this one in the future
+            }
+
+            return height;
         }
     }
 }

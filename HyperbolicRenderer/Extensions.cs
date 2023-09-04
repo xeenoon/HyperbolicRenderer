@@ -33,9 +33,11 @@ namespace HyperbolicRenderer
         public static PointF DistanceTo(this PointF p, Line line)
         {
             Vector normalvector = new Vector(line.start, line.end);
-            Vector perpindicular = normalvector.GetPerpindicular().GetUnitVector();
-            perpindicular = new Vector(p, new PointF((float)(perpindicular.i + p.X), (float)(perpindicular.j+ p.Y)));
-            PointF intersection = normalvector.Intersection(perpindicular);
+            Vector perpindicular = normalvector.GetPerpindicular();
+            perpindicular.A = p;
+            perpindicular.CreateVectorline();
+
+            PointF intersection = normalvector.Intersection(perpindicular, p);
             intersection = new PointF(intersection.X - p.X, intersection.Y - p.Y);
             return intersection;
         }
@@ -50,6 +52,15 @@ namespace HyperbolicRenderer
         public static double Magnitude(this PointF p)
         {
             return Math.Sqrt(p.X * p.X + p.Y * p.Y);
+        }
+
+        public static PointF ToPoint(this Microsoft.Xna.Framework.Vector3 pos)
+        {
+            return new PointF(pos.X, pos.Y);
+        }
+        public static Microsoft.Xna.Framework.Vector3 ToVector(this PointF point)
+        {
+            return new Microsoft.Xna.Framework.Vector3(point.X, point.Y, 0);
         }
     }
 }

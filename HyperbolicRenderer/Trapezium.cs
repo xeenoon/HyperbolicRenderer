@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace HyperbolicRenderer
 {
@@ -16,6 +17,10 @@ namespace HyperbolicRenderer
             this.top_right = top_right;
             this.bottom_right = bottom_right;
         }
+        public Trapezium()
+        {
+
+        }
         public static double elapseddrawtime;
         public static double elapsedtrigtime;
         Stopwatch s = new Stopwatch();
@@ -27,21 +32,17 @@ namespace HyperbolicRenderer
                 return new PointF[4] {top_left, top_right, bottom_right, bottom_left};
             }
         }
-        internal void Draw(BMP image, Graphics outerlayer, bool curved, Color color, Map map, bool fill=true)
+        public void Draw(Graphics graphics, bool curved, System.Drawing.Color color, Map map, bool fill=true)
         {
+            if (top_left.X > map.radius * 2 || top_right.X < 0 || top_left.Y < 0 || bottom_left.Y > map.radius * 2)
+            {
+                return;
+            }
+
+            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             polygonpoints.Clear();
             if (curved)
             {
-                var rightdistance = bottom_right.Y - top_right.Y;
-                var topdistance = top_right.X - top_left.X;
-
-                double t_m = (top_right.Y - top_left.Y) / topdistance;
-                double t_c = top_right.Y - t_m * top_right.X;
-
-                double r_m = rightdistance / (bottom_right.X - top_right.X);
-                double r_c = bottom_right.Y - r_m * bottom_right.X;
-
-
                 polygonpoints.AddRange(Shape.SinCurvePoints(top_left, top_right, map));
                 polygonpoints.AddRange(Shape.SinCurvePoints(top_right, bottom_right, map));
                 polygonpoints.AddRange(Shape.SinCurvePoints(bottom_left, bottom_right, map).Reverse());
@@ -50,94 +51,59 @@ namespace HyperbolicRenderer
             else
             {
                 s.Restart();
-                Shape.DrawLine(top_left, top_right, true, map.radius * 2, image, color);
-                Shape.DrawLine(top_right, bottom_right, false, map.radius * 2, image, color);
+                Shape.DrawLine(top_left, top_right, true, map.radius * 2, color, graphics);
+                Shape.DrawLine(top_right, bottom_right, false, map.radius * 2, color, graphics);
                 s.Stop();
                 elapseddrawtime += s.ElapsedTicks;
             }
 
-            if (polygonpoints.Count() >= 3)
+            List<PointF> finalpoints = new List<PointF>();
+            foreach (PointF p in polygonpoints)
+            {
+                if (p.X > 0 && p.X < map.radius*2 && p.Y > 0 && p.Y < map.radius*2)
+                {
+                    finalpoints.Add(p);
+                }
+            }
+
+            if (finalpoints.Count() >= 3)
             {
                 if (fill)
                 {
-                    outerlayer.FillPolygon(new Pen(color).Brush, polygonpoints.ToArray());
+                    graphics.FillPolygon(new Pen(color).Brush, finalpoints.ToArray());
                 }
                 else
                 {
-                    outerlayer.DrawPolygon(new Pen(color), polygonpoints.ToArray());
+                    graphics.DrawPolygon(new Pen(color), finalpoints.ToArray());
                 }
             }
         }
-        private void DrawCurve(double distance, double m, double c, bool horizontal, double mapsize, BMP image, Color color)
+
+        public Vector2[] GetPoints(Map map)
         {
-            double a = Math.PI / (distance);
-            
-            for (float i = 0; i < distance; ++i)
+            if (top_left.X > map.radius*2 || top_right.X < 0 || top_left.Y < 0 || bottom_left.Y > map.radius*2)
             {
-                s.Restart();
-                double sin_height = Math.Sin(a * i); //Expressed as a percentage of the new height, pi/2 gets to next period to curve upwards
-                int workingvar;
-                if (horizontal)
-                {
-                    workingvar = (int)(i + top_left.X);
-                }
-                else
-                {
-                    workingvar = (int)(i + top_right.Y);
-                }
-
-                double normalheight;
-                if (horizontal)
-                {
-                    normalheight = m*workingvar + c;
-                }
-                else
-                {
-                    normalheight = (workingvar - c) / m; //Find the height if it was a straight line
-                }
-
-                if (bottom_right.X - top_right.X == 0 && !horizontal) //Check fofr pure vertical lines
-                {
-                    normalheight = top_right.X;
-                }
-
-                //Use pythag to get distance to centre
-
-                double axisdist = normalheight - (mapsize / 2);
-
-                double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
-                scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
-                scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
-
-                int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
-                if (curveheight >= mapsize || curveheight < 0 || workingvar >= mapsize || workingvar < 0)
-                {
-                    continue;
-                }
-                s.Stop();
-                elapsedtrigtime += s.ElapsedTicks;
-                s.Restart();
-                if (horizontal)
-                {
-                    image.SetPixel(workingvar, curveheight, color);
-                }
-                else
-                {
-                    image.SetPixel(curveheight, workingvar, color);
-                }
-                s.Stop();
-                elapseddrawtime += s.ElapsedTicks;
+                return Array.Empty<Vector2>();
             }
-        }
-        
-    }
-    public class CurvedShape
-    {
-        PointF[] originalpoints;
-        PointF[] adjustedpoints;
-        public CurvedShape(PointF[] points)
-        {
-            originalpoints = points;
+
+            List<Vector2> vertices = new List<Vector2>();
+
+            vertices.AddRange(Shape.SinCurvePoints(top_left.ToVector(), top_right.ToVector(), map));
+            vertices.AddRange(Shape.SinCurvePoints(top_right.ToVector(), bottom_right.ToVector(), map));
+            vertices.AddRange(Shape.SinCurvePoints(bottom_left.ToVector(), bottom_right.ToVector(), map).Reverse());
+            vertices.AddRange(Shape.SinCurvePoints(top_left.ToVector(), bottom_left.ToVector(), map).Reverse());
+
+
+            List<Vector2> finalpoints = new List<Vector2>();
+            foreach (Vector2 p in vertices)
+            {
+                if (p.X > 0 && p.X < map.radius * 2 && p.Y > 0 && p.Y < map.radius * 2)
+                {
+                    finalpoints.Add(p);
+                }
+            }
+
+            return finalpoints.ToArray();
         }
     }
 }

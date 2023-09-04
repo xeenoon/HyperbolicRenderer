@@ -58,10 +58,9 @@
             // 
             // pictureBox1
             // 
-            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox1.Location = new Point(12, 29);
+            pictureBox1.Location = new Point(0, 0);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(600, 600);
+            pictureBox1.Size = new Size(500, 500);
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             pictureBox1.Paint += pictureBox1_Paint;
@@ -69,7 +68,7 @@
             // textBox1
             // 
             textBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox1.Location = new Point(798, 56);
+            textBox1.Location = new Point(589, 65);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(100, 23);
             textBox1.TabIndex = 1;
@@ -78,7 +77,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button1.Location = new Point(755, 144);
+            button1.Location = new Point(546, 153);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 2;
@@ -92,7 +91,7 @@
             // 
             label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label1.AutoSize = true;
-            label1.Location = new Point(755, 60);
+            label1.Location = new Point(546, 69);
             label1.Name = "label1";
             label1.Size = new Size(34, 15);
             label1.TabIndex = 3;
@@ -102,7 +101,7 @@
             // 
             label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label2.AutoSize = true;
-            label2.Location = new Point(755, 90);
+            label2.Location = new Point(546, 99);
             label2.Name = "label2";
             label2.Size = new Size(34, 15);
             label2.TabIndex = 4;
@@ -111,17 +110,17 @@
             // textBox2
             // 
             textBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox2.Location = new Point(798, 87);
+            textBox2.Location = new Point(589, 96);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 5;
-            textBox2.Text = "0.77";
+            textBox2.Text = "0.769";
             // 
             // checkBox1
             // 
             checkBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(937, 56);
+            checkBox1.Location = new Point(728, 65);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(87, 19);
             checkBox1.TabIndex = 6;
@@ -137,7 +136,7 @@
             checkBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox2.AutoSize = true;
             checkBox2.ForeColor = Color.FromArgb(255, 128, 0);
-            checkBox2.Location = new Point(957, 81);
+            checkBox2.Location = new Point(748, 90);
             checkBox2.Name = "checkBox2";
             checkBox2.Size = new Size(81, 19);
             checkBox2.TabIndex = 11;
@@ -153,7 +152,7 @@
             checkBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox3.AutoSize = true;
             checkBox3.ForeColor = Color.Red;
-            checkBox3.Location = new Point(957, 129);
+            checkBox3.Location = new Point(748, 138);
             checkBox3.Name = "checkBox3";
             checkBox3.Size = new Size(105, 19);
             checkBox3.TabIndex = 12;
@@ -169,7 +168,7 @@
             checkBox4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox4.AutoSize = true;
             checkBox4.ForeColor = Color.Green;
-            checkBox4.Location = new Point(957, 153);
+            checkBox4.Location = new Point(748, 162);
             checkBox4.Name = "checkBox4";
             checkBox4.Size = new Size(115, 19);
             checkBox4.TabIndex = 13;
@@ -185,7 +184,7 @@
             checkBox5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox5.AutoSize = true;
             checkBox5.ForeColor = Color.Magenta;
-            checkBox5.Location = new Point(957, 177);
+            checkBox5.Location = new Point(748, 186);
             checkBox5.Name = "checkBox5";
             checkBox5.Size = new Size(93, 19);
             checkBox5.TabIndex = 14;
@@ -201,7 +200,7 @@
             checkBox6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox6.AutoSize = true;
             checkBox6.ForeColor = Color.Black;
-            checkBox6.Location = new Point(957, 201);
+            checkBox6.Location = new Point(748, 210);
             checkBox6.Name = "checkBox6";
             checkBox6.Size = new Size(97, 19);
             checkBox6.TabIndex = 15;
@@ -217,7 +216,7 @@
             checkBox7.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox7.AutoSize = true;
             checkBox7.ForeColor = Color.FromArgb(255, 128, 0);
-            checkBox7.Location = new Point(957, 105);
+            checkBox7.Location = new Point(748, 114);
             checkBox7.Name = "checkBox7";
             checkBox7.Size = new Size(48, 19);
             checkBox7.TabIndex = 16;
@@ -235,7 +234,7 @@
             checkBox8.Checked = true;
             checkBox8.CheckState = CheckState.Checked;
             checkBox8.ForeColor = Color.Black;
-            checkBox8.Location = new Point(957, 226);
+            checkBox8.Location = new Point(748, 235);
             checkBox8.Name = "checkBox8";
             checkBox8.Size = new Size(90, 19);
             checkBox8.TabIndex = 17;
@@ -250,7 +249,7 @@
             // 
             checkBox9.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox9.AutoSize = true;
-            checkBox9.Location = new Point(755, 206);
+            checkBox9.Location = new Point(546, 215);
             checkBox9.Name = "checkBox9";
             checkBox9.Size = new Size(124, 19);
             checkBox9.TabIndex = 18;
@@ -265,7 +264,7 @@
             label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(937, 29);
+            label3.Location = new Point(728, 38);
             label3.Name = "label3";
             label3.Size = new Size(61, 21);
             label3.TabIndex = 19;
@@ -276,7 +275,7 @@
             label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label4.Location = new Point(755, 29);
+            label4.Location = new Point(546, 38);
             label4.Name = "label4";
             label4.Size = new Size(95, 21);
             label4.TabIndex = 20;
@@ -287,7 +286,7 @@
             label5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label5.Location = new Point(755, 178);
+            label5.Location = new Point(546, 187);
             label5.Name = "label5";
             label5.Size = new Size(93, 21);
             label5.TabIndex = 21;
@@ -297,7 +296,7 @@
             // 
             label6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label6.AutoSize = true;
-            label6.Location = new Point(755, 249);
+            label6.Location = new Point(546, 258);
             label6.Name = "label6";
             label6.Size = new Size(39, 15);
             label6.TabIndex = 22;
@@ -306,7 +305,7 @@
             // textBox3
             // 
             textBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox3.Location = new Point(800, 245);
+            textBox3.Location = new Point(591, 254);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(99, 23);
             textBox3.TabIndex = 23;
@@ -315,7 +314,7 @@
             // button2
             // 
             button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button2.Location = new Point(756, 272);
+            button2.Location = new Point(547, 281);
             button2.Name = "button2";
             button2.Size = new Size(75, 23);
             button2.TabIndex = 24;
@@ -329,7 +328,7 @@
             // 
             checkBox10.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox10.AutoSize = true;
-            checkBox10.Location = new Point(755, 226);
+            checkBox10.Location = new Point(546, 235);
             checkBox10.Name = "checkBox10";
             checkBox10.Size = new Size(80, 19);
             checkBox10.TabIndex = 25;
@@ -341,7 +340,7 @@
             // 
             label7.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label7.AutoSize = true;
-            label7.Location = new Point(922, 284);
+            label7.Location = new Point(713, 293);
             label7.Name = "label7";
             label7.Size = new Size(0, 15);
             label7.TabIndex = 26;
@@ -351,7 +350,7 @@
             // 
             label8.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label8.AutoSize = true;
-            label8.Location = new Point(734, 119);
+            label8.Location = new Point(525, 128);
             label8.Name = "label8";
             label8.Size = new Size(55, 15);
             label8.TabIndex = 27;
@@ -360,7 +359,7 @@
             // textBox4
             // 
             textBox4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox4.Location = new Point(799, 116);
+            textBox4.Location = new Point(590, 125);
             textBox4.Name = "textBox4";
             textBox4.Size = new Size(100, 23);
             textBox4.TabIndex = 28;
@@ -370,7 +369,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1078, 645);
+            ClientSize = new Size(871, 461);
             Controls.Add(textBox4);
             Controls.Add(label8);
             Controls.Add(label7);
@@ -401,6 +400,7 @@
             Load += Form1_Load;
             KeyDown += Form1_KeyDown;
             KeyUp += Form1_KeyUp;
+            Resize += Form1_Resize;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();

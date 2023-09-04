@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,12 +40,13 @@ namespace HyperbolicRenderer
                 float x = (float)(Math.Cos(angle) * radius);
 
                 float y = (float)(Math.Sin(angle) * radius);
+
                 result[i] = new PointF(x + position.X, y + position.Y);
             }
             return new Shape(result, position, radius);
         }
 
-        public void Draw(Graphics graphics, Color color, Map map)
+        public void Draw(Graphics graphics, System.Drawing.Color color, Map map)
         {
             polygonpoints = new List<PointF>();
             for (int i = 0; i < points.Count(); ++i)
@@ -113,12 +115,10 @@ namespace HyperbolicRenderer
             }
 
             PointF[] polygonpoints = new PointF[(int)Math.Ceiling(distance)];
-            double a = Math.PI / (distance);
             distance = Math.Ceiling(distance);
             for (float i = 0; i < distance; ++i)
             {
                 int workingvar = (int)(i + startidx);
-
 
                 double normalheight;
                 if (horizontal)
@@ -144,9 +144,7 @@ namespace HyperbolicRenderer
                 {
                     workingpoint = new PointF((float)normalheight, workingvar);
                 }
-                workingpoint = map.SinScale(0.6f, workingpoint);
-
-
+                workingpoint = map.GetBakedHeights(workingpoint);
                 double sin_height;
                 if (horizontal)
                 {
@@ -159,27 +157,27 @@ namespace HyperbolicRenderer
 
 
                 //f: y=-((1)/(25)) (x-5)^(2)+1
-                double scaleamount = 3;
+                double scaleamount = 1;
                 double axisdist = Math.Abs(normalheight - map.radius);
                 double y = (-(scaleamount / Math.Pow(distance / 2, 2)) * Math.Pow((i - (distance / 2)), (2))) + scaleamount;
 
                 sin_height *= y;
 
-
                 //Use pythag to get distance to centre
 
-                sin_height = axisdist < 0 ? -sin_height : sin_height;
-
                 double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
+                if (scalingfactor > 1)
+                {
+                    scalingfactor = 1;
+                }
                 scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
                 scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
 
                 int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
-                curveheight = (int)Math.Min(curveheight, mapsize - 1);
-                workingvar = (int)Math.Min(workingvar, mapsize - 1);
-                workingvar = (int)Math.Max(workingvar, 0);
-                curveheight = (int)Math.Max(curveheight, 0);
-
+                if (curveheight < 0)
+                {
+                    curveheight = 0;
+                }
                 if (i == distance - 1)
                 {
                     curveheight = (int)normalheight;
@@ -197,7 +195,120 @@ namespace HyperbolicRenderer
 
             return polygonpoints;
         }
-        public static void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, BMP image, Color color)
+        public static Vector2[] SinCurvePoints(Vector3 start, Vector3 end, Map map)
+        {
+            double mapsize = map.radius * 2;
+
+            bool horizontal;
+            double distance;
+            double m;
+            double c;
+            int startidx;
+
+            if (end.X - start.X > end.Y - start.Y)
+            {
+                startidx = (int)start.X;
+                horizontal = true;
+                distance = end.X - start.X;
+                m = (end.Y - start.Y) / distance;
+                c = end.Y - m * end.X;
+            }
+            else
+            {
+                startidx = (int)start.Y;
+                horizontal = false;
+                distance = end.Y - start.Y;
+                m = distance / (end.X - start.X);
+                c = end.Y - m * end.X;
+            }
+
+            if (startidx < 0 || startidx >= mapsize)
+            {
+                return Array.Empty<Vector2>();
+            }
+
+            Vector2[] polygonpoints = new Vector2[(int)Math.Ceiling(distance)];
+            distance = Math.Ceiling(distance);
+            for (float i = 0; i < distance; ++i)
+            {
+                int workingvar = (int)(i + startidx);
+
+                double normalheight;
+                if (horizontal)
+                {
+                    normalheight = m * workingvar + c;
+                }
+                else
+                {
+                    normalheight = (workingvar - c) / m; //Find the height if it was a straight line
+                }
+
+
+                if (double.IsNaN(normalheight))
+                {
+                    normalheight = start.X;
+                }
+                PointF workingpoint;
+                if (horizontal)
+                {
+                    workingpoint = new PointF(workingvar, (float)normalheight);
+                }
+                else
+                {
+                    workingpoint = new PointF((float)normalheight, workingvar);
+                }
+                workingpoint = map.GetBakedHeights(workingpoint);
+                double sin_height;
+                if (horizontal)
+                {
+                    sin_height = workingpoint.Y;
+                }
+                else
+                {
+                    sin_height = workingpoint.X;
+                }
+
+
+                //f: y=-((1)/(25)) (x-5)^(2)+1
+                double scaleamount = 1;
+                double axisdist = Math.Abs(normalheight - map.radius);
+                double y = (-(scaleamount / Math.Pow(distance / 2, 2)) * Math.Pow((i - (distance / 2)), (2))) + scaleamount;
+
+                sin_height *= y;
+
+                //Use pythag to get distance to centre
+
+                double scalingfactor = Math.Abs(axisdist) / (mapsize / 2);
+                if (scalingfactor > 1)
+                {
+                    scalingfactor = 1;
+                }
+                scalingfactor = Math.Log(scalingfactor + 1) * 0.5f;
+                scalingfactor = axisdist > 0 ? scalingfactor : -scalingfactor;
+
+                int curveheight = (int)(sin_height * (distance) * scalingfactor + normalheight);
+                if (curveheight < 0)
+                {
+                    curveheight = 0;
+                }
+                if (i == distance - 1)
+                {
+                    curveheight = (int)normalheight;
+                }
+
+                if (horizontal)
+                {
+                    polygonpoints[(int)i] = new Vector2(workingvar, curveheight);
+                }
+                else
+                {
+                    polygonpoints[(int)i] = new Vector2(curveheight, workingvar);
+                }
+            }
+
+            return polygonpoints;
+        }
+        public static void DrawLine(PointF start, PointF end, bool horizontal, double mapsize, System.Drawing.Color color, Graphics g)
         {
             if (start.X > end.X && horizontal) //Reversed pointers given?
             {
@@ -221,6 +332,7 @@ namespace HyperbolicRenderer
                 m = distance / (end.X - start.X);
                 c = end.Y - m * end.X;
             }
+            PointF[] linepoints = new PointF[(int)Math.Ceiling(distance)];
             for (float i = 0; i < distance; ++i)
             {
                 int workingvar;
@@ -241,25 +353,18 @@ namespace HyperbolicRenderer
                         resultheight = (int)start.X;
                     }
                 }
-                if (workingvar >= mapsize || workingvar < 0 || resultheight >= mapsize || resultheight < 0)
+                if (horizontal)
                 {
-                    continue;
+                    linepoints[(int)i] = new PointF(workingvar, resultheight);                
                 }
-                try
+                else
                 {
-                    if (horizontal)
-                    {
-                        image.SetPixel(workingvar, resultheight, color);
-                    }
-                    else
-                    {
-                        image.SetPixel(resultheight, workingvar, color);
-                    }
+                    linepoints[(int)i] = new PointF(resultheight, workingvar);
                 }
-                catch
-                {
-
-                }
+            }
+            if (linepoints.Count() >= 2)
+            {
+                g.DrawLines(new Pen(color, 5), linepoints);
             }
         }
 

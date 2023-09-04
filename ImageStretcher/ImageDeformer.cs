@@ -42,6 +42,10 @@ namespace ImageStretcher
 
                         // Calculate the displacement for this pixel based on its distance from the polygon edges
                         PointF currentPixel = new PointF(x, y);
+                        if (!currentPixel.InPolygon(polygonPoints))
+                        {
+                            continue;
+                        }
                         PointF displacement = CalculateDisplacement(currentPixel, polygonPoints, newPolygonPoints);
 
                         // Apply the displacement to the pixel's position with subpixel precision
@@ -84,12 +88,13 @@ namespace ImageStretcher
 
                 PointF newPoint = newPoints[i];
 
-                // Calculate the distance between the pixel and the polygon vertex
+                // Calculate the distance between the pixel and the line
                 PointF distance = pixel.DistanceTo(line);
+
                 float magnitude = (float)Math.Sqrt(distance.X*distance.X + distance.Y*distance.Y);
 
                 // Make the pixel's movement inversely proportional to the distance
-                float factor = 1.0f / (magnitude + 1); // Adding 1 to avoid division by zero
+                float factor = 0.2f / (magnitude + 1); // Adding 1 to avoid division by zero
 
                 // Calculate the displacement based on the difference between old and new positions
                 float deltaX = newPoint.X - oldPoint.X;

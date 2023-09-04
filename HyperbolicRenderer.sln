@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameUI", "GameUI\GameUI.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageCollider", "ImageCollider\ImageCollider.csproj", "{A52BA76D-30EF-4858-903C-7D209BE329B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageStretcher", "ImageStretcher\ImageStretcher.csproj", "{AF1003B8-9F37-463C-86D6-AAB4B3F456F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{A52BA76D-30EF-4858-903C-7D209BE329B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A52BA76D-30EF-4858-903C-7D209BE329B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A52BA76D-30EF-4858-903C-7D209BE329B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF1003B8-9F37-463C-86D6-AAB4B3F456F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF1003B8-9F37-463C-86D6-AAB4B3F456F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF1003B8-9F37-463C-86D6-AAB4B3F456F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF1003B8-9F37-463C-86D6-AAB4B3F456F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

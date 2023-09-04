@@ -123,7 +123,7 @@ namespace HyperbolicRenderer
             return vectorLine.SubstituteX(x);
         }
 
-        internal PointF Intersection(Vector rt, PointF point)
+        public PointF Intersection(Vector rt, PointF point)
         {
             //Convert to cartesian and compare
             var line1 = vectorLine;

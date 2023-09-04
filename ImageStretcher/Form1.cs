@@ -25,20 +25,7 @@ namespace ImageStretcher
             List<PointF> adjustedpoints = new List<PointF>();
             foreach (PointF p in colliderpoints)
             {
-                PointF toadd = new PointF(p.X, p.Y);
-                if (p.Y > asteroidimage.Height / 2)
-                {
-                    //toadd.Y -= (p.Y - asteroidimage.Height / 2) * 0.8f;
-                }
-                else
-                {
-                    toadd.X -= (p.X - asteroidimage.Width / 2) * 0.3f;
-                }
-                // if (p.X > asteroidimage.Width / 2)
-                // {
-                //     toadd.X -= (p.X - asteroidimage.Width / 2) * 0.2f;
-                // }
-                adjustedpoints.Add(toadd);
+                adjustedpoints.Add(DeformFunc(p));
             }
             tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints.ToArray());
             tempgraphics.DrawPolygon(new Pen(Color.Red), adjustedpoints.ToArray());
@@ -46,11 +33,25 @@ namespace ImageStretcher
             ImageDeformer imageDeformer = new ImageDeformer(asteroidimage, colliderpoints);
             Stopwatch s = new Stopwatch();
             s.Start();
-            var b = imageDeformer.DeformImageToPolygon(adjustedpoints.ToArray());
+            var b = imageDeformer.DeformImageToPolygon(DeformFunc);
             s.Stop();
             var elapsed = s.ElapsedMilliseconds;
             e.Graphics.DrawImage(b, 0, 0, pictureBox1.Width, pictureBox1.Height);
             e.Graphics.DrawImage(temp, 0, 0, pictureBox1.Width, pictureBox1.Height);
+        }
+
+        public PointF DeformFunc(PointF p)
+        {
+            PointF result = new PointF(p.X, p.Y);
+            if (p.Y > asteroidimage.Height / 2)
+            {
+                result.Y -= (p.Y - asteroidimage.Height / 2) * 0.4f;
+                if (p.X > asteroidimage.Width / 2)
+                {
+                    result.X -= (p.X - asteroidimage.Width / 2) * 0.2f;
+                }
+            }
+            return result;
         }
 
         private void pictureBox2_Paint(object sender, PaintEventArgs e)

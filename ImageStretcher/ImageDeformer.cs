@@ -20,7 +20,7 @@ namespace ImageStretcher
             this.polygonPoints = polygonPoints;
         }
 
-        public Bitmap DeformImageToPolygon(PointF[] newPolygonPoints)
+        public Bitmap DeformImageToPolygon(Func<PointF, PointF> DeformFunction)
         {
             int width = originalimage.Width;
             int height = originalimage.Height;
@@ -44,35 +44,19 @@ namespace ImageStretcher
 
                             Color oldcolor = inputdata.GetPixel(x, y);
                             // Calculate the displacement for this pixel based on its distance from the polygon edges
-                            PointF displacement = CalculateDisplacement(currentPixel, polygonPoints, newPolygonPoints);
-
-                            // Apply the displacement to the pixel's position with subpixel precision
-                            int newX = (int)Math.Round(x + displacement.X);
-                            int newY = (int)Math.Round(y + displacement.Y);
+                            PointF newtransform = DeformFunction(currentPixel);
 
                             // Ensure the new position is within bounds
-                            newX = Math.Max(0, Math.Min(newX, width - 1));
-                            newY = Math.Max(0, Math.Min(newY, height - 1));
+                            newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
 
-                            outputdata.SetPixel(newX, newY, oldcolor);
+                            outputdata.SetPixel((int)newtransform.X, (int)newtransform.Y, oldcolor);
                         }
 
                     }
                 }
             }
 
-            GraphicsPath gp = new GraphicsPath();
-            gp.AddPolygon(newPolygonPoints.ToArray());
-
-            Bitmap finalresult = new Bitmap(originalimage.Width, originalimage.Height);
-            using (Graphics G = Graphics.FromImage(finalresult))
-            {
-                G.Clip = new Region(gp);   // restrict drawing region
-                G.DrawImage(resultBitmap, 0, 0);   // draw clipped
-            }
-            gp.Dispose();
-
-            return finalresult;
+            return resultBitmap;
         }
         private PointF CalculateDisplacement(PointF pixel, PointF[] oldPoints, PointF[] newPoints)
         {

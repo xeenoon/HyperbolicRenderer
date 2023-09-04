@@ -40,7 +40,18 @@ namespace ImageStretcher
             }
             return result;
         }
-
+        public static double DistanceTo(this PointF p, PointF destination)
+        {
+            if (p.X == destination.X && p.Y == destination.Y)
+            {
+                return 0.0001;
+            }
+            return Math.Sqrt(Math.Pow(destination.X - p.X, 2) + Math.Pow(destination.Y - p.Y, 2));
+        }
+        public static double Magnitude(this PointF p)
+        {
+            return Math.Sqrt(p.X * p.X + p.Y * p.Y);
+        }
     }
     public struct Line
     {

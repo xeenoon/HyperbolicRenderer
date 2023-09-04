@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace ImageStretcher
 {
     public partial class Form1 : Form
@@ -24,15 +26,29 @@ namespace ImageStretcher
             foreach (PointF p in colliderpoints)
             {
                 PointF toadd = new PointF(p.X, p.Y);
-                if (p.X > asteroidimage.Width/2)
+                if (p.Y > asteroidimage.Height / 2)
                 {
-                    toadd.X -= 10;
+                    //toadd.Y -= (p.Y - asteroidimage.Height / 2) * 0.8f;
                 }
+                else
+                {
+                    toadd.X -= (p.X - asteroidimage.Width / 2) * 0.3f;
+                }
+                // if (p.X > asteroidimage.Width / 2)
+                // {
+                //     toadd.X -= (p.X - asteroidimage.Width / 2) * 0.2f;
+                // }
                 adjustedpoints.Add(toadd);
             }
+            tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints.ToArray());
             tempgraphics.DrawPolygon(new Pen(Color.Red), adjustedpoints.ToArray());
 
-            var b = ImageDeformer.DeformImageToPolygon(asteroidimage, colliderpoints, adjustedpoints.ToArray());
+            ImageDeformer imageDeformer = new ImageDeformer(asteroidimage, colliderpoints);
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            var b = imageDeformer.DeformImageToPolygon(adjustedpoints.ToArray());
+            s.Stop();
+            var elapsed = s.ElapsedMilliseconds;
             e.Graphics.DrawImage(b, 0, 0, pictureBox1.Width, pictureBox1.Height);
             e.Graphics.DrawImage(temp, 0, 0, pictureBox1.Width, pictureBox1.Height);
         }

@@ -61,7 +61,7 @@ namespace ImageCollider
             {
                 e.Graphics.DrawImage(image, 0, 0, pictureBox1.Width - 20, pictureBox1.Height - 20);
             }
-           // return;
+            // return;
             if (autogenerate)
             {
                 AutoGenerateImage(e.Graphics);
@@ -71,24 +71,55 @@ namespace ImageCollider
                 ManualGenerateImage(e.Graphics);
             }
         }
+        class Vertex
+        {
+            public PointF position;
+            public int index;
 
-        List<PointF> userdefinedpoints = new List<PointF>();
+            public Vertex(PointF position, int index)
+            {
+                this.position = position;
+                this.index = index;
+            }
+        }
+        List<Vertex> userdefinedpoints = new List<Vertex>();
+        bool customindices;
         private void ManualGenerateImage(Graphics graphics)
         {
             const int pointsize = 10;
             List<PointF> polygon = new List<PointF>();
-            if (userdefinedpoints.Count >= 3) 
+            if (userdefinedpoints.Count >= 3 && !customindices)
             {
-                GrahamsAlgorithm(userdefinedpoints.OrderBy(p=>p.Y).First(), userdefinedpoints, ref polygon);
+                GrahamsAlgorithm(userdefinedpoints.OrderBy(p => p.position.Y).First().position, userdefinedpoints.Select(u=>u.position).ToList(), ref polygon);
                 graphics.DrawPolygon(new Pen(Color.Orange), polygon.ToArray());
             }
             if (userdefinedpoints.Count == 2)
             {
-                graphics.DrawLine(new Pen(Color.Orange), userdefinedpoints[0], userdefinedpoints[1]);
+                graphics.DrawLine(new Pen(Color.Orange), userdefinedpoints[0].position, userdefinedpoints[1].position);
             }
-            foreach (PointF p in userdefinedpoints)
+
+            if (customindices && polygon.Count >= 3) //Order as set by the user
             {
-                graphics.FillEllipse(new Pen(Color.Blue).Brush, p.X - (pointsize/2), p.Y - (pointsize / 2), pointsize, pointsize);
+                foreach (PointF p in userdefinedpoints.OrderBy(v=>v.index).Where(v=>v.index != -1).Select(v=>v.position))
+                {
+                    polygon.Add(p); //Add the point at its index
+                }
+                graphics.DrawPolygon(new Pen(Color.Orange), polygon.ToArray());
+            }
+
+            foreach (Vertex v in userdefinedpoints)
+            {
+                PointF p = v.position;
+                graphics.FillEllipse(new Pen(Color.Blue).Brush, p.X - (pointsize / 2), p.Y - (pointsize / 2), pointsize, pointsize);
+                if (polygon.Contains(p))
+                {
+                    var index = polygon.IndexOf(v.position);
+                    if (customindices) 
+                    {
+                        index = v.index;
+                    }
+                    graphics.DrawString(index.ToString(), new Font("Arial", 10), new Pen(Color.Black).Brush, p.X + 15, p.Y);
+                }
             }
 
             //We have a list of points scaled to the current screen, now descale them to the client size
@@ -254,8 +285,8 @@ namespace ImageCollider
             float y;
             float.TryParse(centredata[0], out x);
             float.TryParse(centredata[1], out y);
-            centre = new PointF(x,y);
-            
+            centre = new PointF(x, y);
+
 
             repaintrequired = true;
             pictureBox1.Invalidate();
@@ -277,6 +308,10 @@ namespace ImageCollider
             {
                 nearbypoints = points.Where(p => p.DistanceTo(last) < newresolution && !movedpoints.Contains(p)).ToList();
                 newresolution++;
+                if (newresolution >= pictureBox1.Width)
+                {
+                    return;
+                }
             }
 
             double smallestangle = double.MaxValue;
@@ -290,7 +325,7 @@ namespace ImageCollider
                     closestpoint = point;
                 }
             }
-            if ((result.Count() > (points.Count()) * 0.6f && last.DistanceTo(points[0]) < 10) || movedpoints.Count == points.Count - 1)
+            if ((result.Count() > (points.Count()) * 0.6f && last.DistanceTo(points[0]) < resolution * 2) || movedpoints.Count() >= points.Count() - 1)
             {
                 return;
             }
@@ -309,7 +344,7 @@ namespace ImageCollider
             repaintrequired = true;
             pictureBox1.Invalidate();
         }
-
+        int selectedvertex = -1;
         private void pictureBox1_Click(object sender, EventArgs e)
         {
             if (autogenerate)
@@ -319,9 +354,108 @@ namespace ImageCollider
 
             //Add manual mouseclick positions to the points
             var mpos = pictureBox1.PointToClient(Cursor.Position);
-            userdefinedpoints.Add(mpos);
+
+            if (ModifierKeys == Keys.Shift) //Deleting points
+            {
+                Vertex closestpoint = userdefinedpoints.Where(u => u.position.DistanceTo(mpos) < 10).OrderBy(p => p.position.DistanceTo(mpos)).FirstOrDefault();
+                if (closestpoint != null)
+                {
+                    userdefinedpoints.Remove((Vertex)closestpoint);
+                    //Find all indexes above the closest points index and decrease it
+                    for (int i = 0; i < userdefinedpoints.Count; ++i)
+                    {
+                        if (userdefinedpoints[i].index >= closestpoint.index)
+                        {
+                            userdefinedpoints[i] = new Vertex(userdefinedpoints[i].position, userdefinedpoints[i].index-1);
+                        }
+                    }
+                }
+            }
+            else if (ModifierKeys == Keys.Control && customindices)
+            {
+                Vertex closestpoint = userdefinedpoints.Where(u => u.position.DistanceTo(mpos) < 10).OrderBy(p => p.position.DistanceTo(mpos)).FirstOrDefault();
+                if (closestpoint != null)
+                {
+                    //potentially change the index
+                    textBox4.Text = ((Vertex)closestpoint).index.ToString();
+                    selectedvertex = userdefinedpoints.IndexOf(((Vertex)(closestpoint)));
+                    panel1.Visible = true;
+                }
+            }
+            else
+            {
+                userdefinedpoints.Add(new Vertex(mpos, userdefinedpoints.Count));
+            }
             repaintrequired = true;
             pictureBox1.Invalidate();
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            customindices = checkBox1.Checked;
+            if (customindices && !autogenerate && userdefinedpoints.Count() != 0)
+            {
+                List<PointF> orderedpoints = new List<PointF>();
+                GrahamsAlgorithm(userdefinedpoints.OrderBy(p => p.position.Y).First().position, userdefinedpoints.Select(u => u.position).ToList(), ref orderedpoints);
+                //Find the correct indices of each point and update the userdefinedpoints
+                for (int i = 0; i < userdefinedpoints.Count; ++i)
+                {
+                    int index = userdefinedpoints[i].index;
+
+                    if (index >= orderedpoints.Count || index == -1) //unselected vertice with an index out of the range
+                    {
+                        userdefinedpoints[i] = new Vertex(userdefinedpoints[index].position, -1); //deselct the point
+                    }
+                    else
+                    {
+                        //Swap it out for the new one
+                        userdefinedpoints[i] = new Vertex(orderedpoints[i], index);
+                    }
+                }
+            }
+            repaintrequired = true;
+            pictureBox1.Invalidate();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (panel1.Visible && selectedvertex != -1)
+            {
+                int newidx;
+                if (int.TryParse(textBox4.Text, out newidx))
+                {
+                    if (userdefinedpoints.Any(u=>u.index == newidx)) //overwriting?
+                    {
+                        //Increase the index of all other values
+                        for (int i = 0; i < userdefinedpoints.Count; ++i)
+                        {
+                            Vertex v = userdefinedpoints[i];
+                            if (v.index >= newidx && i != selectedvertex)
+                            {
+                                userdefinedpoints[i] = new Vertex(userdefinedpoints[i].position, v.index + 1);
+                            }
+                        }
+                    }
+                    //Get all the values infront of the moved point, and decrease the index
+                    for (int i = 0; i < userdefinedpoints.Count; ++i)
+                    {
+                        if (userdefinedpoints[i].index >= userdefinedpoints[selectedvertex].index)
+                        {
+                            userdefinedpoints[i] = new Vertex(userdefinedpoints[i].position, userdefinedpoints[i].index-1);
+                        }
+                    }
+
+                    userdefinedpoints[selectedvertex] = new Vertex(userdefinedpoints[selectedvertex].position, newidx);
+                    panel1.Visible = false;
+                    selectedvertex = -1;
+                    repaintrequired = true;
+                    pictureBox1.Invalidate();
+                }
+                else
+                {
+                    MessageBox.Show("Invalid value given");
+                }
+            }
         }
     }
 }

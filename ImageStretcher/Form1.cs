@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace ImageStretcher
 {
@@ -70,39 +71,47 @@ namespace ImageStretcher
                     {
                         if ((ycentre / readlength) % 2 == 0)
                         {
-                            DrawSquare(bmpData, writeData, readlength, xcentre, ycentre);
+                            CopySquare(bmpData, writeData, readlength, xcentre, ycentre);
                         }
                     }
                 }
             }
-
+            s.Stop();
+            var elapsed = s.ElapsedMilliseconds;
             // Unlock the bits.
             bmp.UnlockBits(bmpData);
             writebmp.UnlockBits(writeData);
-            s.Stop();
-            var elapsed = s.ElapsedMilliseconds;
+
             // Draw the modified image.
             e.Graphics.DrawImage(writebmp, 0, 0, pictureBox1.Width, pictureBox1.Height);
         }
 
-        private static void DrawSquare(BitmapData readData, BitmapData writeData, int readlength, int xcentre, int ycentre)
+        private static void CopySquare(BitmapData readData, BitmapData writeData, int radius, int xcentre, int ycentre)
         {
-            int xstart = (xcentre - (readlength / 2)) * 4;
-
-            IntPtr readptr = readData.Scan0;
-            IntPtr writeptr = writeData.Scan0;
-            int x = xstart;
-            for (int y = ycentre - readlength / 2; y < ycentre + readlength / 2; ++y)
+            unsafe
             {
-                int finalptrlocation = ((y * readData.Stride) + x);
+                const int bytesperpixel = 4;
+                int xstart = (xcentre - (radius / 2)) * bytesperpixel;
 
-                byte[] rgbValues = new byte[readlength*4]; //stepsize of readlength
+                int startY = ycentre - radius / 2;
+                int endY = ycentre + radius / 2;
 
-                // Copy the RGB values into the array.
-                System.Runtime.InteropServices.Marshal.Copy(readptr + finalptrlocation, rgbValues, 0, readlength*4);
+                int stride = readData.Stride;
 
-                // Copy the RGB values back to the bitmap
-                System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, writeptr + (finalptrlocation), readlength*4);
+                byte* readPtr = (byte*)readData.Scan0.ToPointer();
+                byte* writePtr = (byte*)writeData.Scan0.ToPointer();
+
+                for (int y = startY; y < endY; ++y)
+                {
+                    int offset = (y * stride) + xstart;
+                    int numBytesToCopy = radius * bytesperpixel;
+
+                    Buffer.MemoryCopy(
+                        readPtr + offset,
+                        writePtr + offset,
+                        numBytesToCopy,
+                        numBytesToCopy);
+                }
             }
         }
 

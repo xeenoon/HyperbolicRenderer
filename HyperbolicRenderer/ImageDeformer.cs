@@ -33,32 +33,38 @@ namespace HyperbolicRenderer
             const int resolution = 4;
             // Lock the source bitmap for faster pixel access
 
-            Stopwatch s = new Stopwatch();
-            s.Start();
-            for (int i = 0; i < 100; ++i)
+            //Stopwatch s = new Stopwatch();
+            //s.Start();
+            //for (int i = 0; i < 100; ++i)
+            //{
+            for (int y = (resolution / 2); y < height; y += resolution)
             {
-                for (int y = (resolution / 2); y < height; y += resolution)
+                for (int x = (resolution / 2); x < width; x += resolution)
                 {
-                    for (int x = (resolution / 2); x < width; x += resolution)
-                    {
-                        PointF blockcentre = new PointF(x, y);
-                        //Color oldcolor = inputdata.GetPixel(x, y);
-                        // Calculate the displacement for this pixel based on its distance from the polygon edges
-                        PointF newtransform = DeformFunction(blockcentre);
-                        newtransform.X += offset.X;
-                        newtransform.Y += offset.Y;
-                        // Ensure the new position is within bounds
-                        newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, resultBitmap.Width - 1) - (resolution / 2)), Math.Max(0, Math.Min(newtransform.Y, resultBitmap.Height - 1) - (resolution / 2)));
-                        //Map the new point to the drawsize
-                        CopyRectangles(inputData, outputData,
-                            new Rectangle((int)(blockcentre.X - (resolution / 2)), (int)(blockcentre.Y) - (resolution / 2), resolution, resolution),
-                            new Rectangle((int)(newtransform.X), (int)(newtransform.Y), resolution, resolution));
+                    PointF blockcentre = new PointF(x, y);
+                    //Color oldcolor = inputdata.GetPixel(x, y);
+                    // Calculate the displacement for this pixel based on its distance from the polygon edges
+                    PointF newtransform = DeformFunction(blockcentre);
+                    newtransform.X += offset.X;
+                    newtransform.Y += offset.Y;
+                    // Ensure the new position is within bounds
 
+                    if (newtransform.X < 0 || newtransform.Y < 0 || newtransform.X > resultBitmap.Width - (resolution / 2) || newtransform.Y > resultBitmap.Height - (resolution / 2))
+                    {
+                        continue;
                     }
+
+                    //newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, resultBitmap.Width - 1) - (resolution / 2)), Math.Max(0, Math.Min(newtransform.Y, resultBitmap.Height - 1) - (resolution / 2)));
+                    //Map the new point to the drawsize
+                    CopyRectangles(inputData, outputData,
+                        new Rectangle((int)(blockcentre.X - (resolution / 2)), (int)(blockcentre.Y) - (resolution / 2), resolution, resolution),
+                        new Rectangle((int)(newtransform.X), (int)(newtransform.Y), resolution, resolution));
+
                 }
             }
-            s.Stop();
-            var elapsed = s.ElapsedMilliseconds;
+            //}
+            //s.Stop();
+            //var elapsed = s.ElapsedMilliseconds;
             resultBitmap.UnlockBits(outputData);
             originalimage.UnlockBits(inputData);
         }

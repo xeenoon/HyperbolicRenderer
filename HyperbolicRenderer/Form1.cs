@@ -1,3 +1,4 @@
+using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Windows.Forms;
 
@@ -147,7 +148,6 @@ namespace HyperbolicRenderer
                 //Draw the image onto the shape
                 ImageDeformer imageDeformer = new ImageDeformer(asteroidBitmap, colliderpoints);
                 imageDeformer.DeformImageToPolygon(AdjustFunc, new Point((int)xchange, (int)ychange), tempimage);
-
                 graphics.DrawPolygon(new Pen(Color.Brown), shape.points);
                 //shape.Draw(graphics, Color.Brown, m);
             }

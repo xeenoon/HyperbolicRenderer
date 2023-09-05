@@ -19,12 +19,12 @@ namespace HyperbolicRenderer
             this.polygonPoints = polygonPoints;
         }
 
-        public Bitmap DeformImageToPolygon(Func<PointF, PointF> DeformFunction)
+        public void DeformImageToPolygon(Func<PointF, PointF> DeformFunction, Point offset, Bitmap resultBitmap)
         {
             int width = originalimage.Width;
             int height = originalimage.Height;
 
-            Bitmap resultBitmap = new Bitmap(originalimage.Width, originalimage.Height);
+            //Bitmap resultBitmap = new Bitmap(originalimage.Width, originalimage.Height);
             BitmapData inputData = originalimage.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
             BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
@@ -45,8 +45,10 @@ namespace HyperbolicRenderer
                         //Color oldcolor = inputdata.GetPixel(x, y);
                         // Calculate the displacement for this pixel based on its distance from the polygon edges
                         PointF newtransform = DeformFunction(blockcentre);
+                        newtransform.X += offset.X;
+                        newtransform.Y += offset.Y;
                         // Ensure the new position is within bounds
-                        newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1) - (resolution / 2)), Math.Max(0, Math.Min(newtransform.Y, height - 1) - (resolution / 2)));
+                        newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, resultBitmap.Width - 1) - (resolution / 2)), Math.Max(0, Math.Min(newtransform.Y, resultBitmap.Height - 1) - (resolution / 2)));
                         //Map the new point to the drawsize
                         CopyRectangles(inputData, outputData,
                             new Rectangle((int)(blockcentre.X - (resolution / 2)), (int)(blockcentre.Y) - (resolution / 2), resolution, resolution),
@@ -59,8 +61,6 @@ namespace HyperbolicRenderer
             var elapsed = s.ElapsedMilliseconds;
             resultBitmap.UnlockBits(outputData);
             originalimage.UnlockBits(inputData);
-
-            return resultBitmap;
         }
 
         private static void CopyRectangles(BitmapData sourceData, BitmapData destinationData, Rectangle sourceRect, Rectangle destinationRect)

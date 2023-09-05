@@ -30,14 +30,13 @@ namespace ImageStretcher
             tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints.ToArray());
             tempgraphics.DrawPolygon(new Pen(Color.Red), adjustedpoints.ToArray());
 
-            ImageDeformer imageDeformer = new ImageDeformer(asteroidimage, colliderpoints);
-            Stopwatch s = new Stopwatch();
-            s.Start();
-            var b = imageDeformer.DeformImageToPolygon(DeformFunc);
-            s.Stop();
-            var elapsed = s.ElapsedMilliseconds;
-            e.Graphics.DrawImage(b, 0, 0, pictureBox1.Width, pictureBox1.Height);
-            e.Graphics.DrawImage(temp, 0, 0, pictureBox1.Width, pictureBox1.Height);
+            Size maxsize = new Size(pictureBox1.Width, pictureBox1.Height);
+            ImageDeformer imageDeformer = new ImageDeformer(asteroidimage, colliderpoints, maxsize);
+            var b = imageDeformer.DeformImageToPolygon(DeformFunc, adjustedpoints.ToArray());
+
+            const int offset = 5;
+            e.Graphics.DrawImage(b, pictureBox1.Width / (2 * offset), pictureBox1.Width / (2 * offset), pictureBox1.Width * (offset - 1) / offset, pictureBox1.Height * (offset - 1) / offset);
+            e.Graphics.DrawImage(temp, pictureBox1.Width / (2 * offset), pictureBox1.Width / (2 * offset), pictureBox1.Width * (offset - 1) / offset, pictureBox1.Height * (offset - 1) / offset);
         }
 
         public PointF DeformFunc(PointF p)
@@ -49,6 +48,10 @@ namespace ImageStretcher
                 if (p.X > asteroidimage.Width / 2)
                 {
                     result.X -= (p.X - asteroidimage.Width / 2) * 0.2f;
+                }
+                else if (p.X < asteroidimage.Width / 2)
+                {
+                   // result.X -= ((asteroidimage.Width / 2) - p.X) * 0.1f;
                 }
             }
             return result;

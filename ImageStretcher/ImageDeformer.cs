@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -13,101 +14,126 @@ namespace ImageStretcher
     {
         public Bitmap originalimage;
         public PointF[] polygonPoints;
+        public Size drawsize;
 
-        public ImageDeformer(Bitmap originalimage, PointF[] polygonPoints)
+        public ImageDeformer(Bitmap originalimage, PointF[] polygonPoints, Size drawsize)
         {
             this.originalimage = originalimage;
             this.polygonPoints = polygonPoints;
+            this.drawsize = drawsize;
         }
 
-        public Bitmap DeformImageToPolygon(Func<PointF, PointF> DeformFunction)
+        public Bitmap DeformImageToPolygon(Func<PointF, PointF> DeformFunction, PointF[] newpolygon)
         {
             int width = originalimage.Width;
             int height = originalimage.Height;
 
-            Bitmap resultBitmap = new Bitmap(width, height);
+            Bitmap resultBitmap = new Bitmap(originalimage.Width, originalimage.Height);
 
+            //const int offset = 5;
+            //Rectangle drawarea = new Rectangle(drawsize.Width / (2 * offset), drawsize.Width / (2 * offset), drawsize.Width * (offset - 1) / offset, drawsize.Height * (offset - 1) / offset);
+            const int resolution = 10;
             // Lock the source bitmap for faster pixel access
             using (BMP inputdata = new BMP(originalimage)) 
             {
                 using (BMP outputdata = new BMP(resultBitmap))
                 {
-                    for (int y = 0; y < height; y++)
+                    Stopwatch s = new Stopwatch();
+                    s.Start();
+                    for (int i = 0; i < 100; ++i)
                     {
-                        for (int x = 0; x < width; x++)
+                        for (int y = 0; y < height; y++)
                         {
-                            PointF currentPixel = new PointF(x, y);
-                            if (!currentPixel.InPolygon(polygonPoints))
+                            for (int x = 0; x < width; x++)
                             {
-                               continue;
+                                PointF currentPixel = new PointF(x, y);
+                                Color oldcolor = inputdata.GetPixel(x, y);
+                                // Calculate the displacement for this pixel based on its distance from the polygon edges
+                                PointF newtransform = DeformFunction(currentPixel);
+
+                                // Ensure the new position is within bounds
+                                newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
+
+                                //Map the new point to the drawsize
+                                int newx = (int)newtransform.X;
+                                int newy = (int)newtransform.Y;
+                                outputdata.SetPixel(newx, newy, oldcolor);
                             }
-
-                            Color oldcolor = inputdata.GetPixel(x, y);
-                            // Calculate the displacement for this pixel based on its distance from the polygon edges
-                            PointF newtransform = DeformFunction(currentPixel);
-
-                            // Ensure the new position is within bounds
-                            newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
-
-                            outputdata.SetPixel((int)newtransform.X, (int)newtransform.Y, oldcolor);
                         }
-
                     }
+                    s.Stop();
+                    var elapsed = s.ElapsedMilliseconds;
                 }
             }
 
             return resultBitmap;
         }
-        private PointF CalculateDisplacement(PointF pixel, PointF[] oldPoints, PointF[] newPoints)
+
+        public static Bitmap RemoveWhitePixelsAndSmooth(Bitmap image, int maxPixelDistance)
         {
-            PointF displacement = new PointF(0, 0);
-            double diagonaldistance = Math.Sqrt(originalimage.Height*originalimage.Height + originalimage.Width*originalimage.Width);
-
-            for (int i = 0; i < oldPoints.Length; i++)
+            Bitmap result = new Bitmap(image);
+            using (var resultbmp = new BMP(result)) 
             {
-                PointF oldPoint = oldPoints[i];
-                
-                PointF startpoint = oldPoints[i];
-                PointF endpoint = i == oldPoints.Length-1 ? oldPoints[0] : oldPoints[i+1];
-                Line line = new Line(startpoint, endpoint);
-
-                PointF newPoint = newPoints[i];
-
-                // Calculate the distance between the pixel and the line
-                double distance = pixel.DistanceTo(line).Magnitude();
-
-                //float magnitude = (float)Math.Sqrt(distance.X*distance.X + distance.Y*distance.Y);
-
-                // Make the pixel's movement inversely proportional to the distance
-
-                double linelength = oldPoint.DistanceTo(newPoint);
-                
-                double scalingfactor = linelength * 0.012;
-
-                scalingfactor = Math.Min(1, scalingfactor);
-
-                double factor = (-1 * (Math.Pow(originalimage.Width, -0.5) * Math.Sqrt(distance*2)) + 1) * 0.05f; // Adding 1 to avoid division by zero
-                factor = Math.Max(0, factor);
-                if (distance > diagonaldistance / 10)
+                for (int x = 0; x < image.Width; x++)
                 {
-                    //continue;
+                    for (int y = 0; y < image.Height; y++)
+                    {
+                        Color pixelColor = image.GetPixel(x, y);
+
+                        if (IsWhite(pixelColor))
+                        {
+                            Color averageColor = CalculateAverageColor(image, x, y, maxPixelDistance);
+                            resultbmp.SetPixel(x, y, averageColor);
+                        }
+                    }
                 }
-                // Calculate the displacement based on the difference between old and new positions
-                float deltaX = newPoint.X - oldPoint.X;
-                float deltaY = newPoint.Y - oldPoint.Y;
-
-                displacement.X += (float)(deltaX * factor);
-                displacement.Y += (float)(deltaY * factor);
             }
-
-            return displacement;
+            return result;
         }
 
-        private float CalculateDistance(PointF point1, PointF point2)
+        private static bool IsWhite(Color color)
         {
-            float dx = point2.X - point1.X;
-            float dy = point2.Y - point1.Y;
-            return (float)Math.Sqrt(dx * dx + dy * dy);
+            return color.R == 255 && color.G == 255 && color.B == 255;
+        }
+
+        private static Color CalculateAverageColor(Bitmap image, int x, int y, int maxPixelDistance)
+        {
+            int totalR = 0, totalG = 0, totalB = 0;
+            int count = 0;
+
+            for (int xOffset = -maxPixelDistance; xOffset <= maxPixelDistance; xOffset++)
+            {
+                for (int yOffset = -maxPixelDistance; yOffset <= maxPixelDistance; yOffset++)
+                {
+                    int newX = x + xOffset;
+                    int newY = y + yOffset;
+
+                    if (newX >= 0 && newX < image.Width && newY >= 0 && newY < image.Height)
+                    {
+                        Color neighborColor = image.GetPixel(newX, newY);
+                        if (!IsWhite(neighborColor))
+                        {
+                            totalR += neighborColor.R;
+                            totalG += neighborColor.G;
+                            totalB += neighborColor.B;
+                            count++;
+                        }
+                    }
+                }
+            }
+
+            if (count > 0)
+            {
+                int avgR = totalR / count;
+                int avgG = totalG / count;
+                int avgB = totalB / count;
+                return Color.FromArgb(avgR, avgG, avgB);
+            }
+            else
+            {
+                // If there are no nearby non-white pixels, return a fallback color (e.g., black)
+                return Color.Black;
+            }
         }
     }
 }

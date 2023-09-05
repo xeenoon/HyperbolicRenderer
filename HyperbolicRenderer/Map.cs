@@ -234,7 +234,7 @@ namespace HyperbolicRenderer
         }
         public PointF SinScale(PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
-            double turningtime = squaresize*(0.585);
+            double turningtime = 100;
             float y_scale = float.MaxValue;
             float x_scale = float.MaxValue;
 
@@ -267,6 +267,8 @@ namespace HyperbolicRenderer
             x_scale *= (float)SmootheCutoff(x_distancetocentre, turningtime);
             y_scale *= (float)SmootheCutoff(y_distancetocentre, turningtime);
 
+            //Sin = 1 at y_distancetocentre = 0
+
             x_scale = (float)Math.Sin((x_scale) / (radius / 10)) / 2;
             y_scale = (float)Math.Sin((y_scale) / (radius / 10)) / 2;
 
@@ -281,6 +283,12 @@ namespace HyperbolicRenderer
             {
                 //Should equal zero when distancetocentre == 0
                 //Should equal 1 when distancetocentre == turningtime
+               // if (distance == 0)
+               // {
+               //     return 0;
+               // }
+               // return Math.Abs(distance / turningtime);
+
                 if (Math.Abs(distance) >= turningtime * cutoff)
                 {
                     double a = 0.7f / Math.Pow(turningtime - (turningtime * cutoff), 2);

@@ -8,12 +8,18 @@ namespace HyperbolicRenderer
         public Form1()
         {
             InitializeComponent();
+            asteroidBitmap = (Bitmap)(pictureBox1.Image.Clone());
+            pictureBox1.Image = null;
         }
         int sides = 4;
         float scale = 0.77f;
+        Bitmap asteroidBitmap;
 
         Map m;
         int mapradius;
+
+        PointF[] colliderpoints = new PointF[110] { new PointF(66, 146), new PointF(61, 146), new PointF(58, 144), new PointF(54, 143), new PointF(50, 141), new PointF(47, 139), new PointF(42, 140), new PointF(37, 141), new PointF(32, 143), new PointF(27, 146), new PointF(22, 148), new PointF(17, 148), new PointF(14, 145), new PointF(11, 143), new PointF(8, 139), new PointF(6, 136), new PointF(3, 132), new PointF(1, 129), new PointF(0, 125), new PointF(0, 120), new PointF(0, 115), new PointF(2, 113), new PointF(4, 109), new PointF(4, 107), new PointF(4, 102), new PointF(4, 97), new PointF(6, 95), new PointF(6, 91), new PointF(6, 89), new PointF(5, 85), new PointF(6, 82), new PointF(7, 79), new PointF(8, 76), new PointF(10, 72), new PointF(12, 69), new PointF(14, 66), new PointF(17, 63), new PointF(21, 59), new PointF(24, 57), new PointF(26, 53), new PointF(28, 51), new PointF(29, 48), new PointF(32, 45), new PointF(34, 41), new PointF(36, 40), new PointF(39, 37), new PointF(41, 34), new PointF(44, 31), new PointF(48, 28), new PointF(50, 27), new PointF(53, 25), new PointF(57, 21), new PointF(60, 19), new PointF(63, 18), new PointF(67, 15), new PointF(70, 14), new PointF(73, 13), new PointF(77, 10), new PointF(80, 9), new PointF(84, 8), new PointF(88, 7), new PointF(92, 5), new PointF(96, 4), new PointF(100, 3), new PointF(104, 2), new PointF(108, 1), new PointF(112, 1), new PointF(115, 0), new PointF(120, 0), new PointF(125, 0), new PointF(130, 0), new PointF(135, 0), new PointF(138, 1), new PointF(142, 2), new PointF(145, 2), new PointF(149, 4), new PointF(152, 5), new PointF(156, 8), new PointF(161, 13), new PointF(165, 18), new PointF(163, 23), new PointF(158, 26), new PointF(155, 31), new PointF(155, 36), new PointF(155, 41), new PointF(159, 46), new PointF(161, 51), new PointF(161, 56), new PointF(160, 61), new PointF(157, 66), new PointF(152, 71), new PointF(148, 76), new PointF(145, 81), new PointF(144, 86), new PointF(143, 91), new PointF(142, 96), new PointF(139, 101), new PointF(134, 105), new PointF(129, 109), new PointF(125, 114), new PointF(120, 117), new PointF(115, 118), new PointF(110, 123), new PointF(105, 126), new PointF(100, 128), new PointF(96, 132), new PointF(92, 137), new PointF(87, 142), new PointF(82, 145), new PointF(77, 145), };
+
         private void button1_Click(object sender, EventArgs e)
         {
             int.TryParse(textBox1.Text, out sides);
@@ -30,6 +36,8 @@ namespace HyperbolicRenderer
             ychange = 0;
             firstdraw = true;
             m = new Map(sides, mapradius);
+            m.shapes.Add(new Shape(colliderpoints, new PointF(88, 74)));
+            //m.shapes.Add(Shape.CreateShape(5, 50, new PointF(200,200)));
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
             m.BakeHeights(10);
 
@@ -59,7 +67,6 @@ namespace HyperbolicRenderer
 
             double gentime = 0;
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
-
             s.Stop();
 
             gentime += s.ElapsedTicks;
@@ -76,11 +83,11 @@ namespace HyperbolicRenderer
             {
                 for (int y = 0; y < m.volumewidth; ++y)
                 {
-                    graphics.DrawLine(new Pen(Color.Orange), new PointF(0, y * m.squaresize), new PointF(mapradius*2, y * m.squaresize));
+                    graphics.DrawLine(new Pen(Color.Orange), new PointF(0, y * m.squaresize), new PointF(mapradius * 2, y * m.squaresize));
                 }
                 for (int x = 0; x < m.volumewidth; ++x)
                 {
-                    graphics.DrawLine(new Pen(Color.Orange), new PointF(x * m.squaresize, 0), new PointF(x * m.squaresize, mapradius*2));
+                    graphics.DrawLine(new Pen(Color.Orange), new PointF(x * m.squaresize, 0), new PointF(x * m.squaresize, mapradius * 2));
                 }
             }
 
@@ -137,7 +144,11 @@ namespace HyperbolicRenderer
 
             foreach (var shape in m.adjustedshapes)
             {
-                shape.Draw(graphics, Color.Brown, m);
+                //Draw the image onto the shape
+                ImageDeformer imageDeformer = new ImageDeformer(asteroidBitmap, colliderpoints);
+                graphics.DrawImage(imageDeformer.DeformImageToPolygon(AdjustFunc), new PointF(xchange, ychange));
+                graphics.DrawPolygon(new Pen(Color.Brown), shape.points);
+                //shape.Draw(graphics, Color.Brown, m);
             }
 
             if (showdebugdata)
@@ -203,6 +214,17 @@ namespace HyperbolicRenderer
             Trapezium.elapseddrawtime = 0;
             Trapezium.elapsedtrigtime = 0;
 
+        }
+        PointF AdjustFunc(PointF input)
+        {
+            float offsetx = xchange;
+            float offsety = ychange;
+
+            PointF newinput = new PointF(input.X + offsetx, input.Y + offsety);
+            PointF output = m.StretchPoint(newinput);
+            output.X -= offsetx;
+            output.Y -= offsety;
+            return output;
         }
         static double longesttrig = 0;
         static double longestdraw = 0;

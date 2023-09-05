@@ -118,11 +118,27 @@ namespace HyperbolicRenderer
             {
                 Shape shape = shapes[i];
                 adjustedshapes.Add(new Shape(new PointF[shape.points.Count()], shape.centre));
+                for (int pointidx = 0; pointidx < shape.points.Length; pointidx++)
+                {
+                    PointF p = shape.points[pointidx];
+                    p.X += offsetx;
+                    p.Y += offsety;
+                    p = StretchPoint(p, offsetx, offsety);
+
+                    adjustedshapes[i].points[pointidx] = p;
+                }
+            }
+            /*
+            adjustedshapes.Clear();
+            for (int i = 0; i < shapes.Count; i++)
+            {
+                Shape shape = shapes[i];
+                adjustedshapes.Add(new Shape(new PointF[shape.points.Count()], shape.centre));
 
                 PointF centre = new PointF(shape.centre.X + offsetx, shape.centre.Y + offsety);
                 List<PointF> closestpoints = new List<PointF>();
-                closestpoints = volume[unadjustedvolume.FindIndex(v=>centre.InPolygon(v.points))].points.ToList();
-                
+                closestpoints = volume[unadjustedvolume.FindIndex(v => centre.InPolygon(v.points))].points.ToList();
+
                 PointF newcentre = StretchShapePoint(offsetx, offsety, closestpoints, centre);
 
                 PointF[] newpoints = new PointF[shape.points.Count()];
@@ -148,7 +164,7 @@ namespace HyperbolicRenderer
                     PointF point = newpoints[j];
                     adjustedshapes[i].points[j] = StretchShapePoint(offsetx, offsety, closestpoints, point);
                 }
-            }
+            }*/
         }
 
         private PointF StretchShapePoint(float offsetx, float offsety, List<PointF> closestpoints, PointF point)
@@ -184,6 +200,7 @@ namespace HyperbolicRenderer
         public PointF StretchPoint(PointF relativepoint, float offsetx, float offsety)
         {
             int debugidx = (int)((relativepoint.X - offsetx) / squaresize + ((relativepoint.Y - offsety) / squaresize) * volumewidth);
+            debugidx = Math.Max(0, debugidx);
             PointF scalar = SinScale(relativepoint, true, debugidx);
 
             float ay = (relativepoint.Y - offsety) / squaresize;
@@ -203,7 +220,18 @@ namespace HyperbolicRenderer
 
             return new PointF(ax, ay);
         }
+        public PointF StretchPoint(PointF relativepoint)
+        {
+            PointF scalar = SinScale(relativepoint);
 
+            float ay = (relativepoint.Y);
+            float ax = (relativepoint.X);
+
+            ay += (float)scalar.Y * squaresize;
+            ax += (float)scalar.X * squaresize;
+
+            return new PointF(ax, ay);
+        }
         public PointF SinScale(PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
             double turningtime = squaresize*(0.585);
@@ -212,40 +240,6 @@ namespace HyperbolicRenderer
 
             //Wrap bounds around shapelines to only deal with relavent ones
             List<Line> lines = shapelines;
-
-            double estimatedangle = Math.Atan(relativepoint.Y / relativepoint.X);
-            
-
-            if (relativepoint.X > radius)
-            {
-                //Only change for larger shapes, otherwise small shapes may be deformed
-                if (lines.Count() >= 20)
-                {
-                    //Get the lines a quarter of the distance away
-                    
-                }
-                else
-                {
-                    lines = shapelines.Take(shapelines.Count() / 2).ToList();
-                }
-            }
-            else
-            {
-                if (lines.Count() >= 20)
-                {
-                    
-                }
-                else
-                {
-                    lines = shapelines.Take(new Range(shapelines.Count() / 2, shapelines.Count())).ToList();
-                }
-            }
-
-            double radiansstepsize = Math.Tau / points.Count();
-            double lowestxdistance = Math.Abs((points[1].X - points[0].X)); //find the average x distance of the points in the shape
-            double lowestydistance = Math.Abs(points[(points.Count()/4) + 1].Y - points[points.Count() / 4].Y); //find the average y distance of the points in the shape
-            lines = shapelines.Where(s=>Math.Abs(relativepoint.DistanceTo(s).X) < lowestxdistance || Math.Abs(relativepoint.DistanceTo(s).Y) < lowestydistance).ToList();
-
             foreach (var line in lines)
             {
                 PointF linedistance = relativepoint.DistanceTo(line);

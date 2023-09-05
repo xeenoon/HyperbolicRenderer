@@ -1,26 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace ImageStretcher
+namespace HyperbolicRenderer
 {
     internal class ImageDeformer
     {
         public Bitmap originalimage;
         public PointF[] polygonPoints;
-        public Size drawsize;
 
-        public ImageDeformer(Bitmap originalimage, PointF[] polygonPoints, Size drawsize)
+        public ImageDeformer(Bitmap originalimage, PointF[] polygonPoints)
         {
             this.originalimage = originalimage;
             this.polygonPoints = polygonPoints;
-            this.drawsize = drawsize;
         }
 
         public Bitmap DeformImageToPolygon(Func<PointF, PointF> DeformFunction)
@@ -39,8 +35,8 @@ namespace ImageStretcher
 
             Stopwatch s = new Stopwatch();
             s.Start();
-            //for (int i = 0; i < 10000; ++i)
-            //{
+            for (int i = 0; i < 100; ++i)
+            {
                 for (int y = (resolution / 2); y < height; y += resolution)
                 {
                     for (int x = (resolution / 2); x < width; x += resolution)
@@ -50,15 +46,15 @@ namespace ImageStretcher
                         // Calculate the displacement for this pixel based on its distance from the polygon edges
                         PointF newtransform = DeformFunction(blockcentre);
                         // Ensure the new position is within bounds
-                        newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
+                        newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1) - (resolution / 2)), Math.Max(0, Math.Min(newtransform.Y, height - 1) - (resolution / 2)));
                         //Map the new point to the drawsize
                         CopyRectangles(inputData, outputData,
                             new Rectangle((int)(blockcentre.X - (resolution / 2)), (int)(blockcentre.Y) - (resolution / 2), resolution, resolution),
-                            new Rectangle((int)(newtransform.X - (resolution / 2)), (int)(newtransform.Y - (resolution / 2)), resolution, resolution));
+                            new Rectangle((int)(newtransform.X), (int)(newtransform.Y), resolution, resolution));
 
                     }
                 }
-            //}
+            }
             s.Stop();
             var elapsed = s.ElapsedMilliseconds;
             resultBitmap.UnlockBits(outputData);
@@ -109,73 +105,6 @@ namespace ImageStretcher
                         bytesToCopy,
                         bytesToCopy);
                 }
-            }
-        }
-
-        public static Bitmap RemoveWhitePixelsAndSmooth(Bitmap image, int maxPixelDistance)
-        {
-            Bitmap result = new Bitmap(image);
-            using (var resultbmp = new BMP(result)) 
-            {
-                for (int x = 0; x < image.Width; x++)
-                {
-                    for (int y = 0; y < image.Height; y++)
-                    {
-                        Color pixelColor = image.GetPixel(x, y);
-
-                        if (IsWhite(pixelColor))
-                        {
-                            Color averageColor = CalculateAverageColor(image, x, y, maxPixelDistance);
-                            resultbmp.SetPixel(x, y, averageColor);
-                        }
-                    }
-                }
-            }
-            return result;
-        }
-
-        private static bool IsWhite(Color color)
-        {
-            return color.R == 255 && color.G == 255 && color.B == 255;
-        }
-
-        private static Color CalculateAverageColor(Bitmap image, int x, int y, int maxPixelDistance)
-        {
-            int totalR = 0, totalG = 0, totalB = 0;
-            int count = 0;
-
-            for (int xOffset = -maxPixelDistance; xOffset <= maxPixelDistance; xOffset++)
-            {
-                for (int yOffset = -maxPixelDistance; yOffset <= maxPixelDistance; yOffset++)
-                {
-                    int newX = x + xOffset;
-                    int newY = y + yOffset;
-
-                    if (newX >= 0 && newX < image.Width && newY >= 0 && newY < image.Height)
-                    {
-                        Color neighborColor = image.GetPixel(newX, newY);
-                        if (!IsWhite(neighborColor))
-                        {
-                            totalR += neighborColor.R;
-                            totalG += neighborColor.G;
-                            totalB += neighborColor.B;
-                            count++;
-                        }
-                    }
-                }
-            }
-
-            if (count > 0)
-            {
-                int avgR = totalR / count;
-                int avgG = totalG / count;
-                int avgB = totalB / count;
-                return Color.FromArgb(avgR, avgG, avgB);
-            }
-            else
-            {
-                // If there are no nearby non-white pixels, return a fallback color (e.g., black)
-                return Color.Black;
             }
         }
     }

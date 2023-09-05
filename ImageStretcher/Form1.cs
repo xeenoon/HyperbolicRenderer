@@ -20,8 +20,6 @@ namespace ImageStretcher
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            LockUnlockBitsExample(e);
-            return;
             Bitmap temp = new Bitmap(asteroidimage.Width, asteroidimage.Height);
             Graphics tempgraphics = Graphics.FromImage(temp);
             //tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints);
@@ -63,15 +61,15 @@ namespace ImageStretcher
             // Declare an array to hold the bytes of the bitmap.
             const int readlength = 10;
 
-            for (int xcentre = readlength/2; xcentre < bmp.Width; xcentre += readlength)
+            for (int xcentre = 0; xcentre < bmp.Width; xcentre += readlength)
             {
                 if ((xcentre / readlength) % 2 == 0)
                 {
-                    for (int ycentre = readlength / 2; ycentre < bmp.Height; ycentre += readlength)
+                    for (int ycentre = 0; ycentre < bmp.Height; ycentre += readlength)
                     {
                         if ((ycentre / readlength) % 2 == 0)
                         {
-                            CopySquare(bmpData, writeData, readlength, xcentre, ycentre);
+                            CopySquare(bmpData, writeData, new Rectangle(xcentre, ycentre, readlength, readlength));
                         }
                     }
                 }
@@ -86,31 +84,31 @@ namespace ImageStretcher
             e.Graphics.DrawImage(writebmp, 0, 0, pictureBox1.Width, pictureBox1.Height);
         }
 
-        private static void CopySquare(BitmapData readData, BitmapData writeData, int radius, int xcentre, int ycentre)
+        private static void CopySquare(BitmapData readData, BitmapData writeData, Rectangle copyRect)
         {
             unsafe
             {
-                const int bytesperpixel = 4;
-                int xstart = (xcentre - (radius / 2)) * bytesperpixel;
-
-                int startY = ycentre - radius / 2;
-                int endY = ycentre + radius / 2;
+                const int bytesPerPixel = 4;
 
                 int stride = readData.Stride;
 
                 byte* readPtr = (byte*)readData.Scan0.ToPointer();
                 byte* writePtr = (byte*)writeData.Scan0.ToPointer();
 
+                int startY = copyRect.Y;
+                int endY = copyRect.Bottom;
+                int startX = copyRect.X * bytesPerPixel;
+                int widthInBytes = copyRect.Width * bytesPerPixel;
+
                 for (int y = startY; y < endY; ++y)
                 {
-                    int offset = (y * stride) + xstart;
-                    int numBytesToCopy = radius * bytesperpixel;
+                    int srcOffset = (y * stride) + startX;
+                    int dstOffset = (y * stride) + startX;
 
-                    Buffer.MemoryCopy(
-                        readPtr + offset,
-                        writePtr + offset,
-                        numBytesToCopy,
-                        numBytesToCopy);
+                    Buffer.MemoryCopy(readPtr + srcOffset,
+                        writePtr + dstOffset,
+                        widthInBytes,
+                        widthInBytes);
                 }
             }
         }

@@ -34,61 +34,82 @@ namespace ImageStretcher
 
             //const int offset = 5;
             //Rectangle drawarea = new Rectangle(drawsize.Width / (2 * offset), drawsize.Width / (2 * offset), drawsize.Width * (offset - 1) / offset, drawsize.Height * (offset - 1) / offset);
-            const int resolution = 10;
+            const int resolution = 4;
             // Lock the source bitmap for faster pixel access
 
-            //Stopwatch s = new Stopwatch();
-            //s.Start();
-            //for (int i = 0; i < 100; ++i)
-            //{
-            for (int y = 0; y < height; y += 10)
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            for (int i = 0; i < 100; ++i)
             {
-                for (int x = 0; x < width; x += 10)
+                for (int y = (resolution / 2); y < height; y += resolution)
                 {
-                    PointF blockcentre = new PointF(x, y);
-                    //Color oldcolor = inputdata.GetPixel(x, y);
-                    // Calculate the displacement for this pixel based on its distance from the polygon edges
-                    PointF newtransform = DeformFunction(blockcentre);
-                    var newtransformX = (int)(newtransform.X - blockcentre.X);
-                    var newtransformY = (int)(newtransform.Y - blockcentre.Y);
-
-                    // Ensure the new position is within bounds
-                    newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
-
-                    IntPtr readptr = inputData.Scan0; //memaddress of first line
-                    int bytes = Math.Abs(inputData.Stride) * 10;
-                    byte[] rgbValues = new byte[bytes];
-                    int memaddress = y * originalimage.Width * inputData.Stride + x * inputData.Stride;
-                    System.Runtime.InteropServices.Marshal.Copy(readptr, rgbValues, memaddress , bytes);
-                    for (int counter = 2; counter < rgbValues.Length; counter += 4)
-                        rgbValues[counter] = 255;
-
-                    IntPtr writeptr = inputData.Scan0; //memaddress of first line
-                    System.Runtime.InteropServices.Marshal.Copy(rgbValues, memaddress, writeptr, bytes);
-
-                    //Map the new point to the drawsize
-                    for (int newx = x - 5; newx < x + 5; ++newx)
+                    for (int x = (resolution / 2); x < width; x += resolution)
                     {
-                        for (int newy = y - 5; newy < y + 5; ++newy)
-                        {
-                            if (newx >= originalimage.Width || newx < 0 || newy >= originalimage.Height || newy < 0)
-                            {
-                                continue;
-                            }
-                            
+                        PointF blockcentre = new PointF(x, y);
+                        //Color oldcolor = inputdata.GetPixel(x, y);
+                        // Calculate the displacement for this pixel based on its distance from the polygon edges
+                        PointF newtransform = DeformFunction(blockcentre);
+                        // Ensure the new position is within bounds
+                        newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
+                        //Map the new point to the drawsize
+                        CopyRectangles(inputData, outputData,
+                            new Rectangle((int)(blockcentre.X - (resolution / 2)), (int)(blockcentre.Y) - (resolution / 2), resolution, resolution),
+                            new Rectangle((int)(newtransform.X - (resolution / 2)), (int)(newtransform.Y - (resolution / 2)), resolution, resolution));
 
-                            //outputdata.SetPixel(newx + newtransformX, newy + newtransformY, inputdata.GetPixel(newx, newy));
-                        }
                     }
-                    //}
-                    //s.Stop();
-                    //var elapsed = s.ElapsedMilliseconds;
                 }
             }
+            s.Stop();
+            var elapsed = s.ElapsedMilliseconds;
             resultBitmap.UnlockBits(outputData);
             originalimage.UnlockBits(inputData);
 
             return resultBitmap;
+        }
+
+        private static void CopyRectangles(BitmapData sourceData, BitmapData destinationData, Rectangle sourceRect, Rectangle destinationRect)
+        {
+            unsafe
+            {
+                const int bytesPerPixel = 4;
+
+                int sourceStride = sourceData.Stride;
+                int destinationStride = destinationData.Stride;
+
+                byte* sourcePtr = (byte*)sourceData.Scan0.ToPointer();
+                byte* destinationPtr = (byte*)destinationData.Scan0.ToPointer();
+
+                int sourceStartY = sourceRect.Y;
+                int sourceStartX = sourceRect.X * bytesPerPixel;
+                int sourceWidthInBytes = sourceRect.Width * bytesPerPixel;
+                int sourceHeight = sourceRect.Height;
+
+                int destinationStartY = destinationRect.Y;
+                int destinationStartX = destinationRect.X * bytesPerPixel;
+                int destinationHeight = destinationRect.Height;
+
+                // Ensure the source and destination rectangles have the same width
+                if (sourceWidthInBytes != destinationRect.Width * bytesPerPixel)
+                {
+                    throw new ArgumentException("Source and destination rectangles must have the same width");
+                }
+
+                // Loop through each row in the source and destination rectangles
+                for (int y = 0; y < sourceHeight && y < destinationHeight; ++y)
+                {
+                    int sourceOffset = ((sourceStartY + y) * sourceStride) + sourceStartX;
+                    int destinationOffset = ((destinationStartY + y) * destinationStride) + destinationStartX;
+
+                    // Calculate the number of bytes to copy for this row
+                    int bytesToCopy = (destinationRect.Width * bytesPerPixel);
+
+                    // Use Buffer.MemoryCopy to copy the data for this row
+                    Buffer.MemoryCopy(sourcePtr + sourceOffset,
+                        destinationPtr + destinationOffset,
+                        bytesToCopy,
+                        bytesToCopy);
+                }
+            }
         }
 
         public static Bitmap RemoveWhitePixelsAndSmooth(Bitmap image, int maxPixelDistance)

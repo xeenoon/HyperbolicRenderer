@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Drawing.Imaging;
 
 namespace ImageStretcher
 {
@@ -56,28 +57,21 @@ namespace ImageStretcher
             System.Drawing.Imaging.BitmapData writeData = writebmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             // Get the address of the first line.
-            IntPtr readptr = bmpData.Scan0;
-            IntPtr writeptr = writeData.Scan0;
+
 
             // Declare an array to hold the bytes of the bitmap.
             const int readlength = 10;
 
-            for (int x = 0; x < bmp.Width*4; x+=readlength)
+            for (int xcentre = readlength/2; xcentre < bmp.Width; xcentre += readlength)
             {
-                if ((x/readlength) % 2 == 0)
+                if ((xcentre / readlength) % 2 == 0)
                 {
-                    for (int y = 0; y < (bmp.Height); ++y)
+                    for (int ycentre = readlength / 2; ycentre < bmp.Height; ycentre += readlength)
                     {
-
-                        int finalptrlocation = ((y * bmpData.Stride) + x);
-
-                        byte[] rgbValues = new byte[readlength]; //stepsize of readlength
-
-                        // Copy the RGB values into the array.
-                        System.Runtime.InteropServices.Marshal.Copy(readptr + finalptrlocation, rgbValues, 0, readlength);
-
-                        // Copy the RGB values back to the bitmap
-                        System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, writeptr + (finalptrlocation), readlength);
+                        if ((ycentre / readlength) % 2 == 0)
+                        {
+                            DrawSquare(bmpData, writeData, readlength, xcentre, ycentre);
+                        }
                     }
                 }
             }
@@ -89,6 +83,27 @@ namespace ImageStretcher
             var elapsed = s.ElapsedMilliseconds;
             // Draw the modified image.
             e.Graphics.DrawImage(writebmp, 0, 0, pictureBox1.Width, pictureBox1.Height);
+        }
+
+        private static void DrawSquare(BitmapData readData, BitmapData writeData, int readlength, int xcentre, int ycentre)
+        {
+            int xstart = (xcentre - (readlength / 2)) * 4;
+
+            IntPtr readptr = readData.Scan0;
+            IntPtr writeptr = writeData.Scan0;
+            int x = xstart;
+            for (int y = ycentre - readlength / 2; y < ycentre + readlength / 2; ++y)
+            {
+                int finalptrlocation = ((y * readData.Stride) + x);
+
+                byte[] rgbValues = new byte[readlength*4]; //stepsize of readlength
+
+                // Copy the RGB values into the array.
+                System.Runtime.InteropServices.Marshal.Copy(readptr + finalptrlocation, rgbValues, 0, readlength*4);
+
+                // Copy the RGB values back to the bitmap
+                System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, writeptr + (finalptrlocation), readlength*4);
+            }
         }
 
         public PointF DeformFunc(PointF p)

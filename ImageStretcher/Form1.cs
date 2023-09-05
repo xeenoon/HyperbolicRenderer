@@ -35,8 +35,8 @@ namespace ImageStretcher
             var b = imageDeformer.DeformImageToPolygon(DeformFunc, adjustedpoints.ToArray());
 
             const int offset = 5;
-            e.Graphics.DrawImage(b, pictureBox1.Width / (2 * offset), pictureBox1.Width / (2 * offset), pictureBox1.Width * (offset - 1) / offset, pictureBox1.Height * (offset - 1) / offset);
-            e.Graphics.DrawImage(temp, pictureBox1.Width / (2 * offset), pictureBox1.Width / (2 * offset), pictureBox1.Width * (offset - 1) / offset, pictureBox1.Height * (offset - 1) / offset);
+            e.Graphics.DrawImage(b, 0, 0, pictureBox1.Width, pictureBox1.Height);
+            e.Graphics.DrawImage(temp, 0, 0, pictureBox1.Width, pictureBox1.Height);
         }
 
         public PointF DeformFunc(PointF p)

@@ -34,35 +34,45 @@ namespace ImageStretcher
             //Rectangle drawarea = new Rectangle(drawsize.Width / (2 * offset), drawsize.Width / (2 * offset), drawsize.Width * (offset - 1) / offset, drawsize.Height * (offset - 1) / offset);
             const int resolution = 10;
             // Lock the source bitmap for faster pixel access
-            using (BMP inputdata = new BMP(originalimage)) 
+            using (BMP inputdata = new BMP(originalimage))
             {
                 using (BMP outputdata = new BMP(resultBitmap))
                 {
-                    Stopwatch s = new Stopwatch();
-                    s.Start();
-                    for (int i = 0; i < 100; ++i)
+                    //Stopwatch s = new Stopwatch();
+                    //s.Start();
+                    //for (int i = 0; i < 100; ++i)
+                    //{
+                    for (int y = 0; y < height; y+=10)
                     {
-                        for (int y = 0; y < height; y++)
+                        for (int x = 0; x < width; x+=10)
                         {
-                            for (int x = 0; x < width; x++)
+                            PointF blockcentre = new PointF(x, y);
+                            Color oldcolor = inputdata.GetPixel(x, y);
+                            // Calculate the displacement for this pixel based on its distance from the polygon edges
+                            PointF newtransform = DeformFunction(blockcentre);
+                            var newtransformX = (int)(newtransform.X - blockcentre.X);
+                            var newtransformY = (int)(newtransform.Y - blockcentre.Y);
+
+                            // Ensure the new position is within bounds
+                            newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
+
+                            //Map the new point to the drawsize
+                            for (int newx = x-5; newx < x+5; ++newx)
                             {
-                                PointF currentPixel = new PointF(x, y);
-                                Color oldcolor = inputdata.GetPixel(x, y);
-                                // Calculate the displacement for this pixel based on its distance from the polygon edges
-                                PointF newtransform = DeformFunction(currentPixel);
-
-                                // Ensure the new position is within bounds
-                                newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
-
-                                //Map the new point to the drawsize
-                                int newx = (int)newtransform.X;
-                                int newy = (int)newtransform.Y;
-                                outputdata.SetPixel(newx, newy, oldcolor);
+                                for (int newy = y - 5; newy < y + 5; ++newy)
+                                {
+                                    if (newx >= originalimage.Width || newx < 0 || newy >= originalimage.Height || newy < 0)
+                                    {
+                                        continue;
+                                    }
+                                    outputdata.SetPixel(newx + newtransformX, newy + newtransformY, oldcolor);
+                                }
                             }
                         }
                     }
-                    s.Stop();
-                    var elapsed = s.ElapsedMilliseconds;
+                    //}
+                    //s.Stop();
+                    //var elapsed = s.ElapsedMilliseconds;
                 }
             }
 

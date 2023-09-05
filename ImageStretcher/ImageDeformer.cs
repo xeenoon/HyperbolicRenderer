@@ -47,7 +47,7 @@ namespace ImageStretcher
                         for (int x = 0; x < width; x+=10)
                         {
                             PointF blockcentre = new PointF(x, y);
-                            Color oldcolor = inputdata.GetPixel(x, y);
+                            //Color oldcolor = inputdata.GetPixel(x, y);
                             // Calculate the displacement for this pixel based on its distance from the polygon edges
                             PointF newtransform = DeformFunction(blockcentre);
                             var newtransformX = (int)(newtransform.X - blockcentre.X);
@@ -65,7 +65,7 @@ namespace ImageStretcher
                                     {
                                         continue;
                                     }
-                                    outputdata.SetPixel(newx + newtransformX, newy + newtransformY, oldcolor);
+                                    outputdata.SetPixel(newx + newtransformX, newy + newtransformY, inputdata.GetPixel(newx, newy));
                                 }
                             }
                         }

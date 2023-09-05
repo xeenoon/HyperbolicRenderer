@@ -29,45 +29,55 @@ namespace ImageStretcher
             int height = originalimage.Height;
 
             Bitmap resultBitmap = new Bitmap(originalimage.Width, originalimage.Height);
+            BitmapData inputData = originalimage.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
+            BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
             //const int offset = 5;
             //Rectangle drawarea = new Rectangle(drawsize.Width / (2 * offset), drawsize.Width / (2 * offset), drawsize.Width * (offset - 1) / offset, drawsize.Height * (offset - 1) / offset);
             const int resolution = 10;
             // Lock the source bitmap for faster pixel access
-            using (BMP inputdata = new BMP(originalimage))
+
+            //Stopwatch s = new Stopwatch();
+            //s.Start();
+            //for (int i = 0; i < 100; ++i)
+            //{
+            for (int y = 0; y < height; y += 10)
             {
-                using (BMP outputdata = new BMP(resultBitmap))
+                for (int x = 0; x < width; x += 10)
                 {
-                    //Stopwatch s = new Stopwatch();
-                    //s.Start();
-                    //for (int i = 0; i < 100; ++i)
-                    //{
-                    for (int y = 0; y < height; y+=10)
+                    PointF blockcentre = new PointF(x, y);
+                    //Color oldcolor = inputdata.GetPixel(x, y);
+                    // Calculate the displacement for this pixel based on its distance from the polygon edges
+                    PointF newtransform = DeformFunction(blockcentre);
+                    var newtransformX = (int)(newtransform.X - blockcentre.X);
+                    var newtransformY = (int)(newtransform.Y - blockcentre.Y);
+
+                    // Ensure the new position is within bounds
+                    newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
+
+                    IntPtr readptr = inputData.Scan0; //memaddress of first line
+                    int bytes = Math.Abs(inputData.Stride) * 10;
+                    byte[] rgbValues = new byte[bytes];
+                    int memaddress = y * originalimage.Width * inputData.Stride + x * inputData.Stride;
+                    System.Runtime.InteropServices.Marshal.Copy(readptr, rgbValues, memaddress , bytes);
+                    for (int counter = 2; counter < rgbValues.Length; counter += 4)
+                        rgbValues[counter] = 255;
+
+                    IntPtr writeptr = inputData.Scan0; //memaddress of first line
+                    System.Runtime.InteropServices.Marshal.Copy(rgbValues, memaddress, writeptr, bytes);
+
+                    //Map the new point to the drawsize
+                    for (int newx = x - 5; newx < x + 5; ++newx)
                     {
-                        for (int x = 0; x < width; x+=10)
+                        for (int newy = y - 5; newy < y + 5; ++newy)
                         {
-                            PointF blockcentre = new PointF(x, y);
-                            //Color oldcolor = inputdata.GetPixel(x, y);
-                            // Calculate the displacement for this pixel based on its distance from the polygon edges
-                            PointF newtransform = DeformFunction(blockcentre);
-                            var newtransformX = (int)(newtransform.X - blockcentre.X);
-                            var newtransformY = (int)(newtransform.Y - blockcentre.Y);
-
-                            // Ensure the new position is within bounds
-                            newtransform = new PointF(Math.Max(0, Math.Min(newtransform.X, width - 1)), Math.Max(0, Math.Min(newtransform.Y, height - 1)));
-
-                            //Map the new point to the drawsize
-                            for (int newx = x-5; newx < x+5; ++newx)
+                            if (newx >= originalimage.Width || newx < 0 || newy >= originalimage.Height || newy < 0)
                             {
-                                for (int newy = y - 5; newy < y + 5; ++newy)
-                                {
-                                    if (newx >= originalimage.Width || newx < 0 || newy >= originalimage.Height || newy < 0)
-                                    {
-                                        continue;
-                                    }
-                                    outputdata.SetPixel(newx + newtransformX, newy + newtransformY, inputdata.GetPixel(newx, newy));
-                                }
+                                continue;
                             }
+                            
+
+                            //outputdata.SetPixel(newx + newtransformX, newy + newtransformY, inputdata.GetPixel(newx, newy));
                         }
                     }
                     //}
@@ -75,6 +85,8 @@ namespace ImageStretcher
                     //var elapsed = s.ElapsedMilliseconds;
                 }
             }
+            resultBitmap.UnlockBits(outputData);
+            originalimage.UnlockBits(inputData);
 
             return resultBitmap;
         }

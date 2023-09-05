@@ -18,6 +18,8 @@ namespace ImageStretcher
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            LockUnlockBitsExample(e);
+            return;
             Bitmap temp = new Bitmap(asteroidimage.Width, asteroidimage.Height);
             Graphics tempgraphics = Graphics.FromImage(temp);
             //tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints);
@@ -37,6 +39,56 @@ namespace ImageStretcher
             const int offset = 5;
             e.Graphics.DrawImage(b, 0, 0, pictureBox1.Width, pictureBox1.Height);
             e.Graphics.DrawImage(temp, 0, 0, pictureBox1.Width, pictureBox1.Height);
+        }
+
+
+        private void LockUnlockBitsExample(PaintEventArgs e)
+        {
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            // Create a new bitmap.
+            Bitmap bmp = asteroidimage;
+            Bitmap writebmp = new Bitmap(bmp.Width, bmp.Height);
+
+            // Lock the bitmap's bits.  
+            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+            System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            System.Drawing.Imaging.BitmapData writeData = writebmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            // Get the address of the first line.
+            IntPtr readptr = bmpData.Scan0;
+            IntPtr writeptr = writeData.Scan0;
+
+            // Declare an array to hold the bytes of the bitmap.
+            const int readlength = 10;
+
+            for (int x = 0; x < bmp.Width*4; x+=readlength)
+            {
+                if ((x/readlength) % 2 == 0)
+                {
+                    for (int y = 0; y < (bmp.Height); ++y)
+                    {
+
+                        int finalptrlocation = ((y * bmpData.Stride) + x);
+
+                        byte[] rgbValues = new byte[readlength]; //stepsize of readlength
+
+                        // Copy the RGB values into the array.
+                        System.Runtime.InteropServices.Marshal.Copy(readptr + finalptrlocation, rgbValues, 0, readlength);
+
+                        // Copy the RGB values back to the bitmap
+                        System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, writeptr + (finalptrlocation), readlength);
+                    }
+                }
+            }
+
+            // Unlock the bits.
+            bmp.UnlockBits(bmpData);
+            writebmp.UnlockBits(writeData);
+            s.Stop();
+            var elapsed = s.ElapsedMilliseconds;
+            // Draw the modified image.
+            e.Graphics.DrawImage(writebmp, 0, 0, pictureBox1.Width, pictureBox1.Height);
         }
 
         public PointF DeformFunc(PointF p)

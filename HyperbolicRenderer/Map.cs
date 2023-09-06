@@ -234,7 +234,7 @@ namespace HyperbolicRenderer
         }
         public PointF SinScale(PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
-            double turningtime = 100;
+            double turningtime = squaresize * 3;
             float y_scale = float.MaxValue;
             float x_scale = float.MaxValue;
 
@@ -349,12 +349,12 @@ namespace HyperbolicRenderer
             }
 
             PointF height = heights[xloc, yloc];
-           // if (height.IsEmpty)
-           // {
-           //     height = SinScale(relativepoint);
-           //     heights[xloc, yloc] = height; //Update the array in-case we need this one in the future
-           //     return height;
-           // }
+            if (height.IsEmpty)
+            {
+                height = SinScale(relativepoint);
+                heights[xloc, yloc] = height; //Update the array in-case we need this one in the future
+                return height;
+            }
 
             return height;
         }

@@ -153,14 +153,14 @@ namespace HyperbolicRenderer
             foreach (var shape in m.adjustedshapes)
             {
                 //Draw the image onto the shape
-             //   graphics.DrawPolygon(new Pen(Color.Red), shape.points);
-             //
-             //   PointF[] oldpoints = new PointF[shape.points.Length];
-             //   for (int i = 0; i < colliderpoints.Length; ++i) 
-             //   {
-             //       oldpoints[i] = new PointF(xchange + colliderpoints[i].X, ychange + colliderpoints[i].Y);
-             //   }
-             //   graphics.DrawPolygon(new Pen(Color.Orange), oldpoints);
+                //   graphics.DrawPolygon(new Pen(Color.Red), shape.points);
+                //
+                //   PointF[] oldpoints = new PointF[shape.points.Length];
+                //   for (int i = 0; i < colliderpoints.Length; ++i) 
+                //   {
+                //       oldpoints[i] = new PointF(xchange + colliderpoints[i].X, ychange + colliderpoints[i].Y);
+                //   }
+                //   graphics.DrawPolygon(new Pen(Color.Orange), oldpoints);
                 //shape.Draw(graphics, Color.Brown, m);
             }
 
@@ -235,7 +235,7 @@ namespace HyperbolicRenderer
 
             PointF newinput = new PointF(input.X + offsetx, input.Y + offsety);
             PointF output = m.StretchPoint(newinput);
-            
+
             return new Point((int)output.X, (int)output.Y);
         }
         static double longesttrig = 0;
@@ -406,7 +406,7 @@ namespace HyperbolicRenderer
                         break;
                 }
             }
-            if (m==null)
+            if (m == null)
             {
                 return;
             }

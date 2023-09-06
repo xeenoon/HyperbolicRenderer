@@ -151,15 +151,38 @@ namespace HyperbolicRenderer
                 for (int x = 0; x < newwidth; x++)
                 {
                     // Calculate the corresponding position in the source bitmap
-                    int srcX = (int)(x * scaleX);
-                    int srcY = (int)(y * scaleY);
+                    float srcX = x * scaleX;
+                    float srcY = y * scaleY;
 
-                    // Calculate the byte offsets for the source and destination pixels
-                    long srcOffset = (srcY * sourceData.Stride) + (srcX * bytesPerPixel);
+                    // Find the neighboring pixels
+                    int x1 = (int)srcX;
+                    int x2 = x1 + 1;
+                    int y1 = (int)srcY;
+                    int y2 = y1 + 1;
+
+                    // Ensure boundaries
+                    if (x2 >= sourceData.Width) x2 = x1;
+                    if (y2 >= sourceData.Height) y2 = y1;
+
+                    // Calculate interpolation weights
+                    float xWeight = srcX - x1;
+                    float yWeight = srcY - y1;
+
+                    // Calculate byte offsets for the source and destination pixels
+                    long srcOffset1 = (y1 * sourceData.Stride) + (x1 * bytesPerPixel);
+                    long srcOffset2 = (y1 * sourceData.Stride) + (x2 * bytesPerPixel);
+                    long srcOffset3 = (y2 * sourceData.Stride) + (x1 * bytesPerPixel);
+                    long srcOffset4 = (y2 * sourceData.Stride) + (x2 * bytesPerPixel);
+
                     long destOffset = (y * destData.Stride) + (x * bytesPerPixel);
 
-                    // Use MemoryCopy to copy the pixel data
-                    Buffer.MemoryCopy(srcPointer + srcOffset, destPointer + destOffset, bytesPerPixel, bytesPerPixel);
+                    // Interpolate each channel (RGBA)
+                    for (int i = 0; i < 4; i++)
+                    {
+                        float topInterpolation = (1 - xWeight) * srcPointer[srcOffset1 + i] + xWeight * srcPointer[srcOffset2 + i];
+                        float bottomInterpolation = (1 - xWeight) * srcPointer[srcOffset3 + i] + xWeight * srcPointer[srcOffset4 + i];
+                        destPointer[destOffset + i] = (byte)((1 - yWeight) * topInterpolation + yWeight * bottomInterpolation);
+                    }
                 }
             }
             return destData;

@@ -43,12 +43,12 @@ namespace HyperbolicRenderer
             Stopwatch s = new Stopwatch();
             s.Start();
 
-            for (int i = 0; i < 10000; ++i)
+            for (int i = 0; i < 1; ++i)
             {
                 int numRows = (height - (resolution / 2)) / resolution;
                 int numCols = (width - (resolution / 2)) / resolution;
 
-                int numElements = (numRows + 2) * (numCols + 2);
+                int numElements = (numRows + 2) * (numCols + 2); //Store elements behind and infront
 
                 int* xCoordinates;
                 int* yCoordinates;
@@ -60,9 +60,9 @@ namespace HyperbolicRenderer
                 {
                     for (int col = 0; col < numCols+2; col++)
                     {
-                        int index = row * numCols + col;
+                        int index = row * (numCols+2) + col;
 
-                        PointF blockcentre = new PointF((col * resolution) + (resolution / 2), (row * resolution) + (resolution / 2));
+                        PointF blockcentre = new PointF((col * resolution) - (resolution / 2), (row * resolution) - (resolution / 2));
                         PointF newtransform = DeformFunction(blockcentre);
 
                         xCoordinates[index] = (int)newtransform.X;
@@ -75,13 +75,14 @@ namespace HyperbolicRenderer
                 {
                     for (int col = 1; col < numCols + 1; col++)
                     {
-                        int index = row * numCols + col;
+                        int index = row * (numCols+2) + col;
 
                         // Access and manipulate the x and y coordinates using pointers
                         int x = xCoordinates[index];
                         int y = yCoordinates[index];
 
-                        PointF blockcentre = new PointF((col * resolution) + (resolution / 2), (row * resolution) + (resolution / 2));
+                        int blockcentrex = ((col-1) * resolution);
+                        int blockcentrey = ((row-1) * resolution);
 
                         int newtransformx = xCoordinates[index];
                         int newtransformy = yCoordinates[index];
@@ -89,8 +90,8 @@ namespace HyperbolicRenderer
                         float nextxstride = Math.Abs(newtransformx - xCoordinates[index + 1]);
                         float lastxstride = Math.Abs(newtransformx - xCoordinates[index - 1]);
 
-                        float nextystride = Math.Abs(newtransformy - yCoordinates[index + numCols]);
-                        float lastystride = Math.Abs(newtransformy - yCoordinates[index - numCols]);
+                        float nextystride = Math.Abs(newtransformy - yCoordinates[index + numCols + 2]);
+                        float lastystride = Math.Abs(newtransformy - yCoordinates[index - numCols - 2]);
 
                         double xchangeratio = Math.Max(((nextxstride + lastxstride) / resolution), 0);
                         double ychangeratio = Math.Max(((nextystride + lastystride) / resolution), 0);
@@ -112,18 +113,13 @@ namespace HyperbolicRenderer
                             newtransformx > resultBitmap.Width - (finalxresolution / 2) ||
                             newtransformy > resultBitmap.Height - (finalyresolution / 2) ||
 
-                            blockcentre.X < finalxresolution / 2 ||
-                            blockcentre.Y < finalyresolution / 2 ||
-                            blockcentre.X > width - (finalxresolution / 2) ||
-                            blockcentre.Y > height - (finalyresolution / 2) ||
-
                             finalxresolution <= 0 ||
                             finalyresolution <= 0)
                         {
                             continue;
                         }
                         //Instead of increasing the size of the area being drawn, scale the old image
-                        BitmapData sourceData = ResizeBitmap(inputData, new Rectangle((int)(blockcentre.X - (resolution / 2)), (int)(blockcentre.Y) - (resolution / 2), resolution, resolution), (int)finalxresolution, (int)finalyresolution);
+                        BitmapData sourceData = ResizeBitmap(inputData, new Rectangle((int)(blockcentrex), (int)(blockcentrey), resolution, resolution), (int)finalxresolution, (int)finalyresolution);
                         CopyRectangles(sourceData,
                                        outputData,
                                        new Rectangle(0, 0, (int)finalxresolution, (int)finalyresolution),
@@ -138,7 +134,7 @@ namespace HyperbolicRenderer
 
             s.Stop();
             var elapsed = s.ElapsedMilliseconds;
-            MessageBox.Show(elapsed.ToString());
+            //MessageBox.Show(elapsed.ToString());
             resultBitmap.UnlockBits(outputData);
             originalimage.UnlockBits(inputData);
         }

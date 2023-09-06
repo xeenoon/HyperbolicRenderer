@@ -222,7 +222,7 @@ namespace HyperbolicRenderer
         }
         public PointF StretchPoint(PointF relativepoint)
         {
-            PointF scalar = SinScale(relativepoint);
+            PointF scalar = GetBakedHeights(relativepoint);
 
             float ay = (relativepoint.Y);
             float ax = (relativepoint.X);

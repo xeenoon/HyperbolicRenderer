@@ -230,6 +230,7 @@ namespace HyperbolicRenderer
 
             PointF newinput = new PointF(input.X + offsetx, input.Y + offsety);
             PointF output = m.StretchPoint(newinput);
+
             output.X -= offsetx;
             output.Y -= offsety;
             return output;

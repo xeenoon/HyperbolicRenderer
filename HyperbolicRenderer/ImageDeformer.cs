@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -41,7 +42,7 @@ namespace HyperbolicRenderer
 
             Stopwatch s = new Stopwatch();
             s.Start();
-            for (int i = 0; i < 1; ++i)
+            for (int i = 0; i < 1000; ++i)
             {
                 for (int y = (resolution / 2); y < height; y += resolution)
                 {
@@ -62,9 +63,6 @@ namespace HyperbolicRenderer
 
                         double xchangeratio = Math.Max(((nextxstride + lastxstride) / resolution), 0);
                         double ychangeratio = Math.Max(((nextystride + lastystride) / resolution), 0);
-
-                        //double xchangeratio = Math.Abs((newtransform.X-(width / 2)) / (blockcentre.X-(width / 2)));
-                        //double ychangeratio = Math.Abs((newtransform.Y-(height / 2)) / (blockcentre.Y-(height / 2)));
 
                         //if |newtransform| < ||blockcentre:
                         //scale INWARDS
@@ -88,20 +86,16 @@ namespace HyperbolicRenderer
                             blockcentre.Y > height - (finalyresolution / 2) ||
 
                             finalxresolution <= 0 ||
-                            finalyresolution <= 0
-                            )
+                            finalyresolution <= 0)
                         {
                             continue;
                         }
-
                         //Instead of increasing the size of the area being drawn, scale the old image
-                    CopyRectangles(ResizeBitmap(inputData, 
-                            new Rectangle((int)(blockcentre.X - (resolution / 2)), (int)(blockcentre.Y) - (resolution / 2), resolution, resolution), (int)finalxresolution, (int)finalyresolution)
-                            
-                            , outputData,
-                            new Rectangle(0, 0, (int)finalxresolution, (int)finalyresolution),
-                            new Rectangle((int)(newtransform.X - (finalxresolution / 2)), (int)(newtransform.Y - (finalyresolution / 2)), (int)finalxresolution, (int)finalyresolution));
-
+                        CopyRectangles(ResizeBitmap(inputData,
+                                                    new Rectangle((int)(blockcentre.X - (resolution / 2)), (int)(blockcentre.Y) - (resolution / 2), resolution, resolution), (int)finalxresolution, (int)finalyresolution),
+                                       outputData,
+                                       new Rectangle(0, 0, (int)finalxresolution, (int)finalyresolution),
+                                       new Rectangle((int)(newtransform.X - (finalxresolution / 2)), (int)(newtransform.Y - (finalyresolution / 2)), (int)finalxresolution, (int)finalyresolution));
                     }
                 }
             }
@@ -113,11 +107,16 @@ namespace HyperbolicRenderer
         }
         public unsafe static BitmapData ResizeBitmap(BitmapData sourceData, Rectangle areafrom, int newwidth, int newheight)
         {
-            // Create a new Bitmap with the desired dimensions
-            Bitmap resizedBitmap = new Bitmap(newwidth, newheight);
-
             // Lock the source and destination bitmaps in memory
-            BitmapData destData = resizedBitmap.LockBits(new Rectangle(0, 0, newwidth, newheight), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            BitmapData destData = new BitmapData
+            {
+                Width = newwidth,
+                Height = newheight,
+                Stride = newwidth * 4, // Assuming 32bpp ARGB format
+                PixelFormat = PixelFormat.Format32bppArgb
+            };
+            destData.Scan0 = Marshal.AllocHGlobal(destData.Stride * newheight);
+
 
             // Calculate the scaling factors for width and height
             float scaleX = (float)areafrom.Width / newwidth;

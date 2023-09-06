@@ -40,100 +40,89 @@ namespace HyperbolicRenderer
             //Bitmap smallportion = new Bitmap(resolution, resolution);
             //BitmapData portionData = smallportion.LockBits(new Rectangle(0, 0, smallportion.Width, smallportion.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
 
-            Stopwatch s = new Stopwatch();
-            s.Start();
+            //Stopwatch s = new Stopwatch();
+            //s.Start();
 
-            for (int i = 0; i < 1; ++i)
+            //for (int i = 0; i < 100000; ++i)
+            //{
+            int numRows = ((height - (resolution / 2)) / resolution) + 2;
+            int numCols = ((width - (resolution / 2)) / resolution) + 2; //Add 2 to store elements behind and infront
+
+            int numElements = (numRows) * (numCols);
+
+            int* xCoordinates;
+            int* yCoordinates;
+
+            xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
+            yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
+
+            for (int row = 0; row < numRows; row++)
             {
-                int numRows = (height - (resolution / 2)) / resolution;
-                int numCols = (width - (resolution / 2)) / resolution;
-
-                int numElements = (numRows + 2) * (numCols + 2); //Store elements behind and infront
-
-                int* xCoordinates;
-                int* yCoordinates;
-
-                xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
-                yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
-
-                for (int row = 0; row < numRows+2; row++)
+                for (int col = 0; col < numCols; col++)
                 {
-                    for (int col = 0; col < numCols+2; col++)
-                    {
-                        int index = row * (numCols+2) + col;
+                    int index = row * (numCols) + col;
 
-                        PointF blockcentre = new PointF((col * resolution) - (resolution / 2), (row * resolution) - (resolution / 2));
-                        PointF newtransform = DeformFunction(blockcentre);
+                    PointF blockcentre = new PointF((col * resolution) - (resolution / 2), (row * resolution) - (resolution / 2));
+                    PointF newtransform = DeformFunction(blockcentre);
 
-                        xCoordinates[index] = (int)newtransform.X;
-                        yCoordinates[index] = (int)newtransform.Y;
-                    }
+                    xCoordinates[index] = (int)newtransform.X;
+                    yCoordinates[index] = (int)newtransform.Y;
                 }
-
-                // Now, you use the precomputed deformation values inside your nested for loops
-                for (int row = 1; row < numRows + 1; row++)
-                {
-                    for (int col = 1; col < numCols + 1; col++)
-                    {
-                        int index = row * (numCols+2) + col;
-
-                        // Access and manipulate the x and y coordinates using pointers
-                        int x = xCoordinates[index];
-                        int y = yCoordinates[index];
-
-                        int blockcentrex = ((col-1) * resolution);
-                        int blockcentrey = ((row-1) * resolution);
-
-                        int newtransformx = xCoordinates[index];
-                        int newtransformy = yCoordinates[index];
-
-                        float nextxstride = Math.Abs(newtransformx - xCoordinates[index + 1]);
-                        float lastxstride = Math.Abs(newtransformx - xCoordinates[index - 1]);
-
-                        float nextystride = Math.Abs(newtransformy - yCoordinates[index + numCols + 2]);
-                        float lastystride = Math.Abs(newtransformy - yCoordinates[index - numCols - 2]);
-
-                        double xchangeratio = Math.Max(((nextxstride + lastxstride) / resolution), 0);
-                        double ychangeratio = Math.Max(((nextystride + lastystride) / resolution), 0);
-
-
-                        //if |newtransform| < ||blockcentre:
-                        //scale INWARDS
-                        //else
-                        //scale OUTWARDS
-                        var finalxresolution = (resolution * xchangeratio);
-                        var finalyresolution = (resolution * ychangeratio);
-
-                        newtransformx += offset.X;
-                        newtransformy += offset.Y;
-
-                        // Ensure the new position is within bounds
-                        if (newtransformx < finalxresolution / 2 ||
-                            newtransformy < finalyresolution / 2 ||
-                            newtransformx > resultBitmap.Width - (finalxresolution / 2) ||
-                            newtransformy > resultBitmap.Height - (finalyresolution / 2) ||
-
-                            finalxresolution <= 0 ||
-                            finalyresolution <= 0)
-                        {
-                            continue;
-                        }
-                        //Instead of increasing the size of the area being drawn, scale the old image
-                        BitmapData sourceData = ResizeBitmap(inputData, new Rectangle((int)(blockcentrex), (int)(blockcentrey), resolution, resolution), (int)finalxresolution, (int)finalyresolution);
-                        CopyRectangles(sourceData,
-                                       outputData,
-                                       new Rectangle(0, 0, (int)finalxresolution, (int)finalyresolution),
-                                       new Rectangle((int)(newtransformx - (finalxresolution / 2)), (int)(newtransformy - (finalyresolution / 2)), (int)finalxresolution, (int)finalyresolution));
-                        Marshal.FreeHGlobal(sourceData.Scan0);
-                    }
-                }
-
-                Marshal.FreeHGlobal((IntPtr)xCoordinates);
-                Marshal.FreeHGlobal((IntPtr)yCoordinates);
             }
 
-            s.Stop();
-            var elapsed = s.ElapsedMilliseconds;
+            // Now, you use the precomputed deformation values inside your nested for loops
+            for (int row = 1; row < numRows - 1; row++)
+            {
+                for (int col = 1; col < numCols - 1; col++)
+                {
+                    int index = row * numCols + col;
+
+                    int blockcentrex = ((col - 1) * resolution);
+                    int blockcentrey = ((row - 1) * resolution);
+
+                    int newtransformx = xCoordinates[index];
+                    int newtransformy = yCoordinates[index];
+
+                    double xchangeratio = ((xCoordinates[index + 1] - xCoordinates[index - 1]) / resolution);
+                    double ychangeratio = ((yCoordinates[index + numCols] - yCoordinates[index - numCols]) / resolution);
+
+                    //if |newtransform| < ||blockcentre:
+                    //scale INWARDS
+                    //else
+                    //scale OUTWARDS
+                    var finalxresolution = (resolution * xchangeratio);
+                    var finalyresolution = (resolution * ychangeratio);
+
+                    newtransformx += offset.X;
+                    newtransformy += offset.Y;
+
+                    // Ensure the new position is within bounds
+                    if (newtransformx < finalxresolution / 2 ||
+                        newtransformy < finalyresolution / 2 ||
+                        newtransformx > resultBitmap.Width - (finalxresolution / 2) ||
+                        newtransformy > resultBitmap.Height - (finalyresolution / 2) ||
+
+                        finalxresolution <= 0 ||
+                        finalyresolution <= 0)
+                    {
+                        continue;
+                    }
+                    //Instead of increasing the size of the area being drawn, scale the old image
+                    BitmapData sourceData = ResizeBitmap(inputData, new Rectangle((int)(blockcentrex), (int)(blockcentrey), resolution, resolution), (int)finalxresolution, (int)finalyresolution);
+                    CopyRectangles(sourceData,
+                                   outputData,
+                                   new Rectangle(0, 0, (int)finalxresolution, (int)finalyresolution),
+                                   new Rectangle((int)(newtransformx - (finalxresolution / 2)), (int)(newtransformy - (finalyresolution / 2)), (int)finalxresolution, (int)finalyresolution));
+                    Marshal.FreeHGlobal(sourceData.Scan0);
+                }
+            }
+
+            Marshal.FreeHGlobal((IntPtr)xCoordinates);
+            Marshal.FreeHGlobal((IntPtr)yCoordinates);
+            //}
+
+            //s.Stop();
+            //var elapsed = s.ElapsedMilliseconds;
             //MessageBox.Show(elapsed.ToString());
             resultBitmap.UnlockBits(outputData);
             originalimage.UnlockBits(inputData);

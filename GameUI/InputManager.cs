@@ -62,7 +62,7 @@ namespace GameUI
                 Vector shippointend = cockpitdirection * (distanceaway + Game1.bullettexture.Height);
                 Vector2 shippointendposition = new Vector2((float)(Game1.player.position.X + shippointend.i), (float)(Game1.player.position.Y + shippointend.j));
 
-                Game1.projectiles.Add(new Bullet(Game1.bullettexture, shippointendposition, new Vector(Game1.player.rotation - Math.PI / 2).GetUnitVector(), 20));
+                Game1.projectiles.Add(new Bullet(Game1.bullettexture, shippointendposition, new Vector(Game1.player.rotation - Math.PI / 2).GetUnitVector(), 20, "PLAYER"));
             }
 
             mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (lastMouseState.LeftButton == ButtonState.Released);

@@ -66,7 +66,7 @@ namespace GameUI
                 //graphicalcollider.color = Color.Red;
                 return true;
             }
-            if (tag == "BULLET")
+            if (tag.Contains("BULLET"))
             {
                 disappear = true;
                 return true;

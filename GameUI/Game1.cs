@@ -131,7 +131,7 @@ namespace GameUI
                 }
                 
                 batcher.AddShape(outerpoints, new Color(0, 84, 22));
-                batcher.AddShape(innerpoints, Color.DarkBlue);
+                batcher.AddShape(innerpoints, Color.Transparent);
             }
             s.Stop();
             rendertime += s.ElapsedMilliseconds;

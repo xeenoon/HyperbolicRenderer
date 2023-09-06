@@ -10,16 +10,18 @@ namespace GameUI
     {
         public Vector destinationdirection;
         public float speed;
+        public string team;
         //centre -7,-7
         public Vector2[] colliderpoints = new Vector2[4] { new Vector2(-1, 4), new Vector2(-7, 0), new Vector2(-4, -7), new Vector2(4, -4), };
         Collider collider;
         //MoveableShape graphicalcollider;
-        public Bullet(Texture2D tex, Vector2 position, Vector direction, float speed) : base(tex, position)
+        public Bullet(Texture2D tex, Vector2 position, Vector direction, float speed, string team) : base(tex, position)
         {
             this.destinationdirection = direction;
 
-            collider = new Collider(colliderpoints, OnCollision, position, "BULLET");
+            collider = new Collider(colliderpoints, OnCollision, position, "BULLET:"+team);
             this.speed = speed;
+            this.team = team;
 
             //graphicalcollider = Game1.game.batcher.AddMoveableShape(colliderpoints.Copy().ToArray(), Color.White, Vector2.Zero);
             //graphicalcollider.Move(position);

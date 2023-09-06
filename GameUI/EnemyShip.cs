@@ -11,11 +11,12 @@ namespace GameUI
 {
     public class EnemyShip : Ship
     {
+        const string tag = "ENEMY";
         Vector2[] colliderpoints = new Vector2[149] { new Vector2(23, 33), new Vector2(22, 32), new Vector2(21, 31), new Vector2(19, 29), new Vector2(20, 29), new Vector2(19, 28), new Vector2(18, 26), new Vector2(17, 25), new Vector2(15, 23), new Vector2(15, 22), new Vector2(16, 22), new Vector2(15, 21), new Vector2(14, 20), new Vector2(12, 19), new Vector2(14, 19), new Vector2(13, 19), new Vector2(11, 21), new Vector2(9, 23), new Vector2(7, 25), new Vector2(5, 27), new Vector2(3, 27), new Vector2(2, 27), new Vector2(-5, 28), new Vector2(-2, 28), new Vector2(-3, 27), new Vector2(-4, 26), new Vector2(-6, 27), new Vector2(-7, 26), new Vector2(-8, 25), new Vector2(-9, 24), new Vector2(-10, 23), new Vector2(-11, 22), new Vector2(-12, 20), new Vector2(-15, 18), new Vector2(-14, 18), new Vector2(-14, 19), new Vector2(-16, 21), new Vector2(-17, 23), new Vector2(-18, 25), new Vector2(-20, 27), new Vector2(-20, 29), new Vector2(-22, 31), new Vector2(-24, 33), new Vector2(-25, 32), new Vector2(-26, 31), new Vector2(-28, 31), new Vector2(-28, 29), new Vector2(-28, 27), new Vector2(-28, 26), new Vector2(-27, 24), new Vector2(-28, 23), new Vector2(-27, 23), new Vector2(-27, 21), new Vector2(-28, 20), new Vector2(-27, 20), new Vector2(-26, 18), new Vector2(-28, 18), new Vector2(-28, 16), new Vector2(-27, 16), new Vector2(-26, 16), new Vector2(-26, 14), new Vector2(-27, 13), new Vector2(-26, 13), new Vector2(-26, 12), new Vector2(-26, 10), new Vector2(-25, 10), new Vector2(-25, 8), new Vector2(-24, 6), new Vector2(-24, 4), new Vector2(-24, 1), new Vector2(-23, 1), new Vector2(-23, -1), new Vector2(-23, -2), new Vector2(-22, -4), new Vector2(-22, -7), new Vector2(-21, -7), new Vector2(-21, -9), new Vector2(-21, -10), new Vector2(-20, -12), new Vector2(-20, -14), new Vector2(-20, -15), new Vector2(-19, -18), new Vector2(-18, -18), new Vector2(-16, -18), new Vector2(-15, -18), new Vector2(-14, -16), new Vector2(-14, -14), new Vector2(-12, -12), new Vector2(-11, -12), new Vector2(-11, -13), new Vector2(-10, -15), new Vector2(-10, -18), new Vector2(-9, -18), new Vector2(-9, -21), new Vector2(-8, -21), new Vector2(-8, -22), new Vector2(-7, -25), new Vector2(-6, -25), new Vector2(-6, -26), new Vector2(-5, -29), new Vector2(-4, -29), new Vector2(-4, -30), new Vector2(-3, -32), new Vector2(-1, -34), new Vector2(0, -34), new Vector2(1, -33), new Vector2(3, -31), new Vector2(4, -29), new Vector2(5, -27), new Vector2(6, -25), new Vector2(7, -23), new Vector2(8, -21), new Vector2(8, -19), new Vector2(8, -16), new Vector2(9, -14), new Vector2(9, -12), new Vector2(11, -11), new Vector2(12, -13), new Vector2(13, -13), new Vector2(13, -16), new Vector2(14, -16), new Vector2(14, -17), new Vector2(16, -18), new Vector2(18, -18), new Vector2(19, -16), new Vector2(19, -14), new Vector2(19, -12), new Vector2(20, -10), new Vector2(20, -8), new Vector2(21, -6), new Vector2(21, -4), new Vector2(22, -2), new Vector2(22, 0), new Vector2(24, 2), new Vector2(24, 4), new Vector2(24, 6), new Vector2(24, 8), new Vector2(24, 10), new Vector2(24, 12), new Vector2(25, 14), new Vector2(25, 16), new Vector2(26, 18), new Vector2(26, 20), new Vector2(26, 22), new Vector2(27, 24), new Vector2(27, 26), new Vector2(27, 28), new Vector2(27, 30), new Vector2(26, 32), }; 
         //MoveableShape graphicalcollider;
         public EnemyShip(Texture2D tex, Vector2 pos) : base(tex, pos)
         {
-            collider = new Collider(colliderpoints, OnCollision, pos, "ENEMY");
+            collider = new Collider(colliderpoints, OnCollision, pos, tag);
             //graphicalcollider = Game1.game.batcher.AddMoveableShape(colliderpoints.Copy().ToArray(), Color.White, Vector2.Zero);
             //graphicalcollider.Move(position);
 
@@ -28,7 +29,7 @@ namespace GameUI
         double lasttime = Game1.game.totalseconds;
         public override bool OnCollision(string tag)
         {
-            if (tag == "BULLET")
+            if (tag == "BULLET:PLAYER")
             {
                 disappear = true;
             }
@@ -87,7 +88,7 @@ namespace GameUI
             if (Game1.game.totalseconds - lasttime >= reloadtime)
             {
                 lasttime = Game1.game.totalseconds;
-                Game1.projectiles.Add(new Bullet(Game1.bullettexture, shippointendposition, new Vector(rotation - Math.PI / 2).GetUnitVector(), 7));
+                Game1.projectiles.Add(new Bullet(Game1.bullettexture, shippointendposition, new Vector(rotation - Math.PI / 2).GetUnitVector(), 7, tag));
             }
 
             Vector shipengine = (cockpitdirection * -1) * distanceaway;

@@ -403,6 +403,10 @@ namespace HyperbolicRenderer
                         break;
                 }
             }
+            if (m==null)
+            {
+                return;
+            }
             if (m.points.Count() % 2 == 0 || !invertodd)
             {
                 xchange += xadd * speedmodifier;

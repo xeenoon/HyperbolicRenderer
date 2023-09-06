@@ -146,7 +146,7 @@ namespace HyperbolicRenderer
             foreach (var shape in m.adjustedshapes)
             {
                 //Draw the image onto the shape
-                ImageDeformer imageDeformer = new ImageDeformer(asteroidBitmap, colliderpoints);
+                ImageDeformer imageDeformer = new ImageDeformer(asteroidBitmap);
                 imageDeformer.DeformImageToPolygon(AdjustFunc, new Point((int)xchange, (int)ychange), tempimage);
                 graphics.DrawPolygon(new Pen(Color.Red), shape.points);
 

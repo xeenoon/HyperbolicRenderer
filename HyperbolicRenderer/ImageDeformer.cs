@@ -14,47 +14,30 @@ namespace HyperbolicRenderer
 {
     internal class ImageDeformer
     {
-        public Bitmap originalimage;
-        public PointF[] polygonPoints;
+        BitmapData imagedata;
 
-        public ImageDeformer(Bitmap originalimage, PointF[] polygonPoints)
+        public ImageDeformer(Bitmap originalimage)
         {
-            this.originalimage = originalimage;
-            this.polygonPoints = polygonPoints;
+            imagedata = originalimage.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
         }
 
         public unsafe void DeformImageToPolygon(Func<PointF, PointF> DeformFunction, Point offset, Bitmap resultBitmap)
         {
-            int width = originalimage.Width;
-            int height = originalimage.Height;
+            int width = imagedata.Width;
+            int height = imagedata.Height;
 
-            //Bitmap resultBitmap = new Bitmap(originalimage.Width, originalimage.Height);
-            BitmapData inputData = originalimage.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
             BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
-            //const int offset = 5;
-            //Rectangle drawarea = new Rectangle(drawsize.Width / (2 * offset), drawsize.Width / (2 * offset), drawsize.Width * (offset - 1) / offset, drawsize.Height * (offset - 1) / offset);
-            const int resolution = 4;
-            // Lock the source bitmap for faster pixel access
+            const int sectionwidth = 4;
+            const int sectionradius = sectionwidth/2;
 
-            //Bitmap smallportion = new Bitmap(resolution, resolution);
-            //BitmapData portionData = smallportion.LockBits(new Rectangle(0, 0, smallportion.Width, smallportion.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
-
-            //Stopwatch s = new Stopwatch();
-            //s.Start();
-
-            //for (int i = 0; i < 100000; ++i)
-            //{
-            int numRows = ((height - (resolution / 2)) / resolution) + 2;
-            int numCols = ((width - (resolution / 2)) / resolution) + 2; //Add 2 to store elements behind and infront
+            int numRows = ((height - sectionradius) / sectionwidth) + 2;
+            int numCols = ((width - sectionradius) / sectionwidth) + 2; //Add 2 to store elements behind and infront
 
             int numElements = (numRows) * (numCols);
 
-            int* xCoordinates;
-            int* yCoordinates;
-
-            xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
-            yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
+            int* xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
+            int* yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
 
             for (int row = 0; row < numRows; row++)
             {
@@ -62,7 +45,7 @@ namespace HyperbolicRenderer
                 {
                     int index = row * (numCols) + col;
 
-                    PointF blockcentre = new PointF((col * resolution) - (resolution / 2), (row * resolution) - (resolution / 2));
+                    PointF blockcentre = new PointF((col * sectionwidth) - (sectionradius), (row * sectionwidth) - (sectionradius));
                     PointF newtransform = DeformFunction(blockcentre);
 
                     xCoordinates[index] = (int)newtransform.X;
@@ -70,28 +53,24 @@ namespace HyperbolicRenderer
                 }
             }
 
-            // Now, you use the precomputed deformation values inside your nested for loops
+            // Now, use the precomputed deformation values
             for (int row = 1; row < numRows - 1; row++)
             {
                 for (int col = 1; col < numCols - 1; col++)
                 {
                     int index = row * numCols + col;
 
-                    int blockcentrex = ((col - 1) * resolution);
-                    int blockcentrey = ((row - 1) * resolution);
+                    int blockcentrex = ((col - 1) * sectionwidth);
+                    int blockcentrey = ((row - 1) * sectionwidth);
 
                     int newtransformx = xCoordinates[index];
                     int newtransformy = yCoordinates[index];
 
-                    double xchangeratio = ((xCoordinates[index + 1] - xCoordinates[index - 1]) / resolution);
-                    double ychangeratio = ((yCoordinates[index + numCols] - yCoordinates[index - numCols]) / resolution);
+                    double xchangeratio = ((xCoordinates[index + 1] - xCoordinates[index - 1]) / sectionwidth);
+                    double ychangeratio = ((yCoordinates[index + numCols] - yCoordinates[index - numCols]) / sectionwidth);
 
-                    //if |newtransform| < ||blockcentre:
-                    //scale INWARDS
-                    //else
-                    //scale OUTWARDS
-                    var finalxresolution = (resolution * xchangeratio);
-                    var finalyresolution = (resolution * ychangeratio);
+                    var finalxresolution = (sectionwidth * xchangeratio);
+                    var finalyresolution = (sectionwidth * ychangeratio);
 
                     newtransformx += offset.X;
                     newtransformy += offset.Y;
@@ -108,7 +87,7 @@ namespace HyperbolicRenderer
                         continue;
                     }
                     //Instead of increasing the size of the area being drawn, scale the old image
-                    BitmapData sourceData = ResizeBitmap(inputData, new Rectangle((int)(blockcentrex), (int)(blockcentrey), resolution, resolution), (int)finalxresolution, (int)finalyresolution);
+                    BitmapData sourceData = ResizeBitmap(imagedata, new Rectangle((int)(blockcentrex), (int)(blockcentrey), sectionwidth, sectionwidth), (int)finalxresolution, (int)finalyresolution);
                     CopyRectangles(sourceData,
                                    outputData,
                                    new Rectangle(0, 0, (int)finalxresolution, (int)finalyresolution),
@@ -119,13 +98,7 @@ namespace HyperbolicRenderer
 
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
-            //}
-
-            //s.Stop();
-            //var elapsed = s.ElapsedMilliseconds;
-            //MessageBox.Show(elapsed.ToString());
             resultBitmap.UnlockBits(outputData);
-            originalimage.UnlockBits(inputData);
         }
         public unsafe static BitmapData ResizeBitmap(BitmapData sourceData, Rectangle areafrom, int newwidth, int newheight)
         {

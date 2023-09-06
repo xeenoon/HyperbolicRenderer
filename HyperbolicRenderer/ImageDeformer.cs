@@ -15,20 +15,25 @@ namespace HyperbolicRenderer
     internal class ImageDeformer
     {
         BitmapData imagedata;
-
+        Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
         public ImageDeformer(Bitmap originalimage)
         {
-            imagedata = originalimage.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
+            GC_pacifier = (Bitmap)originalimage.Clone();
+            imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
         }
 
+        bool asyncrunning = false;
         public unsafe void DeformImageToPolygon(Func<PointF, PointF> DeformFunction, Point offset, Bitmap resultBitmap)
         {
+            while (asyncrunning) { }
+            asyncrunning = true;
+
             int width = imagedata.Width;
             int height = imagedata.Height;
 
             BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
-            const int sectionwidth = 4;
+            const int sectionwidth = 2;
             const int sectionradius = sectionwidth/2;
 
             int numRows = ((height - sectionradius) / sectionwidth) + 2;
@@ -69,8 +74,8 @@ namespace HyperbolicRenderer
                     double xchangeratio = ((xCoordinates[index + 1] - xCoordinates[index - 1]) / sectionwidth);
                     double ychangeratio = ((yCoordinates[index + numCols] - yCoordinates[index - numCols]) / sectionwidth);
 
-                    var finalxresolution = (sectionwidth * xchangeratio);
-                    var finalyresolution = (sectionwidth * ychangeratio);
+                    int finalxresolution = (int)(sectionwidth * xchangeratio);
+                    int finalyresolution = (int)(sectionwidth * ychangeratio);
 
                     newtransformx += offset.X;
                     newtransformy += offset.Y;
@@ -87,11 +92,11 @@ namespace HyperbolicRenderer
                         continue;
                     }
                     //Instead of increasing the size of the area being drawn, scale the old image
-                    BitmapData sourceData = ResizeBitmap(imagedata, new Rectangle((int)(blockcentrex), (int)(blockcentrey), sectionwidth, sectionwidth), (int)finalxresolution, (int)finalyresolution);
+                    BitmapData sourceData = ResizeBitmap(imagedata, new Rectangle(blockcentrex, blockcentrey, sectionwidth, sectionwidth), finalxresolution, finalyresolution);
                     CopyRectangles(sourceData,
                                    outputData,
-                                   new Rectangle(0, 0, (int)finalxresolution, (int)finalyresolution),
-                                   new Rectangle((int)(newtransformx - (finalxresolution / 2)), (int)(newtransformy - (finalyresolution / 2)), (int)finalxresolution, (int)finalyresolution));
+                                   new Rectangle(0, 0, finalxresolution, finalyresolution),
+                                   new Rectangle(newtransformx - (finalxresolution / 2), newtransformy - (finalyresolution / 2), finalxresolution, finalyresolution));
                     Marshal.FreeHGlobal(sourceData.Scan0);
                 }
             }
@@ -99,28 +104,43 @@ namespace HyperbolicRenderer
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             resultBitmap.UnlockBits(outputData);
+            asyncrunning = false;
         }
-        public unsafe static BitmapData ResizeBitmap(BitmapData sourceData, Rectangle areafrom, int newwidth, int newheight)
+        void TestResize()
         {
+            for (int i = 0; i < 1000; ++i)
+            {
+                var b = ResizeBitmap(imagedata, new Rectangle(0, 0, 4, 4), 2, 2);
+                Marshal.FreeHGlobal(b.Scan0);
+            }
+        }
+        public unsafe BitmapData ResizeBitmap(BitmapData sourceData, Rectangle areafrom, int newwidth, int newheight)
+        {
+            const int bytesPerPixel = 4;
+
             // Lock the source and destination bitmaps in memory
             BitmapData destData = new BitmapData
             {
                 Width = newwidth,
                 Height = newheight,
-                Stride = newwidth * 4, // Assuming 32bpp ARGB format
+                Stride = newwidth * bytesPerPixel, // Assuming 32bpp ARGB format
                 PixelFormat = PixelFormat.Format32bppArgb
             };
             destData.Scan0 = Marshal.AllocHGlobal(destData.Stride * newheight);
-
+            
             // Calculate the scaling factors for width and height
             float scaleX = (float)areafrom.Width / newwidth;
             float scaleY = (float)areafrom.Height / newheight;
 
-            // Pointer to the first pixel of the source and destination bitmaps
-            byte* srcPointer = (byte*)sourceData.Scan0 + (areafrom.X * 4) + (areafrom.Y * 4 * sourceData.Width);
-            byte* destPointer = (byte*)destData.Scan0;
+            if (scaleX == 1 && scaleY == 1)
+            {
+                CopyRectangles(sourceData, destData, areafrom, new Rectangle(0,0,newwidth, newheight));
+                return destData;
+            }
 
-            int pixelSize = 4; // Each pixel is represented by 4 bytes (32bpp ARGB)
+            // Pointer to the first pixel of the source and destination bitmaps
+            byte* srcPointer = (byte*)sourceData.Scan0 + (areafrom.X * bytesPerPixel) + (areafrom.Y * sourceData.Stride);
+            byte* destPointer = (byte*)destData.Scan0;
 
             for (int y = 0; y < newheight; y++)
             {
@@ -131,16 +151,16 @@ namespace HyperbolicRenderer
                     int srcY = (int)(y * scaleY);
 
                     // Calculate the byte offsets for the source and destination pixels
-                    long srcOffset = (srcY * sourceData.Stride) + (srcX * pixelSize);
-                    long destOffset = (y * destData.Stride) + (x * pixelSize);
+                    long srcOffset = (srcY * sourceData.Stride) + (srcX * bytesPerPixel);
+                    long destOffset = (y * destData.Stride) + (x * bytesPerPixel);
 
                     // Use MemoryCopy to copy the pixel data
-                    Buffer.MemoryCopy(srcPointer + srcOffset, destPointer + destOffset, pixelSize, pixelSize);
+                    Buffer.MemoryCopy(srcPointer + srcOffset, destPointer + destOffset, bytesPerPixel, bytesPerPixel);
                 }
             }
             return destData;
         }
-        private static void CopyRectangles(BitmapData sourceData, BitmapData destinationData, Rectangle sourceRect, Rectangle destinationRect)
+        private void CopyRectangles(BitmapData sourceData, BitmapData destinationData, Rectangle sourceRect, Rectangle destinationRect)
         {
             unsafe
             {

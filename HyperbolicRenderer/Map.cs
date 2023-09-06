@@ -349,11 +349,12 @@ namespace HyperbolicRenderer
             }
 
             PointF height = heights[xloc, yloc];
-            if (height.IsEmpty)
-            {
-                height = SinScale(relativepoint);
-                heights[xloc, yloc] = height; //Update the array in-case we need this one in the future
-            }
+           // if (height.IsEmpty)
+           // {
+           //     height = SinScale(relativepoint);
+           //     heights[xloc, yloc] = height; //Update the array in-case we need this one in the future
+           //     return height;
+           // }
 
             return height;
         }

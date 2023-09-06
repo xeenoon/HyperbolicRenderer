@@ -52,7 +52,13 @@ namespace HyperbolicRenderer
             s.Start();
 
             Bitmap tempimage = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-
+            if (imageDeformer != null)
+            {
+                imageDeformer.DeformImageToPolygon(AdjustFunc, new Point((int)xchange, (int)ychange), tempimage);
+            }
+            e.Graphics.DrawImage(tempimage, 0, 0);
+            s.Stop();
+            return;
             //Graphics graphics = e.Graphics;
             Graphics graphics = Graphics.FromImage(tempimage);
             if (m == null)
@@ -147,15 +153,14 @@ namespace HyperbolicRenderer
             foreach (var shape in m.adjustedshapes)
             {
                 //Draw the image onto the shape
-                imageDeformer.DeformImageToPolygon(AdjustFunc, new Point((int)xchange, (int)ychange), tempimage);
-                graphics.DrawPolygon(new Pen(Color.Red), shape.points);
-
-                PointF[] oldpoints = new PointF[shape.points.Length];
-                for (int i = 0; i < colliderpoints.Length; ++i) 
-                {
-                    oldpoints[i] = new PointF(xchange + colliderpoints[i].X, ychange + colliderpoints[i].Y);
-                }
-                graphics.DrawPolygon(new Pen(Color.Orange), oldpoints);
+             //   graphics.DrawPolygon(new Pen(Color.Red), shape.points);
+             //
+             //   PointF[] oldpoints = new PointF[shape.points.Length];
+             //   for (int i = 0; i < colliderpoints.Length; ++i) 
+             //   {
+             //       oldpoints[i] = new PointF(xchange + colliderpoints[i].X, ychange + colliderpoints[i].Y);
+             //   }
+             //   graphics.DrawPolygon(new Pen(Color.Orange), oldpoints);
                 //shape.Draw(graphics, Color.Brown, m);
             }
 
@@ -223,17 +228,15 @@ namespace HyperbolicRenderer
             Trapezium.elapsedtrigtime = 0;
 
         }
-        PointF AdjustFunc(PointF input)
+        Point AdjustFunc(Point input)
         {
             float offsetx = xchange;
             float offsety = ychange;
 
             PointF newinput = new PointF(input.X + offsetx, input.Y + offsety);
             PointF output = m.StretchPoint(newinput);
-
-            output.X -= offsetx;
-            output.Y -= offsety;
-            return output;
+            
+            return new Point((int)output.X, (int)output.Y);
         }
         static double longesttrig = 0;
         static double longestdraw = 0;

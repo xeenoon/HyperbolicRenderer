@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace HyperbolicRenderer
 {
-    internal class ImageDeformer
+    public class ImageDeformer
     {
         BitmapData imagedata;
         Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
@@ -23,7 +23,7 @@ namespace HyperbolicRenderer
         }
 
         bool asyncrunning = false;
-        public unsafe void DeformImageToPolygon(Func<PointF, PointF> DeformFunction, Point offset, Bitmap resultBitmap)
+        public unsafe void DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap resultBitmap)
         {
             while (asyncrunning) { }
             asyncrunning = true;
@@ -50,8 +50,12 @@ namespace HyperbolicRenderer
                 {
                     int index = row * (numCols) + col;
 
-                    PointF blockcentre = new PointF((col * sectionwidth) - (sectionradius), (row * sectionwidth) - (sectionradius));
-                    PointF newtransform = DeformFunction(blockcentre);
+                    Point blockcentre = new Point((col * sectionwidth) - (sectionradius), (row * sectionwidth) - (sectionradius));
+                    Point newtransform = DeformFunction(blockcentre);
+
+                    if ((newtransform.X == offset.X) || (newtransform.Y == offset.Y))
+                    {
+                    }
 
                     xCoordinates[index] = (int)newtransform.X;
                     yCoordinates[index] = (int)newtransform.Y;
@@ -71,21 +75,21 @@ namespace HyperbolicRenderer
                     int newtransformx = xCoordinates[index];
                     int newtransformy = yCoordinates[index];
 
-                    double xchangeratio = ((xCoordinates[index + 1] - xCoordinates[index - 1]) / sectionwidth);
-                    double ychangeratio = ((yCoordinates[index + numCols] - yCoordinates[index - numCols]) / sectionwidth);
+                    int leftdist = Math.Abs(xCoordinates[index - 1] - newtransformx);
+                    int rightdist = Math.Abs(xCoordinates[index + 1] - newtransformx);
+                    int topdist = Math.Abs(yCoordinates[index - numCols] - newtransformy);
+                    int downdist = Math.Abs(yCoordinates[index + numCols] - newtransformy);
 
-                    int finalxresolution = (int)(sectionwidth * xchangeratio);
-                    int finalyresolution = (int)(sectionwidth * ychangeratio);
-
-                    newtransformx += offset.X;
-                    newtransformy += offset.Y;
+                    newtransformx -= leftdist / 2; //Travel half the distance to the left point
+                    newtransformy -= topdist / 2; //Travel half the distance to the top point
+                    int finalxresolution = leftdist + rightdist;
+                    int finalyresolution = topdist + downdist;
 
                     // Ensure the new position is within bounds
-                    if (newtransformx < finalxresolution / 2 ||
-                        newtransformy < finalyresolution / 2 ||
-                        newtransformx > resultBitmap.Width - (finalxresolution / 2) ||
-                        newtransformy > resultBitmap.Height - (finalyresolution / 2) ||
-
+                    if (newtransformx < 0 ||
+                        newtransformy < 0 ||
+                        newtransformx > resultBitmap.Width - (finalxresolution) ||
+                        newtransformy > resultBitmap.Height - (finalyresolution) ||
                         finalxresolution <= 0 ||
                         finalyresolution <= 0)
                     {
@@ -96,7 +100,7 @@ namespace HyperbolicRenderer
                     CopyRectangles(sourceData,
                                    outputData,
                                    new Rectangle(0, 0, finalxresolution, finalyresolution),
-                                   new Rectangle(newtransformx - (finalxresolution / 2), newtransformy - (finalyresolution / 2), finalxresolution, finalyresolution));
+                                   new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
                     Marshal.FreeHGlobal(sourceData.Scan0);
                 }
             }

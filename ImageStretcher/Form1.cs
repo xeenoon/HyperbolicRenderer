@@ -1,3 +1,4 @@
+using HyperbolicRenderer;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -32,102 +33,37 @@ namespace ImageStretcher
             tempgraphics.DrawPolygon(new Pen(Color.Red), adjustedpoints.ToArray());
 
             Size maxsize = new Size(pictureBox1.Width, pictureBox1.Height);
-            ImageDeformer imageDeformer = new ImageDeformer(asteroidimage, colliderpoints, maxsize);
-            var b = imageDeformer.DeformImageToPolygon(DeformFunc);
+            ImageDeformer imageDeformer = new ImageDeformer(asteroidimage);
+            Bitmap b = new Bitmap(pictureBox1.Width, pictureBox1.Height);
 
-            const int offset = 5;
+            Point offset = new Point(pictureBox1.Width / 2 - asteroidimage.Width, pictureBox1.Height / 2 - asteroidimage.Height);
+            imageDeformer.DeformImageToPolygon(DeformFunc, offset, b);
+
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             e.Graphics.DrawImage(b, 0, 0, pictureBox1.Width, pictureBox1.Height);
-            e.Graphics.DrawImage(temp, 0, 0, pictureBox1.Width, pictureBox1.Height);
+            e.Graphics.DrawImage(temp, offset);
         }
-
-
-        private void LockUnlockBitsExample(PaintEventArgs e)
-        {
-            Stopwatch s = new Stopwatch();
-            s.Start();
-            // Create a new bitmap.
-            Bitmap bmp = asteroidimage;
-            Bitmap writebmp = new Bitmap(bmp.Width, bmp.Height);
-
-            // Lock the bitmap's bits.  
-            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            System.Drawing.Imaging.BitmapData writeData = writebmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            // Get the address of the first line.
-
-
-            // Declare an array to hold the bytes of the bitmap.
-            const int readlength = 10;
-
-            for (int xcentre = 0; xcentre < bmp.Width; xcentre += readlength)
-            {
-                if ((xcentre / readlength) % 2 == 0)
-                {
-                    for (int ycentre = 0; ycentre < bmp.Height; ycentre += readlength)
-                    {
-                        if ((ycentre / readlength) % 2 == 0)
-                        {
-                            CopySquare(bmpData, writeData, new Rectangle(xcentre, ycentre, readlength, readlength));
-                        }
-                    }
-                }
-            }
-            s.Stop();
-            var elapsed = s.ElapsedMilliseconds;
-            // Unlock the bits.
-            bmp.UnlockBits(bmpData);
-            writebmp.UnlockBits(writeData);
-
-            // Draw the modified image.
-            e.Graphics.DrawImage(writebmp, 0, 0, pictureBox1.Width, pictureBox1.Height);
-        }
-
-        private static void CopySquare(BitmapData readData, BitmapData writeData, Rectangle copyRect)
-        {
-            unsafe
-            {
-                const int bytesPerPixel = 4;
-
-                int stride = readData.Stride;
-
-                byte* readPtr = (byte*)readData.Scan0.ToPointer();
-                byte* writePtr = (byte*)writeData.Scan0.ToPointer();
-
-                int startY = copyRect.Y;
-                int endY = copyRect.Bottom;
-                int startX = copyRect.X * bytesPerPixel;
-                int widthInBytes = copyRect.Width * bytesPerPixel;
-
-                for (int y = startY; y < endY; ++y)
-                {
-                    int srcOffset = (y * stride) + startX;
-                    int dstOffset = (y * stride) + startX;
-
-                    Buffer.MemoryCopy(readPtr + srcOffset,
-                        writePtr + dstOffset,
-                        widthInBytes,
-                        widthInBytes);
-                }
-            }
-        }
-
-        public PointF DeformFunc(PointF p)
+        public Point DeformFunc(Point p)
         {
             PointF result = new PointF(p.X, p.Y);
-            if (p.Y > asteroidimage.Height / 2)
+            if (p.Y < asteroidimage.Height / 2)
             {
-                result.Y -= (p.Y - asteroidimage.Height / 2) * 0.4f;
-                if (p.X > asteroidimage.Width / 2)
-                {
-               //     result.X -= (p.X - asteroidimage.Width / 2) * 0.2f;
-                }
-                else if (p.X < asteroidimage.Width / 2)
-                {
-                   // result.X -= ((asteroidimage.Width / 2) - p.X) * 0.1f;
-                }
+                result.Y -= Math.Abs((p.Y - asteroidimage.Height / 2) * 1f);
             }
-            return result;
+            else
+            {
+                result.Y += Math.Abs((p.Y - asteroidimage.Height / 2) * 1f);
+            }
+
+            if (p.X < asteroidimage.Width / 2)
+            {
+                result.X -= Math.Abs((p.X - asteroidimage.Width / 2) * 4f);
+            }
+            else
+            {
+                //result.Y += Math.Abs((p.Y - asteroidimage.Width / 2) * 1f);
+            }
+            return new Point((int)result.X, (int)result.Y);
         }
 
         private void pictureBox2_Paint(object sender, PaintEventArgs e)
@@ -135,7 +71,8 @@ namespace ImageStretcher
             Bitmap temp = new Bitmap(asteroidimage.Width, asteroidimage.Height);
             Graphics tempgraphics = Graphics.FromImage(temp);
             tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints);
-            e.Graphics.DrawImage(asteroidimage, 0, 0, pictureBox1.Width, pictureBox1.Height);
+            tempgraphics.DrawImage(asteroidimage, 0, 0, asteroidimage.Width, asteroidimage.Height);
+
             e.Graphics.DrawImage(temp, 0, 0, pictureBox1.Width, pictureBox1.Height);
         }
     }

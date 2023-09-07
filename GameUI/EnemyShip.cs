@@ -156,21 +156,21 @@ namespace GameUI
 
             if (edge == 0)
             {
-                startposition.Y = GameManager.RandomFloat(0, Game1.game.height);
+                startposition.Y = GameManager.RandomFloat(0, Game1.height);
             }
             else if (edge == 1)
             {
-                startposition.X = GameManager.RandomFloat(0, Game1.game.width);
+                startposition.X = GameManager.RandomFloat(0, Game1.width);
             }
             if (edge == 2)
             {
-                startposition.X = Game1.game.width;
-                startposition.Y = GameManager.RandomFloat(0, Game1.game.height);
+                startposition.X = Game1.width;
+                startposition.Y = GameManager.RandomFloat(0, Game1.height);
             }
             else if (edge == 3)
             {
-                startposition.Y = Game1.game.height;
-                startposition.X = GameManager.RandomFloat(0, Game1.game.width);
+                startposition.Y = Game1.height;
+                startposition.X = GameManager.RandomFloat(0, Game1.width);
             }
             double shiptype = GameManager.RandomDouble();
             if (shiptype < 0.5)

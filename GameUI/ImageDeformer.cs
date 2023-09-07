@@ -1,0 +1,183 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct3D9;
+using System;
+using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GameUI
+{
+    public class ImageDeformer
+    {
+        int imagewidth;
+        int imageheight;
+        Color[] textureData;
+        Texture2D GC_pacifier; //This has to exist or GC will have a temper tantrum
+        public ImageDeformer(Texture2D originalimage)
+        {
+            imageheight = originalimage.Height;
+            imagewidth = originalimage.Width;
+            GC_pacifier = originalimage;
+            textureData = new Color[originalimage.Width * originalimage.Height];
+            originalimage.GetData(textureData);
+        }
+
+        public unsafe Color[] DeformImageToPolygon(Func<Vector2, Vector2, Vector2> DeformFunction, int outputwidth, int outputheight, Vector2 imagelocation, int inneroffsetx, int inneroffsety)
+        {
+            Color[] outputData = new Color[outputwidth * outputheight];
+
+            const int sectionwidth = 2;
+            const int sectionradius = sectionwidth / 2;
+
+            int numRows = ((imageheight - sectionradius) / sectionwidth) + 2;
+            int numCols = ((imagewidth - sectionradius) / sectionwidth) + 2; //Add 2 to store elements behind and infront
+
+            int numElements = (numRows) * (numCols);
+
+            int* xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
+            int* yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
+
+            for (int row = 0; row < numRows; row++)
+            {
+                for (int col = 0; col < numCols; col++)
+                {
+                    int index = row * (numCols) + col;
+
+                    Vector2 blockcentre = new Vector2((col * sectionwidth) - (sectionradius), (row * sectionwidth) - (sectionradius));
+                    Vector2 newtransform = DeformFunction(blockcentre, imagelocation);
+
+                    xCoordinates[index] = (int)newtransform.X + inneroffsetx;
+                    yCoordinates[index] = (int)newtransform.Y + inneroffsety;
+                }
+            }
+            // Now, use the precomputed deformation values
+            for (int row = 1; row < numRows - 1; row++)
+            {
+                for (int col = 1; col < numCols - 1; col++)
+                {
+                    int index = row * numCols + col;
+
+                    int blockcentrex = ((col - 1) * sectionwidth);
+                    int blockcentrey = ((row - 1) * sectionwidth);
+
+                    int newtransformx = xCoordinates[index];
+                    int newtransformy = yCoordinates[index];
+
+                    int leftdist = Math.Abs(xCoordinates[index - 1] - newtransformx);
+                    int rightdist = Math.Abs(xCoordinates[index + 1] - newtransformx);
+                    int topdist = Math.Abs(yCoordinates[index - numCols] - newtransformy);
+                    int downdist = Math.Abs(yCoordinates[index + numCols] - newtransformy);
+
+                    newtransformx -= leftdist / 2; //Travel half the distance to the left point
+                    newtransformy -= topdist / 2; //Travel half the distance to the top point
+                    int finalxresolution = leftdist + rightdist;
+                    int finalyresolution = topdist + downdist;
+
+                    // Ensure the new position is within bounds
+                    if (newtransformx < 0 ||
+                        newtransformy < 0 ||
+                        newtransformx > outputwidth - (finalxresolution) ||
+                        newtransformy > outputheight - (finalyresolution) ||
+                        finalxresolution <= 0 ||
+                        finalyresolution <= 0)
+                    {
+                        continue;
+                    }
+                    //Instead of increasing the size of the area being drawn, scale the old image
+                    fixed (Color* outputpointer = outputData)
+                    {
+                        fixed (Color* inputpointer = textureData)
+                        {
+                            var sourceData = ResizeBitmapFast((byte*)inputpointer, imagewidth * 4, new Rectangle(blockcentrex, blockcentrey, sectionwidth, sectionwidth), finalxresolution, finalyresolution);
+                            CopyRectangles(sourceData, finalxresolution * 4,
+                                           (byte*)outputpointer, outputwidth * 4,
+                                           new Rectangle(0, 0, finalxresolution, finalyresolution),
+                                           new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
+                            Marshal.FreeHGlobal((IntPtr)sourceData);
+                        }
+                    }
+                }
+            }
+            Marshal.FreeHGlobal((IntPtr)xCoordinates);
+            Marshal.FreeHGlobal((IntPtr)yCoordinates);
+            return outputData;
+        }
+        public unsafe byte* ResizeBitmapFast(byte* sourceData, int sourcestride, Rectangle areafrom, int newwidth, int newheight)
+        {
+            const int bytesPerPixel = 4;
+            int deststride = newwidth * bytesPerPixel;
+
+            // Pointer to the first pixel of the source and destination bitmaps
+            byte* srcPointer = sourceData + (areafrom.X * bytesPerPixel) + (areafrom.Y * sourcestride);
+            byte* destPointer = (byte*)Marshal.AllocHGlobal(deststride * newheight);
+            // Calculate the scaling factors for width and height
+            float scaleX = (float)areafrom.Width / newwidth;
+            float scaleY = (float)areafrom.Height / newheight;
+
+            if (scaleX == 1 && scaleY == 1)
+            {
+                CopyRectangles(sourceData, sourcestride, destPointer, newwidth * bytesPerPixel, areafrom, new Rectangle(0, 0, newwidth, newheight));
+                return destPointer;
+            }
+
+            for (int y = 0; y < newheight; y++)
+            {
+                for (int x = 0; x < newwidth; x++)
+                {
+                    // Calculate the byte offsets for the source and destination pixels
+                    long srcOffset = (y * sourcestride) + (x * bytesPerPixel);
+                    long destOffset = (y * deststride) + (x * bytesPerPixel);
+
+                    // Use MemoryCopy to copy the pixel data
+                    Buffer.MemoryCopy(srcPointer + srcOffset, destPointer + destOffset, bytesPerPixel, bytesPerPixel);
+
+                }
+            }
+            return destPointer;
+        }
+        private unsafe void CopyRectangles(byte* sourcePtr, int sourceStride, byte* destinationPtr, int destinationStride, Rectangle sourceRect, Rectangle destinationRect)
+        {
+            const int bytesPerPixel = 4;
+
+            int sourceStartY = sourceRect.Y;
+            int sourceStartX = sourceRect.X * bytesPerPixel;
+            int sourceWidthInBytes = sourceRect.Width * bytesPerPixel;
+            int sourceHeight = sourceRect.Height;
+
+            int destinationStartY = destinationRect.Y;
+            int destinationStartX = destinationRect.X * bytesPerPixel;
+            int destinationHeight = destinationRect.Height;
+
+            // Ensure the source and destination rectangles have the same width
+            if (sourceWidthInBytes != destinationRect.Width * bytesPerPixel)
+            {
+                throw new ArgumentException("Source and destination rectangles must have the same width");
+            }
+
+            // Loop through each row in the source and destination rectangles
+            for (int y = 0; y < sourceHeight && y < destinationHeight; ++y)
+            {
+                int sourceOffset = ((sourceStartY + y) * sourceStride) + sourceStartX;
+                int destinationOffset = ((destinationStartY + y) * destinationStride) + destinationStartX;
+
+                // Calculate the number of bytes to copy for this row
+                int bytesToCopy = (destinationRect.Width * bytesPerPixel);
+
+                // Use Buffer.MemoryCopy to copy the data for this row
+                Buffer.MemoryCopy(sourcePtr + sourceOffset,
+                    destinationPtr + destinationOffset,
+                    bytesToCopy,
+                    bytesToCopy);
+            }
+        }
+        public unsafe void CopyRectangles(BitmapData input, BitmapData output, Rectangle sourcerectangle, Rectangle destinationRect)
+        {
+            CopyRectangles((byte*)input.Scan0.ToPointer(), input.Stride, (byte*)output.Scan0.ToPointer(), output.Stride, sourcerectangle, destinationRect);
+        }
+    }
+
+}

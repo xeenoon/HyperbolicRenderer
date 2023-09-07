@@ -57,9 +57,8 @@ namespace GameUI
         {
         }
 
-        Map m;
-        public int width;
-        public int height; 
+        public static int width;
+        public static int height; 
         Stopwatch s = new Stopwatch();
         Texture2D background;
         public static Texture2D bullettexture;
@@ -75,6 +74,7 @@ namespace GameUI
         public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
         public static Game1 game;
+        public static Map map;
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -99,42 +99,11 @@ namespace GameUI
 
             player = new PlayerShip(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
 
-            return;
-            int mapsize = (int)(height/2);
-            int xoffset = (width - height)/2;
-            m = new Map(4, mapsize);
-            int extrasize = 100;
-            Map.extracells = extrasize;
-            m.GenerateVolume(0.769f, 0, 0, false);
-            //xoffset += (int)(m.squaresize * 5);
-            m.GenerateVolume(0.769f, -m.squaresize * (extrasize/2), -m.squaresize * (extrasize/2), false);
-            m.BakeHeights(10);
-            s.Start();
-            for (int i = 0; i < m.volume.Count; i++)
-            {
-                Trapezium outertrapezium = m.volume[i];
-                const float bordersize = 2;
-                Trapezium innertrapezium = new()
-                {
-                    top_left = new System.Drawing.PointF(outertrapezium.top_left.X + bordersize, outertrapezium.top_left.Y + bordersize),
-                    top_right = new System.Drawing.PointF(outertrapezium.top_right.X - bordersize, outertrapezium.top_right.Y + bordersize),
-                    bottom_left = new System.Drawing.PointF(outertrapezium.bottom_left.X + bordersize, outertrapezium.bottom_left.Y - bordersize),
-                    bottom_right = new System.Drawing.PointF(outertrapezium.bottom_right.X - bordersize, outertrapezium.bottom_right.Y - bordersize)
-                };
-
-
-                var outerpoints = outertrapezium.GetPoints(m);
-                var innerpoints = innertrapezium.GetPoints(m);
-                if (outerpoints.Count() <= 2)
-                {
-                    continue;
-                }
-                
-                batcher.AddShape(outerpoints, new Color(0, 84, 22));
-                batcher.AddShape(innerpoints, Color.Transparent);
-            }
-            s.Stop();
-            rendertime += s.ElapsedMilliseconds;
+            int mapsize = (int)(height / 2);
+            Map.extracells = 100;
+            map = new Map(4, mapsize);
+            map.GenerateVolume(0.769f, mapsize / 4, 0, false);
+            map.BakeHeights(10);
         }
 
         protected override void UnloadContent()
@@ -172,7 +141,18 @@ namespace GameUI
 
             base.Draw(gameTime);
         }
+        public static Vector2 AdjustFunc(Vector2 input, Vector2 offset)
+        {
+            float offsetx = width / 4;
 
+            Vector2 newinput = new Vector2(input.X + offsetx + offset.X, input.Y + offset.Y);
+            Vector2 output = map.StretchPoint(new System.Drawing.PointF(newinput.X, newinput.Y)).ToVector2();
+            output.X -= offsetx;
+            output.X -= offset.X;
+            output.Y -= offset.Y;
+
+            return new Vector2((int)output.X, (int)output.Y);
+        }
         internal void Reset()
         {
             foreach (var asteroid in asteroids)

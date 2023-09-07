@@ -40,7 +40,7 @@ namespace GameUI
             position.X += (float)(destinationdirection.i) * speed;
             position.Y += (float)(destinationdirection.j) * speed;
 
-            if (position.X < 0 || position.Y < 0 || position.X > Game1.game.width || position.Y > Game1.game.height)
+            if (position.X < 0 || position.Y < 0 || position.X > Game1.width || position.Y > Game1.height)
             {
                 Dispose();
             }

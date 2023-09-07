@@ -25,6 +25,7 @@ namespace GameUI
         double rotationspeed;
         public bool disappear;
         public Collider collider;
+        ImageDeformer deformer;
         //public MoveableShape graphicalcollider;
 
         //Centre -83, -75
@@ -80,13 +81,18 @@ namespace GameUI
         }
         public override void Draw()
         {
-            Game1.game.spriteBatch.Draw(texture, position, null, Color.White, (float)rotation, origin, 1f, SpriteEffects.None, 1);
+            //Bend texture
+            deformer = new ImageDeformer(texture);
+            Texture2D final = new Texture2D(Game1.game.GraphicsDevice, texture.Width*2, texture.Height*2);
+            Color[] colors = deformer.DeformImageToPolygon(Game1.AdjustFunc, texture.Width * 2, texture.Height * 2, position, texture.Width/2, texture.Height/2);
+            final.SetData(colors);
+            Game1.game.spriteBatch.Draw(final, position, null, Color.White, (float)0, origin, 1f, SpriteEffects.None, 1);
         }
         public void Update()
         {
             rotation += (rotationspeed * Game1.game.looptime);
             position = new Vector2 (position.X + (float)(speed*Game1.game.looptime*direction.i), position.Y + (float)(speed * Game1.game.looptime * direction.j));
-            if (position.X < -100 || position.Y < -100 || position.X > (Game1.game.width + 100) || position.Y > (Game1.game.height+100))
+            if (position.X < -100 || position.Y < -100 || position.X > (Game1.width + 100) || position.Y > (Game1.height+100))
             {
                 disappear = true;
             }
@@ -114,27 +120,27 @@ namespace GameUI
 
             if (edge == 0)
             {
-                startposition.Y = GameManager.RandomFloat(0, Game1.game.height);
+                startposition.Y = GameManager.RandomFloat(0, Game1.height);
                 //Spawn on left, can only move right
                 xdirection += 0.5;
             }
             else if (edge == 1)
             {
-                startposition.X = GameManager.RandomFloat(0, Game1.game.width);
+                startposition.X = GameManager.RandomFloat(0, Game1.width);
                 //Spawn on top, can only move down
                 ydirection += 0.5;
             }
             if (edge == 2)
             {
-                startposition.X = Game1.game.width;
-                startposition.Y = GameManager.RandomFloat(0, Game1.game.height);
+                startposition.X = Game1.width;
+                startposition.Y = GameManager.RandomFloat(0, Game1.height);
                 //Spawn on right, can only move left
                 xdirection -= 0.5;
             }
             else if (edge == 3)
             {
-                startposition.Y = Game1.game.height;
-                startposition.X = GameManager.RandomFloat(0, Game1.game.width);
+                startposition.Y = Game1.height;
+                startposition.X = GameManager.RandomFloat(0, Game1.width);
                 //Spawn on bottom, can only move up
                 ydirection -= 0.5;
             }

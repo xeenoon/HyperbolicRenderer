@@ -223,7 +223,10 @@ namespace HyperbolicRenderer
         public PointF StretchPoint(PointF relativepoint)
         {
             PointF scalar = GetBakedHeights(relativepoint);
+            if (scalar.X != 0)
+            {
 
+            }
             float ay = (relativepoint.Y);
             float ax = (relativepoint.X);
 
@@ -232,6 +235,7 @@ namespace HyperbolicRenderer
 
             return new PointF(ax, ay);
         }
+
         public PointF SinScale(PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
             double turningtime = squaresize * 3;

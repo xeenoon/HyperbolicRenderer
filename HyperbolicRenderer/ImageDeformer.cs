@@ -101,7 +101,6 @@ namespace HyperbolicRenderer
                         new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
                 }
             }
-            MessageBox.Show(s.ElapsedMilliseconds.ToString());
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             resultBitmap.UnlockBits(outputData);

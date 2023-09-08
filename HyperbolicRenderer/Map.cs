@@ -41,11 +41,12 @@ namespace HyperbolicRenderer
         public List<Shape> shapes = new List<Shape>();
         public List<Shape> adjustedshapes = new List<Shape>();
         List<Line> shapelines = new List<Line>();
-
+        PointF fixedoffset;
 
         public Map(int pointcount, int radius, PointF offset)
         {
-            shape = Shape.CreateShape(pointcount, radius, new PointF(radius + offset.X, radius + offset.Y));
+            fixedoffset = offset;
+            shape = Shape.CreateShape(pointcount, radius, new PointF(radius, radius));
             
             for (int i = 0; i < points.Count(); i++)
             {
@@ -194,8 +195,8 @@ namespace HyperbolicRenderer
             }
 
 
-            float y_distancetocentre = relativepoint.Y - radius;
-            float x_distancetocentre = relativepoint.X - radius;
+            float y_distancetocentre = (relativepoint.Y - radius) + fixedoffset.Y;
+            float x_distancetocentre = (relativepoint.X - radius) + fixedoffset.X;
 
             x_scale *= (float)SmootheCutoff(x_distancetocentre, turningtime);
             y_scale *= (float)SmootheCutoff(y_distancetocentre, turningtime);

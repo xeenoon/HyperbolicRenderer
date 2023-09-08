@@ -125,7 +125,7 @@ namespace HyperbolicRenderer
                 for (int x = 0; x < newwidth; x++)
                 {
                     // Calculate the byte offsets for the source and destination pixels
-                    long srcOffset = (y * sourcestride) + (x * bytesPerPixel);
+                    long srcOffset = ((long)(y*scaleY) * sourcestride) + ((long)(x * scaleX) * bytesPerPixel);
                     long destOffset = (y * deststride) + (x * bytesPerPixel);
 
                     // Use MemoryCopy to copy the pixel data

@@ -101,7 +101,7 @@ namespace GameUI
 
             int mapsize = (int)(height / 2);
             Map.extracells = 100;
-            map = new Map(4, mapsize);
+            map = new Map(4, mapsize, new System.Drawing.PointF(0,0));
             map.GenerateVolume(0.769f, mapsize / 4, 0, false);
             map.BakeHeights(10);
         }

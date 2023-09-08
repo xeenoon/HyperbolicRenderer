@@ -27,7 +27,7 @@ namespace ImageStretcher
             List<PointF> adjustedpoints = new List<PointF>();
             foreach (PointF p in colliderpoints)
             {
-                adjustedpoints.Add(DeformFunc(p));
+                adjustedpoints.Add(DeformFunc(new Point((int)p.X, (int)p.Y)));
             }
             tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints.ToArray());
             tempgraphics.DrawPolygon(new Pen(Color.Red), adjustedpoints.ToArray());

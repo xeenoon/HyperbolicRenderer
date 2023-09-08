@@ -56,6 +56,7 @@ namespace HyperbolicRenderer
                     yCoordinates[index] = (int)newtransform.Y;
                 }
             }
+
             // Now, use the precomputed deformation values
             for (int row = 1; row < numRows - 1; row++)
             {
@@ -90,15 +91,17 @@ namespace HyperbolicRenderer
                     {
                         continue;
                     }
-                    //Instead of increasing the size of the area being drawn, scale the old image
-                    var sourceData = ResizeBitmapFast((byte*)imagedata.Scan0.ToPointer(), imagedata.Stride, new Rectangle(blockcentrex, blockcentrey, sectionwidth, sectionwidth), finalxresolution, finalyresolution);
-                    CopyRectangles(sourceData, finalxresolution * 4,
-                                   (byte*)outputData.Scan0.ToPointer(), outputData.Stride,
-                                   new Rectangle(0, 0, finalxresolution, finalyresolution),
-                                   new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
-                    Marshal.FreeHGlobal((IntPtr)sourceData);
+
+                    //Resize the section to fit, and copy it into the result
+                    ResizeCopy(imagedata,
+                        new Rectangle(blockcentrex, blockcentrey, sectionwidth, sectionwidth),
+                        finalxresolution, finalyresolution,
+
+                        outputData,
+                        new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
                 }
             }
+            MessageBox.Show(s.ElapsedMilliseconds.ToString());
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             resultBitmap.UnlockBits(outputData);
@@ -107,27 +110,46 @@ namespace HyperbolicRenderer
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         public static extern unsafe IntPtr memset(void* dest, int c, int count);
 
-        public unsafe byte* ResizeBitmapFast(byte* sourceData, int sourcestride, Rectangle areafrom, int newwidth, int newheight)
+        public unsafe byte* ResizeBitmapFast(BitmapData input, Rectangle areafrom, int newwidth, int newheight)
         {
             const int bytesPerPixel = 4;
             int deststride = newwidth * bytesPerPixel;
 
             // Pointer to the first pixel of the source and destination bitmaps
-            byte* srcPointer = sourceData + (areafrom.X * bytesPerPixel) + (areafrom.Y * sourcestride);
+            byte* srcPointer = (byte*)(input.Scan0 + (areafrom.X * bytesPerPixel) + (areafrom.Y * input.Stride));
             byte* destPointer = (byte*)Marshal.AllocHGlobal(deststride * newheight);
             
             for (int y = 0; y < newheight; y++)
             {
-                int maxy = Math.Min(y, imagedata.Height - 1 - areafrom.Y);
-                int width = Math.Min(newwidth, imagedata.Width - 1 - areafrom.X);
+                int maxy = Math.Min(y, input.Height - 1 - areafrom.Y);
+                int width = Math.Min(newwidth, input.Width - 1 - areafrom.X);
                 int writestride = width * bytesPerPixel;
                 int writestart = (y * deststride);
 
-                Buffer.MemoryCopy(srcPointer + (maxy * sourcestride), destPointer + writestart, writestride, writestride);
+                Buffer.MemoryCopy(srcPointer + (maxy * input.Stride), destPointer + writestart, writestride, writestride);
                 memset(destPointer + writestart + writestride, 0, (newwidth-width)*bytesPerPixel);
             }
 
             return destPointer;
+        }
+        private unsafe void ResizeCopy(BitmapData input, Rectangle areafrom, int newwidth, int newheight, BitmapData dest, Rectangle destrect)
+        {
+            const int bytesPerPixel = 4;
+
+            // Pointer to the first pixel of the source and destination bitmaps
+            byte* srcPointer = (byte*)(input.Scan0 + (areafrom.X * bytesPerPixel) + (areafrom.Y * input.Stride));
+            byte* destPointer = (byte*)(dest.Scan0 + (destrect.X * bytesPerPixel) + (destrect.Y * dest.Stride));
+
+            for (int y = 0; y < newheight; y++)
+            {
+                int maxy = Math.Min(y, input.Height - 1 - areafrom.Y);
+                int width = Math.Min(newwidth, input.Width - 1 - areafrom.X);
+                int writestride = width * bytesPerPixel;
+                int writestart = (y * dest.Stride);
+
+                Buffer.MemoryCopy(srcPointer + (maxy * input.Stride), destPointer + writestart, writestride, writestride);
+                memset(destPointer + writestart + writestride, 0, (newwidth - width) * bytesPerPixel);
+            }
         }
         private unsafe void CopyRectangles(byte* sourcePtr, int sourceStride, byte* destinationPtr, int destinationStride, Rectangle sourceRect, Rectangle destinationRect)
         {

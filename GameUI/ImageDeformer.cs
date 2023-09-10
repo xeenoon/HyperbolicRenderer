@@ -26,7 +26,7 @@ namespace GameUI
             originalimage.GetData(textureData);
         }
 
-        public unsafe Color[] DeformImageToPolygon(Func<Vector2, Vector2, Vector2> DeformFunction, int outputwidth, int outputheight, Vector2 imagelocation, int inneroffsetx, int inneroffsety)
+        public unsafe Color[] DeformImageToPolygon(Func<Vector2, Vector2, Vector2> DeformFunction, int outputwidth, int outputheight, Vector2 imagelocation)
         {
             Color[] outputData = new Color[outputwidth * outputheight];
 
@@ -50,8 +50,15 @@ namespace GameUI
                     Vector2 blockcentre = new Vector2((col * sectionwidth) - (sectionradius), (row * sectionwidth) - (sectionradius));
                     Vector2 newtransform = DeformFunction(blockcentre, imagelocation);
 
-                    xCoordinates[index] = (int)newtransform.X + inneroffsetx;
-                    yCoordinates[index] = (int)newtransform.Y + inneroffsety;
+                    //Centre inside the new image
+                    int xcentredist = (int)(newtransform.X - (imagewidth / 2));
+                    int finalx = (outputwidth / 2) + xcentredist;
+
+                    int ycentredist = (int)(newtransform.Y - (imageheight / 2));
+                    int finaly = (outputheight / 2) + ycentredist;
+
+                    xCoordinates[index] = finalx;
+                    yCoordinates[index] = finaly;
                 }
             }
             // Now, use the precomputed deformation values
@@ -92,12 +99,8 @@ namespace GameUI
                     {
                         fixed (Color* inputpointer = textureData)
                         {
-                            var sourceData = ResizeBitmapFast((byte*)inputpointer, imagewidth * 4, new Rectangle(blockcentrex, blockcentrey, sectionwidth, sectionwidth), finalxresolution, finalyresolution);
-                            CopyRectangles(sourceData, finalxresolution * 4,
-                                           (byte*)outputpointer, outputwidth * 4,
-                                           new Rectangle(0, 0, finalxresolution, finalyresolution),
-                                           new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
-                            Marshal.FreeHGlobal((IntPtr)sourceData);
+                            ResizeCopy((byte*)inputpointer, imagewidth, imageheight, new Rectangle(blockcentrex, blockcentrey, sectionwidth, sectionwidth), finalxresolution, finalyresolution, 
+                                (byte*)outputpointer, outputwidth, new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
                         }
                     }
                 }
@@ -106,6 +109,30 @@ namespace GameUI
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             return outputData;
         }
+
+        [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        public static extern unsafe IntPtr memset(void* dest, int c, int count);
+
+        private unsafe void ResizeCopy(byte* inputstart, int inputwidth, int inputheight, Rectangle areafrom, int newwidth, int newheight, byte* deststart, int destwidth, Rectangle destrect)
+        {
+            const int bytesPerPixel = 4;
+
+            // Pointer to the first pixel of the source and destination bitmaps
+            byte* srcPointer  = inputstart + (areafrom.X * bytesPerPixel) + (areafrom.Y * inputwidth * bytesPerPixel);
+            byte* destPointer = deststart + (destrect.X * bytesPerPixel) + (destrect.Y * destwidth * bytesPerPixel);
+
+            for (int y = 0; y < newheight; y++)
+            {
+                int maxy = Math.Min(y, inputheight - 1 - areafrom.Y);
+                int width = Math.Min(newwidth, inputwidth - 1 - areafrom.X);
+                int writestride = width * bytesPerPixel;
+                int writestart = (y * destwidth * bytesPerPixel);
+
+                Buffer.MemoryCopy(srcPointer + (maxy * inputwidth * 4), destPointer + writestart, writestride, writestride);
+                memset(destPointer + writestart + writestride, 0, (newwidth - width) * bytesPerPixel);
+            }
+        }
+
         public unsafe byte* ResizeBitmapFast(byte* sourceData, int sourcestride, Rectangle areafrom, int newwidth, int newheight)
         {
             const int bytesPerPixel = 4;

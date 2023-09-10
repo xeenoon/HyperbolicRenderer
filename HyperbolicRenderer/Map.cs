@@ -168,6 +168,8 @@ namespace HyperbolicRenderer
 
         public PointF SinScale(PointF relativepoint, bool showdebug = false, int debugidx = 0)
         {
+            relativepoint = new PointF(relativepoint.X - fixedoffset.X, relativepoint.Y - fixedoffset.Y);
+
             double turningtime = squaresize;
             float y_scale = float.MaxValue;
             float x_scale = float.MaxValue;
@@ -191,15 +193,15 @@ namespace HyperbolicRenderer
             }
 
 
-            float y_distancetocentre = (relativepoint.Y - radius) + fixedoffset.Y;
-            float x_distancetocentre = (relativepoint.X - radius) + fixedoffset.X;
+            float y_distancetocentre = (relativepoint.Y - radius);
+            float x_distancetocentre = (relativepoint.X - radius);
 
             x_scale *= (float)SmootheCutoff(x_distancetocentre, turningtime);
             y_scale *= (float)SmootheCutoff(y_distancetocentre, turningtime);
 
             
-            x_scale = (float)Math.Sin((Math.PI * x_scale) / (2 * radius)) / 2;
-            y_scale = (float)Math.Sin((Math.PI * y_scale) / (2 * radius)) / 2;
+            x_scale = (float)Math.Sin((Math.PI * x_scale) / (2 * radius));
+            y_scale = (float)Math.Sin((Math.PI * y_scale) / (2 * radius));
 
             return new PointF(x_scale, y_scale);
         }

@@ -81,12 +81,11 @@ namespace GameUI
         }
         public override void Draw()
         {
-            //Bend texture
-            deformer = new ImageDeformer(texture);
-            Texture2D final = new Texture2D(Game1.game.GraphicsDevice, texture.Width*2, texture.Height*2);
-            Color[] colors = deformer.DeformImageToPolygon(Game1.AdjustFunc, texture.Width * 2, texture.Height * 2, position, texture.Width/2, texture.Height/2);
+            var deformer = new ImageDeformer(texture);
+            Texture2D final = new Texture2D(Game1.game.GraphicsDevice, texture.Width * 4, texture.Height * 4);
+            Color[] colors = deformer.DeformImageToPolygon(Game1.AdjustFunc, texture.Width * 4, texture.Height * 4, position);
             final.SetData(colors);
-            Game1.game.spriteBatch.Draw(final, position, null, Color.White, (float)0, origin, 1f, SpriteEffects.None, 1);
+            Game1.game.spriteBatch.Draw(final, position, null, Color.White, (float)rotation, new Vector2(final.Width / 2, final.Width / 2), 1f, SpriteEffects.None, 1);
         }
         public void Update()
         {

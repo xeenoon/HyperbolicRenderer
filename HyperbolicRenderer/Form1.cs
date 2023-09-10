@@ -25,7 +25,7 @@ namespace HyperbolicRenderer
         PointF fixedoffset = new PointF(0, 0);
         private void button1_Click(object sender, EventArgs e)
         {
-            //fixedoffset = new PointF(pictureBox1.Width/2, pictureBox1.Width/2);
+            fixedoffset = new PointF(pictureBox1.Width/2, pictureBox1.Width/2);
             int.TryParse(textBox1.Text, out sides);
             float.TryParse(textBox2.Text, out scale);
             int inputsize;

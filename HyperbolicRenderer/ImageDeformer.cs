@@ -70,10 +70,15 @@ namespace HyperbolicRenderer
                     int newtransformx = xCoordinates[index];
                     int newtransformy = yCoordinates[index];
 
-                    int leftdist = Math.Abs(xCoordinates[index - 1] - newtransformx);
-                    int rightdist = Math.Abs(xCoordinates[index + 1] - newtransformx);
-                    int topdist = Math.Abs(yCoordinates[index - numCols] - newtransformy);
-                    int downdist = Math.Abs(yCoordinates[index + numCols] - newtransformy);
+                    int leftdist = newtransformx - xCoordinates[index - 1];
+                    int rightdist = xCoordinates[index + 1] - newtransformx;
+                    int topdist = newtransformy - yCoordinates[index - numCols];
+                    int downdist = yCoordinates[index + numCols] - newtransformy;
+
+                    if (leftdist < 0 || rightdist < 0 || topdist < 0 || downdist < 0)
+                    {
+                        continue;
+                    }
 
                     newtransformx -= leftdist / 2; //Travel half the distance to the left point
                     newtransformy -= topdist / 2; //Travel half the distance to the top point

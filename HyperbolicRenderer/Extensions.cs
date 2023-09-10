@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ManagedCuda.BasicTypes;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -32,14 +33,38 @@ namespace HyperbolicRenderer
         }
         public static PointF DistanceTo(this PointF p, Line line)
         {
-            Vector normalvector = new Vector(line.start, line.end);
-            Vector perpindicular = normalvector.GetPerpindicular();
-            perpindicular.A = p;
-            perpindicular.CreateVectorline();
+            var A = p.X - line.start.X;
+            var B = p.Y - line.start.Y;
+            var C = line.end.X - line.start.X;
+            var D = line.end.Y - line.start.Y;
 
-            PointF intersection = normalvector.Intersection(perpindicular, p);
-            intersection = new PointF(intersection.X - p.X, intersection.Y - p.Y);
-            return intersection;
+            var dot = A * C + B * D;
+            var len_sq = C * C + D * D;
+            float param = -1;
+            if (len_sq != 0) //in case of 0 length line
+                param = dot / len_sq;
+
+            float xx, yy;
+
+            if (param < 0)
+            {
+                xx = line.start.X;
+                yy = line.start.Y;
+            }
+            else if (param > 1)
+            {
+                xx = line.end.X;
+                yy = line.end.Y;
+            }
+            else
+            {
+                xx = line.start.X + param * C;
+                yy = line.start.Y + param * D;
+            }
+
+            var dx = p.X - xx;
+            var dy = p.Y - yy;
+            return new PointF(dx, dy);
         }
         public static double DistanceTo(this PointF p, PointF destination)
         {

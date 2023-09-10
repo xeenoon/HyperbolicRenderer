@@ -31,7 +31,7 @@ namespace HyperbolicRenderer
         }
 
         //               AB
-        private YMC_VectorLine vectorLine;
+        public YMC_VectorLine vectorLine;
         public Vector(double i, double j)
         {
             this.i = i;
@@ -78,7 +78,9 @@ namespace HyperbolicRenderer
             //Convert into a y = mx + c equation
             //Step one, convert into ai + bj + t(ci + dj)
             //AB = A + t(b-a)
-            var b_minus_a = new PointF((float)i, (float)j);
+
+            //b_minus_a = i, j
+            
             //r = (a+ct)i + (b+dt)j
 
             //a+ct = x
@@ -88,7 +90,7 @@ namespace HyperbolicRenderer
             //y = b + d((x-a)/c)
             //y = d (x-a)/c
 
-            vectorLine = new YMC_VectorLine(A.X, A.Y, b_minus_a.X, b_minus_a.Y);
+            vectorLine = new YMC_VectorLine(A.X, A.Y, i, j);
         }
 
         public Vector GetPerpindicular()
@@ -101,21 +103,6 @@ namespace HyperbolicRenderer
             //Unit vector = v/|v|
             double magnitude = Math.Sqrt(i * i + j * j);
             return new Vector(i / magnitude, j / magnitude);
-        }
-
-        public bool PointOnLine(PointF point)
-        {
-            //Convert into a y = mx + c equation
-            //Step one, convert into ai + bj + t(ci + dj)
-
-            //Can only be done if two seperate points are given, where our 'point' is within the bounds
-            RectangleF bounds = new RectangleF(new PointF(A.X < B.X ? A.X : B.X, A.Y < B.Y ? A.Y : B.Y), new SizeF(Math.Abs(B.X - A.X), Math.Abs(B.Y - A.Y)));
-            if (A == B || !bounds.Contains(point)) //A, B start as 0,0 so if no points are given still returns false
-            {
-                return false;
-            }
-
-            return vectorLine.PointOnLine(point.X, point.Y);
         }
 
         internal double GetPoint(double x)

@@ -9,6 +9,7 @@ namespace ImageStretcher
     {
         System.Timers.Timer timer = new System.Timers.Timer(10);
         TimeScalar scalar;
+        ImageDeformer deformer;
         public Form1()
         {
             InitializeComponent();
@@ -18,6 +19,7 @@ namespace ImageStretcher
             scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2));
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
+            deformer = new ImageDeformer(image);
         }
 
         private void Update(object sender, System.Timers.ElapsedEventArgs e)
@@ -33,9 +35,9 @@ namespace ImageStretcher
             if (image != null)
             {
                 Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                ImageDeformer deformer = new ImageDeformer(image);
                 deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result);
                 e.Graphics.DrawImage(result, new Point(0, 0));
+                result.Dispose();
             }
         }
         Bitmap image;

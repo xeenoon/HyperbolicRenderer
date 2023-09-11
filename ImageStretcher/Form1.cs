@@ -54,6 +54,8 @@ namespace ImageStretcher
                     var temp = (Bitmap)Image.FromFile(name);
                     image = temp.Clone(new Rectangle(0, 0, temp.Width, temp.Height), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                     scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2));
+                    deformer.GC_pacifier.Dispose();
+                    deformer = new ImageDeformer(image);
                     pictureBox1.Invalidate();
                 }
             }

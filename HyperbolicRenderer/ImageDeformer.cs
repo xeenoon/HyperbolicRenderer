@@ -19,7 +19,7 @@ namespace HyperbolicRenderer
     public class ImageDeformer
     {
         BitmapData imagedata;
-        Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
+        public Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
         public ImageDeformer(Bitmap originalimage)
         {
             GC_pacifier = (Bitmap)originalimage.Clone();

@@ -7,73 +7,114 @@ namespace ImageStretcher
 {
     public partial class Form1 : Form
     {
-        Bitmap asteroidimage;
-        PointF[] colliderpoints = new PointF[110] { new PointF(66, 146), new PointF(61, 146), new PointF(58, 144), new PointF(54, 143), new PointF(50, 141), new PointF(47, 139), new PointF(42, 140), new PointF(37, 141), new PointF(32, 143), new PointF(27, 146), new PointF(22, 148), new PointF(17, 148), new PointF(14, 145), new PointF(11, 143), new PointF(8, 139), new PointF(6, 136), new PointF(3, 132), new PointF(1, 129), new PointF(0, 125), new PointF(0, 120), new PointF(0, 115), new PointF(2, 113), new PointF(4, 109), new PointF(4, 107), new PointF(4, 102), new PointF(4, 97), new PointF(6, 95), new PointF(6, 91), new PointF(6, 89), new PointF(5, 85), new PointF(6, 82), new PointF(7, 79), new PointF(8, 76), new PointF(10, 72), new PointF(12, 69), new PointF(14, 66), new PointF(17, 63), new PointF(21, 59), new PointF(24, 57), new PointF(26, 53), new PointF(28, 51), new PointF(29, 48), new PointF(32, 45), new PointF(34, 41), new PointF(36, 40), new PointF(39, 37), new PointF(41, 34), new PointF(44, 31), new PointF(48, 28), new PointF(50, 27), new PointF(53, 25), new PointF(57, 21), new PointF(60, 19), new PointF(63, 18), new PointF(67, 15), new PointF(70, 14), new PointF(73, 13), new PointF(77, 10), new PointF(80, 9), new PointF(84, 8), new PointF(88, 7), new PointF(92, 5), new PointF(96, 4), new PointF(100, 3), new PointF(104, 2), new PointF(108, 1), new PointF(112, 1), new PointF(115, 0), new PointF(120, 0), new PointF(125, 0), new PointF(130, 0), new PointF(135, 0), new PointF(138, 1), new PointF(142, 2), new PointF(145, 2), new PointF(149, 4), new PointF(152, 5), new PointF(156, 8), new PointF(161, 13), new PointF(165, 18), new PointF(163, 23), new PointF(158, 26), new PointF(155, 31), new PointF(155, 36), new PointF(155, 41), new PointF(159, 46), new PointF(161, 51), new PointF(161, 56), new PointF(160, 61), new PointF(157, 66), new PointF(152, 71), new PointF(148, 76), new PointF(145, 81), new PointF(144, 86), new PointF(143, 91), new PointF(142, 96), new PointF(139, 101), new PointF(134, 105), new PointF(129, 109), new PointF(125, 114), new PointF(120, 117), new PointF(115, 118), new PointF(110, 123), new PointF(105, 126), new PointF(100, 128), new PointF(96, 132), new PointF(92, 137), new PointF(87, 142), new PointF(82, 145), new PointF(77, 145), };
-        
+        System.Timers.Timer timer = new System.Timers.Timer(10);
+        TimeScalar scalar;
         public Form1()
         {
             InitializeComponent();
-            asteroidimage = (Bitmap)pictureBox1.Image.Clone();
+            timer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
+            timer.Start();
+            image = (Bitmap)pictureBox1.Image.Clone();
+            scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2));
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
         }
 
+        private void Update(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (started)
+            {
+                pictureBox1.Invalidate();
+            }
+        }
+
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            Bitmap temp = new Bitmap(asteroidimage.Width, asteroidimage.Height);
-            Graphics tempgraphics = Graphics.FromImage(temp);
-            //tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints);
-
-            List<PointF> adjustedpoints = new List<PointF>();
-            foreach (PointF p in colliderpoints)
+            if (image != null)
             {
-                adjustedpoints.Add(DeformFunc(new Point((int)p.X, (int)p.Y)));
+                Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+                ImageDeformer deformer = new ImageDeformer(image);
+                deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result);
+                e.Graphics.DrawImage(result, new Point(0, 0));
             }
-            tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints.ToArray());
-            tempgraphics.DrawPolygon(new Pen(Color.Red), adjustedpoints.ToArray());
-
-            Size maxsize = new Size(pictureBox1.Width, pictureBox1.Height);
-            ImageDeformer imageDeformer = new ImageDeformer(asteroidimage);
-            Bitmap b = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-
-            Point offset = new Point(pictureBox1.Width / 2 - asteroidimage.Width, pictureBox1.Height / 2 - asteroidimage.Height);
-            imageDeformer.DeformImageToPolygon(DeformFunc, offset, b);
-
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            e.Graphics.DrawImage(b, 0, 0, pictureBox1.Width, pictureBox1.Height);
-            e.Graphics.DrawImage(temp, offset);
         }
-        public Point DeformFunc(Point p)
+        Bitmap image;
+        private void button1_Click(object sender, EventArgs e)
         {
-            PointF result = new PointF(p.X, p.Y);
-            if (p.Y < asteroidimage.Height / 2)
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.ShowDialog(this);
+            string name = ofd.FileName;
+            if (File.Exists(name))
             {
-                result.Y -= Math.Abs((p.Y - asteroidimage.Height / 2) * 1f);
+                string extension = name.Split(".")[1];
+                if (extension == "png" || extension == "jpg")
+                {
+                    var temp = (Bitmap)Image.FromFile(name);
+                    image = temp.Clone(new Rectangle(0, 0, temp.Width, temp.Height), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                    scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2));
+                    pictureBox1.Invalidate();
+                }
+            }
+        }
+        bool started = false;
+        double lasttime = 0;
+        private void button2_Click(object sender, EventArgs e)
+        {
+            started = !started;
+            if (started)
+            {
+                scalar.time = lasttime;
+                button2.BackColor = Color.Red;
+                button2.Text = "Stop";
             }
             else
             {
-                result.Y += Math.Abs((p.Y - asteroidimage.Height / 2) * 1f);
+                button2.BackColor = Color.FromArgb(0, 255, 0);
+                button2.Text = "Start time";
+                lasttime = scalar.time;
             }
-
-            if (p.X < asteroidimage.Width / 2)
-            {
-                result.X -= Math.Abs((p.X - asteroidimage.Width / 2) * 4f);
-            }
-            else
-            {
-                //result.Y += Math.Abs((p.Y - asteroidimage.Width / 2) * 1f);
-            }
-            return new Point((int)result.X, (int)result.Y);
         }
 
-        private void pictureBox2_Paint(object sender, PaintEventArgs e)
+        private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            Bitmap temp = new Bitmap(asteroidimage.Width, asteroidimage.Height);
-            Graphics tempgraphics = Graphics.FromImage(temp);
-            tempgraphics.DrawPolygon(new Pen(Color.Orange), colliderpoints);
-            tempgraphics.DrawImage(asteroidimage, 0, 0, asteroidimage.Width, asteroidimage.Height);
-
-            e.Graphics.DrawImage(temp, 0, 0, pictureBox1.Width, pictureBox1.Height);
+            float outfloat;
+            switch (((Control)sender).Name)
+            {
+                case "textBox1": //speed
+                    if (float.TryParse(textBox1.Text, out outfloat))
+                    {
+                        scalar.speed = outfloat;
+                    }
+                    break;
+                case "textBox2": //period
+                    if (float.TryParse(textBox2.Text, out outfloat))
+                    {
+                        if (outfloat % 1 != 0)
+                        {
+                            textBox2.ForeColor = Color.Red;
+                        }
+                        else
+                        {
+                            textBox2.ForeColor = Color.Black;
+                        }
+                        scalar.period = outfloat;
+                    }
+                    break;
+                case "textBox3": //amplitude
+                    if (float.TryParse(textBox3.Text, out outfloat))
+                    {
+                        if (outfloat > 0.3f)
+                        {
+                            textBox3.ForeColor = Color.Red;
+                        }
+                        else
+                        {
+                            textBox3.ForeColor = Color.Black;
+                        }
+                        scalar.amplitude = outfloat;
+                    }
+                    break;
+            }
         }
     }
 }

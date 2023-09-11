@@ -7,13 +7,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ApplicationIcon>bob-removebg-preview.ico</ApplicationIcon>
-    <AssemblyName>Jello-Machine</AssemblyName>
+    <AssemblyName>JelloMachine</AssemblyName>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="bob-removebg-preview.ico" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\HyperbolicRenderer\HyperbolicRenderer.csproj" />

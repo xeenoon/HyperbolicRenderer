@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
@@ -32,8 +33,16 @@ namespace HyperbolicRenderer
 
             BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
-            const int sectionwidth = 2;
-            const int sectionradius = sectionwidth / 2;
+            int sectionwidth = 2;
+            if (imagedata.Width > 500)
+            {
+                sectionwidth = 4;
+            }
+            else if (imagedata.Width > 1000)
+            {
+                sectionwidth = 8;
+            }
+            int sectionradius = sectionwidth / 2;
 
             int numRows = ((height - sectionradius) / sectionwidth) + 2;
             int numCols = ((width - sectionradius) / sectionwidth) + 2; //Add 2 to store elements behind and infront
@@ -51,6 +60,7 @@ namespace HyperbolicRenderer
 
                     Point blockcentre = new Point((col * sectionwidth) - (sectionradius), (row * sectionwidth) - (sectionradius));
                     Point newtransform = DeformFunction(blockcentre);
+
 
                     xCoordinates[index] = (int)newtransform.X;
                     yCoordinates[index] = (int)newtransform.Y;
@@ -106,6 +116,7 @@ namespace HyperbolicRenderer
                         new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
                 }
             }
+
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             resultBitmap.UnlockBits(outputData);

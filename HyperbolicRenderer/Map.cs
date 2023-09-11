@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.Logging;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -288,6 +289,38 @@ namespace HyperbolicRenderer
             }
 
             return height;
+        }
+    }
+    public class TimeScalar
+    {
+        PointF centre;
+        System.Timers.Timer timer = new System.Timers.Timer();
+
+        double time = 0;
+
+        public TimeScalar(PointF centre)
+        {
+            this.centre = centre;
+            timer.Interval = 100;
+            timer.Start();
+        }
+        public void Update()
+        {
+            //time += 0.1;
+        }
+
+        public System.Drawing.Point TransformPoint(System.Drawing.Point input)
+        {
+            PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
+            //Based on time, points will be scaled based on their angle to the centre
+            double angle = Math.Tan(adjustedpoint.Y / adjustedpoint.X);
+            float heightmultiplier = (float)((Math.Cos(angle) + 2)/4);
+            adjustedpoint.X *= heightmultiplier;
+            adjustedpoint.Y *= heightmultiplier;
+            adjustedpoint.X += centre.X;
+            adjustedpoint.Y += centre.Y;
+
+            return new System.Drawing.Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
         }
     }
 }

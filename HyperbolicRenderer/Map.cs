@@ -314,8 +314,8 @@ namespace HyperbolicRenderer
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
             //Based on time, points will be scaled based on their angle to the centre
-            double angle = Math.Abs(Math.Atan(adjustedpoint.Y / adjustedpoint.X));
-            float heightmultiplier = (float)((Math.Cos((angle*5) + time))/20)+1;
+            double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X) + Math.PI;
+            float heightmultiplier = (float)((Math.Cos((angle*4) + time))/20)+1;
             adjustedpoint.X *= heightmultiplier;
             adjustedpoint.Y *= heightmultiplier;
             adjustedpoint.X += centre.X;

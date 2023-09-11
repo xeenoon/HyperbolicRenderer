@@ -59,7 +59,7 @@ namespace HyperbolicRenderer
             Bitmap tempimage = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             if (imageDeformer != null)
             {
-                imageDeformer.DeformImageToPolygon(AdjustFunc, new Point((int)xchange, (int)ychange), tempimage);
+                imageDeformer.DeformImageToPolygon(timeScalar.TransformPoint, new Point((int)xchange, (int)ychange), tempimage);
             }
             e.Graphics.DrawImage(tempimage, 0, 0);
             s.Stop();

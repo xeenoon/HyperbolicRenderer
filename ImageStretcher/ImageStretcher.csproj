@@ -17,12 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="AnimatedGif" Version="1.0.5" />
-    <PackageReference Include="FFMediaToolkit" Version="4.5.1" />
     <PackageReference Include="Splicer" Version="1.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\HyperbolicRenderer\HyperbolicRenderer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

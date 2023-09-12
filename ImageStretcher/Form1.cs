@@ -139,7 +139,7 @@ namespace ImageStretcher
                     deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result, resolution);
                 }
                 s.Stop();
-                MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString());
+                MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
             }
         }
 

@@ -42,6 +42,8 @@
             textBox4 = new TextBox();
             label4 = new Label();
             button4 = new Button();
+            button5 = new Button();
+            button6 = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -144,7 +146,7 @@
             // button3
             // 
             button3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button3.Location = new Point(674, 236);
+            button3.Location = new Point(674, 295);
             button3.Name = "button3";
             button3.Size = new Size(84, 23);
             button3.TabIndex = 9;
@@ -155,7 +157,7 @@
             // textBox4
             // 
             textBox4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox4.Location = new Point(740, 207);
+            textBox4.Location = new Point(740, 266);
             textBox4.Name = "textBox4";
             textBox4.Size = new Size(100, 23);
             textBox4.TabIndex = 10;
@@ -165,7 +167,7 @@
             // 
             label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
-            label4.Location = new Point(674, 210);
+            label4.Location = new Point(674, 269);
             label4.Name = "label4";
             label4.Size = new Size(63, 15);
             label4.TabIndex = 11;
@@ -174,19 +176,41 @@
             // button4
             // 
             button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button4.Location = new Point(695, 177);
+            button4.Location = new Point(682, 178);
             button4.Name = "button4";
-            button4.Size = new Size(78, 23);
+            button4.Size = new Size(104, 23);
             button4.TabIndex = 12;
             button4.Text = "Export GIF";
             button4.UseVisualStyleBackColor = true;
             button4.Click += button4_Click;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(682, 207);
+            button5.Name = "button5";
+            button5.Size = new Size(104, 23);
+            button5.TabIndex = 13;
+            button5.Text = "Export Frames";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
+            // 
+            // button6
+            // 
+            button6.Location = new Point(682, 236);
+            button6.Name = "button6";
+            button6.Size = new Size(104, 23);
+            button6.TabIndex = 14;
+            button6.Text = "Export MP4";
+            button6.UseVisualStyleBackColor = true;
+            button6.Click += button6_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(855, 450);
+            Controls.Add(button6);
+            Controls.Add(button5);
             Controls.Add(button4);
             Controls.Add(label4);
             Controls.Add(textBox4);
@@ -223,5 +247,7 @@
         private TextBox textBox4;
         private Label label4;
         private Button button4;
+        private Button button5;
+        private Button button6;
     }
 }

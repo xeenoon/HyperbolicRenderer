@@ -4,6 +4,9 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using AnimatedGif;
+using Splicer.Renderer;
+using Splicer.Timeline;
+using Splicer.WindowsMedia;
 
 namespace ImageStretcher
 {
@@ -157,10 +160,10 @@ namespace ImageStretcher
                 {
                     for (int i = 0; i < frames; ++i)
                     {
-                        scalar.time += ((2 * Math.PI) / (33f));
+                        scalar.time += ((2 * Math.PI) / (31.4f));
                         GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
                         deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
-                        gif.AddFrame(GIFbitmaps[i], delay: 33, quality: GifQuality.Default);
+                        gif.AddFrame(GIFbitmaps[i], delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
                     }
                 }
             }
@@ -183,6 +186,86 @@ namespace ImageStretcher
 
             // Return an empty string if the user cancels the dialog
             return string.Empty;
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            TimeScalar scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2), false);
+            scalar.period = this.scalar.period;
+            scalar.amplitude = this.scalar.amplitude;
+            scalar.speed = this.scalar.speed;
+
+            string path = SelectFolder();
+            int frames = (int)((scalar.period * 4) / (Math.PI * 2)) * 33;
+            if (path != "")
+            {
+                Bitmap[] GIFbitmaps = new Bitmap[frames];
+                for (int i = 0; i < frames; ++i)
+                {
+                    scalar.time += ((2 * Math.PI) / (31.4f));
+                    GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
+                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
+                    GIFbitmaps[i].Save(path + @"\" + i.ToString() + ".png");
+                }
+                MessageBox.Show("Finished exporting");
+            }
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            TimeScalar scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2), false);
+            scalar.period = this.scalar.period;
+            scalar.amplitude = this.scalar.amplitude;
+            scalar.speed = this.scalar.speed;
+
+            string path = SelectFolder();
+            int frames = (int)((scalar.period * 4) / (Math.PI * 2)) * 33;
+            if (path != "")
+            {
+                string outputFile = path + @"\vid.mp4";
+
+                Bitmap[] GIFbitmaps = new Bitmap[frames];
+
+                for (int i = 0; i < frames; ++i)
+                {
+                    scalar.time += ((2 * Math.PI) / (31.4f));
+                    GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
+                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
+                }
+                bool success = false;
+                do
+                {
+                    success  = CreateVideo(GIFbitmaps.ToList(), outputFile, 10 * scalar.speed);
+                } while (!success);
+                MessageBox.Show("Finished exporting");
+            }
+        }
+
+        public bool CreateVideo(List<Bitmap> bitmaps, string outputFile, double fps)
+        {
+            int width = 640;
+            int height = 480;
+            if (bitmaps == null || bitmaps.Count == 0) return false;
+            try
+            {
+                using (ITimeline timeline = new DefaultTimeline(fps))
+                {
+                    IGroup group = timeline.AddVideoGroup(32, width, height);
+                    ITrack videoTrack = group.AddTrack();
+
+                    int i = 0;
+                    double miniDuration = 1.0 / fps;
+                    foreach (var bmp in bitmaps)
+                    {
+                        IClip clip = videoTrack.AddImage(bmp, 0, i * miniDuration, (i + 1) * miniDuration);
+                    }
+                    timeline.AddAudioGroup();
+                    IRenderer renderer = new WindowsMediaRenderer(timeline, outputFile, WindowsMediaProfiles.HighQualityVideo);
+                    renderer.Render();
+                }
+            }
+            catch { return false; }
+            return true;
         }
     }
 }

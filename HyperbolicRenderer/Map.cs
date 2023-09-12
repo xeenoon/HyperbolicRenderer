@@ -300,25 +300,38 @@ namespace HyperbolicRenderer
         public double period = 2;
         public double amplitude = 0.05;
         public double speed = 1;
-        public TimeScalar(PointF centre)
+        public TimeScalar(PointF centre, bool usetimer = true)
         {
             this.centre = centre;
-            timer.Interval = 100;
-            timer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
-            timer.Start();
+            UpdateHeights();
+            if (usetimer) 
+            {
+                timer.Interval = 100;
+                timer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
+                timer.Start();
+            }
         }
         public void Update(object sender, System.Timers.ElapsedEventArgs e)
         {
             time += 0.5f;
         }
-
+        float[] heightmultipliers = new float[314159];
+        public void UpdateHeights()
+        {
+            int idx = 0;
+         //  for (double angle = 0; angle < 3.14159; angle+=0.00001)
+         //  {
+         //      heightmultipliers[idx] = (float)((Math.Cos((angle * period * 2) + (time * speed))) * amplitude) + 1;
+         //      ++idx;
+         //  }
+        }
         public System.Drawing.Point TransformPoint(System.Drawing.Point input)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
             //Based on time, points will be scaled based on their angle to the centre
             double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X) + Math.PI/2;
-            float heightmultiplier = (float)((Math.Cos((angle * period * 2) + (time*speed)))* amplitude) + 1;
+            float heightmultiplier = (float)((Math.Cos((angle * period * 2) + (time * speed))) * amplitude) + 1;
             adjustedpoint.X *= heightmultiplier;
             adjustedpoint.Y *= heightmultiplier;
             adjustedpoint.X += centre.X;

@@ -38,6 +38,10 @@
             textBox3 = new TextBox();
             label2 = new Label();
             label3 = new Label();
+            button3 = new Button();
+            textBox4 = new TextBox();
+            label4 = new Label();
+            button4 = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -69,7 +73,7 @@
             button2.BackColor = Color.Lime;
             button2.FlatAppearance.BorderSize = 0;
             button2.FlatStyle = FlatStyle.Popup;
-            button2.Location = new Point(687, 148);
+            button2.Location = new Point(682, 148);
             button2.Name = "button2";
             button2.Size = new Size(104, 23);
             button2.TabIndex = 2;
@@ -137,11 +141,52 @@
             label3.TabIndex = 8;
             label3.Text = "Amplitude";
             // 
+            // button3
+            // 
+            button3.Location = new Point(674, 236);
+            button3.Name = "button3";
+            button3.Size = new Size(84, 23);
+            button3.TabIndex = 9;
+            button3.Text = "Benchmark";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
+            // textBox4
+            // 
+            textBox4.Location = new Point(740, 207);
+            textBox4.Name = "textBox4";
+            textBox4.Size = new Size(100, 23);
+            textBox4.TabIndex = 10;
+            textBox4.Text = "10";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(674, 210);
+            label4.Name = "label4";
+            label4.Size = new Size(63, 15);
+            label4.TabIndex = 11;
+            label4.Text = "Resolution";
+            // 
+            // button4
+            // 
+            button4.Location = new Point(695, 177);
+            button4.Name = "button4";
+            button4.Size = new Size(78, 23);
+            button4.TabIndex = 12;
+            button4.Text = "Export GIF";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(855, 450);
+            Controls.Add(button4);
+            Controls.Add(label4);
+            Controls.Add(textBox4);
+            Controls.Add(button3);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(textBox3);
@@ -170,5 +215,9 @@
         private TextBox textBox3;
         private Label label2;
         private Label label3;
+        private Button button3;
+        private TextBox textBox4;
+        private Label label4;
+        private Button button4;
     }
 }

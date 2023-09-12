@@ -1,7 +1,9 @@
 using HyperbolicRenderer;
+using ManagedCuda.BasicTypes;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using AnimatedGif;
 
 namespace ImageStretcher
 {
@@ -119,6 +121,68 @@ namespace ImageStretcher
                     }
                     break;
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            int resolution;
+            if (int.TryParse(textBox4.Text, out resolution))
+            {
+                Stopwatch s = new Stopwatch();
+                s.Start();
+                Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+                for (int i = 0; i < 1000; ++i)
+                {
+                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result, resolution);
+                }
+                s.Stop();
+                MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString());
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            TimeScalar scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2), false);
+            scalar.period = this.scalar.period;
+            scalar.amplitude = this.scalar.amplitude;
+            scalar.speed = this.scalar.speed;
+            //const float timeamt = 2;
+            int frames = (int)((scalar.period * 4) / (Math.PI * 2)) * 33;
+
+            Bitmap[] GIFbitmaps = new Bitmap[frames];
+            string path = SelectFolder();
+            if (path != "")
+            {
+                using (var gif = AnimatedGif.AnimatedGif.Create(path + @"\gif.gif", 33))
+                {
+                    for (int i = 0; i < frames; ++i)
+                    {
+                        scalar.time += ((2*Math.PI)/(33f));
+                        GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
+                        deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
+                        gif.AddFrame(GIFbitmaps[i], delay: 33, quality: GifQuality.Bit8);
+                    }
+                }
+            }
+            MessageBox.Show("Finished exporting");
+        }
+        private string SelectFolder()
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                // Set the initial folder (optional)
+                //folderBrowserDialog.SelectedPath = @"C:\users"; // Change to your desired initial folder
+
+                // Show the FolderBrowserDialog and check if the user clicked the "OK" button
+                if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Get the selected folder path
+                    return folderBrowserDialog.SelectedPath;
+                }
+            }
+
+            // Return an empty string if the user cancels the dialog
+            return string.Empty;
         }
     }
 }

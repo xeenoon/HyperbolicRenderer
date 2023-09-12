@@ -26,21 +26,20 @@ namespace HyperbolicRenderer
             imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
         }
 
-        public unsafe void DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap resultBitmap)
+        public unsafe void DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap resultBitmap, int sectionwidth = 2)
         {
             int width = imagedata.Width;
             int height = imagedata.Height;
 
             BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
-            int sectionwidth = 2;
             if (imagedata.Width > 500)
             {
-                sectionwidth = 4;
+                sectionwidth += 4;
             }
             else if (imagedata.Width > 1000)
             {
-                sectionwidth = 8;
+                sectionwidth += 8;
             }
             int sectionradius = sectionwidth / 2;
 
@@ -51,7 +50,6 @@ namespace HyperbolicRenderer
 
             int* xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
             int* yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
-
             for (int row = 0; row < numRows; row++)
             {
                 for (int col = 0; col < numCols; col++)
@@ -116,7 +114,6 @@ namespace HyperbolicRenderer
                         new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
                 }
             }
-
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             resultBitmap.UnlockBits(outputData);

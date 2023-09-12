@@ -45,11 +45,11 @@ namespace HyperbolicRenderer
             m.GenerateVolume(scale, xchange, ychange, infinitemovement);
             m.BakeHeights(10);
 
-            timeScalar = new TimeScalar(new PointF(asteroidBitmap.Width / 2 + xchange, asteroidBitmap.Height / 2 + ychange));
+         //   timeScalar = new TimeScalar(new PointF(asteroidBitmap.Width / 2 + xchange, asteroidBitmap.Height / 2 + ychange));
 
             pictureBox1.Refresh();
         }
-        TimeScalar timeScalar;
+      //  TimeScalar timeScalar;
         bool firstdraw = true;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
@@ -59,7 +59,7 @@ namespace HyperbolicRenderer
             Bitmap tempimage = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             if (imageDeformer != null)
             {
-                imageDeformer.DeformImageToPolygon(timeScalar.TransformPoint, new Point((int)xchange, (int)ychange), tempimage);
+           //     imageDeformer.DeformImageToPolygon(timeScalar.TransformPoint, new Point((int)xchange, (int)ychange), tempimage);
             }
             e.Graphics.DrawImage(tempimage, 0, 0);
             s.Stop();

@@ -186,6 +186,7 @@
             // 
             // button5
             // 
+            button5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button5.Location = new Point(682, 207);
             button5.Name = "button5";
             button5.Size = new Size(104, 23);
@@ -196,6 +197,7 @@
             // 
             // button6
             // 
+            button6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button6.Location = new Point(682, 236);
             button6.Name = "button6";
             button6.Size = new Size(104, 23);

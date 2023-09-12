@@ -157,10 +157,10 @@ namespace ImageStretcher
                 {
                     for (int i = 0; i < frames; ++i)
                     {
-                        scalar.time += ((2*Math.PI)/(33f));
+                        scalar.time += ((2 * Math.PI) / (33f));
                         GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
                         deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
-                        gif.AddFrame(GIFbitmaps[i], delay: 33, quality: GifQuality.Bit8);
+                        gif.AddFrame(GIFbitmaps[i], delay: 33, quality: GifQuality.Default);
                     }
                 }
             }

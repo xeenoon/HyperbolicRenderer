@@ -143,6 +143,7 @@
             // 
             // button3
             // 
+            button3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button3.Location = new Point(674, 236);
             button3.Name = "button3";
             button3.Size = new Size(84, 23);
@@ -153,6 +154,7 @@
             // 
             // textBox4
             // 
+            textBox4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             textBox4.Location = new Point(740, 207);
             textBox4.Name = "textBox4";
             textBox4.Size = new Size(100, 23);
@@ -161,6 +163,7 @@
             // 
             // label4
             // 
+            label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
             label4.Location = new Point(674, 210);
             label4.Name = "label4";
@@ -170,6 +173,7 @@
             // 
             // button4
             // 
+            button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button4.Location = new Point(695, 177);
             button4.Name = "button4";
             button4.Size = new Size(78, 23);

@@ -46,6 +46,7 @@
             label5 = new Label();
             checkBox2 = new CheckBox();
             checkBox3 = new CheckBox();
+            button3 = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             panel1.SuspendLayout();
             SuspendLayout();
@@ -169,7 +170,7 @@
             checkBox1.TabIndex = 13;
             checkBox1.Text = "Custom indices";
             checkBox1.UseVisualStyleBackColor = true;
-            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
+            checkBox1.CheckedChanged += CustomIndicesCheckedChange;
             // 
             // panel1
             // 
@@ -219,7 +220,7 @@
             checkBox2.TabIndex = 15;
             checkBox2.Text = "Show markers";
             checkBox2.UseVisualStyleBackColor = true;
-            checkBox2.CheckedChanged += checkBox2_CheckedChanged;
+            checkBox2.CheckedChanged += ShowMarkersCheckedChange;
             // 
             // checkBox3
             // 
@@ -230,13 +231,24 @@
             checkBox3.TabIndex = 16;
             checkBox3.Text = "Custom vertices";
             checkBox3.UseVisualStyleBackColor = true;
-            checkBox3.CheckedChanged += checkBox3_CheckedChanged;
+            checkBox3.CheckedChanged += CustomVerticesCheckChanged;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(547, 122);
+            button3.Name = "button3";
+            button3.Size = new Size(95, 23);
+            button3.TabIndex = 17;
+            button3.Text = "Clear";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 489);
+            Controls.Add(button3);
             Controls.Add(checkBox3);
             Controls.Add(checkBox2);
             Controls.Add(panel1);
@@ -281,5 +293,6 @@
         private Button button4;
         private CheckBox checkBox2;
         private CheckBox checkBox3;
+        private Button button3;
     }
 }

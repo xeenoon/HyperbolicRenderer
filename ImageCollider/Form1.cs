@@ -201,6 +201,8 @@ namespace ImageCollider
             GrahamsAlgorithm(points[0].position, points.Select(p => p.position).ToList(), ref highdefpoints);
             highdefpoints.Reverse();
             userdefinedpoints.Clear();
+            float xscale = (float)pictureBox1.Width / image.Width;
+            float yscale = (float)pictureBox1.Height / image.Height;
             for (int i = 0; i < highdefpoints.Count; i++)
             {
                 PointF p = highdefpoints[i];
@@ -210,7 +212,10 @@ namespace ImageCollider
 
                     polygonpoints.Add(p);
                     data += string.Format("new {0}({1},{2}),", comboBox1.SelectedItem, adjustedpoint.X, adjustedpoint.Y);
-                    userdefinedpoints.Add(p);
+
+                    PointF upoint = new PointF((float)(Math.Round(xscale * p.X) + centre.X), (float)(Math.Round(yscale * p.Y) + centre.Y));
+
+                    userdefinedpoints.Add(upoint);
                 }
             }
 

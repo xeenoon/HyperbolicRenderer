@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,13 +30,14 @@ namespace ImageStretcher
         {
             time += 0.5f;
         }
-        public Point JelloTransformPoint(Point input)
+        public Point WaveDeform(Point input)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
             //Based on time, points will be scaled based on their angle to the centre
             double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X) + Math.PI / 2;
-            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed))) * amplitude) + 1;
+            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed)) * amplitude) + (1+amplitude));
+            
             adjustedpoint.X *= heightmultiplier;
             adjustedpoint.Y *= heightmultiplier;
 
@@ -45,20 +47,19 @@ namespace ImageStretcher
             return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
         }
 
-        public Point RightDeform(Point input)
+
+        public static PointF[] bobsrightarm = new PointF[7] { new PointF(246, 6), new PointF(194, 8), new PointF(185, 12), new PointF(184, 17), new PointF(181, 18), new PointF(213, 76), new PointF(233, 114), };
+        public static PointF[] bobsleftarm = new PointF[12] { new PointF(73, 131), new PointF(64, 131), new PointF(34, 139), new PointF(45, 173), new PointF(53, 182), new PointF(70, 197), new PointF(86, 201), new PointF(93, 184), new PointF(87, 178), new PointF(79, 171), new PointF(80, 165), new PointF(83, 159), };
+        public Point WaveArms(Point input)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
-            if (adjustedpoint.X > 0 && adjustedpoint.Y < 0) //Only move points on rhs
+            if (input.InPolygon(bobsrightarm) || input.InPolygon(bobsleftarm)) //Only move points on rhs
             {
-                double change = (time % 20);
-
-                if (change > 10)
-                {
-                    change = 10 - (change - 10);
-                }
-                change *= 0.05f;
-                adjustedpoint.X *= (float)(1 + change);
+                double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X) + Math.PI / 2;
+                float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed))) * amplitude * 2) + 1;
+                adjustedpoint.X *= heightmultiplier;
+                adjustedpoint.Y *= heightmultiplier;
             }
 
             adjustedpoint.X += centre.X;

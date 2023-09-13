@@ -59,7 +59,7 @@ namespace ImageCollider
             repaintrequired = false;
             if (image != null)
             {
-                e.Graphics.DrawImage(image, 0, 0, pictureBox1.Width - 20, pictureBox1.Height - 20);
+                e.Graphics.DrawImage(image, 0, 0, pictureBox1.Width, pictureBox1.Height);
             }
             // return;
             if (autogenerate)

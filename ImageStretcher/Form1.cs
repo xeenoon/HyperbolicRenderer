@@ -38,8 +38,10 @@ namespace ImageStretcher
             if (image != null)
             {
                 Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), result);
+                deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), result);
                 e.Graphics.DrawImage(result, new Point(0, 0));
+              //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsleftarm);
+              //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsrightarm);
                 result.Dispose();
             }
         }
@@ -134,7 +136,7 @@ namespace ImageStretcher
                 Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
                 for (int i = 0; i < 1000; ++i)
                 {
-                    deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), result, resolution);
+                    deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), result, resolution);
                 }
                 s.Stop();
                 MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
@@ -160,7 +162,7 @@ namespace ImageStretcher
                     {
                         scalar.time += ((2 * Math.PI) / (31.4f));
                         GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                        deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), GIFbitmaps[i]);
+                        deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), GIFbitmaps[i]);
                         gif.AddFrame(GIFbitmaps[i], delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
                     }
                 }
@@ -202,7 +204,7 @@ namespace ImageStretcher
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
                     GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), GIFbitmaps[i]);
+                    deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), GIFbitmaps[i]);
                     GIFbitmaps[i].Save(path + @"\" + i.ToString() + ".png");
                 }
                 MessageBox.Show("Finished exporting");
@@ -228,7 +230,7 @@ namespace ImageStretcher
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
                     GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), GIFbitmaps[i]);
+                    deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), GIFbitmaps[i]);
                 }
                 bool success = false;
                 do

@@ -19,7 +19,7 @@ namespace ImageStretcher
             timer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
             timer.Start();
             image = (Bitmap)pictureBox1.Image.Clone();
-            scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2));
+            scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width);
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
             deformer = new ImageDeformer(image);
@@ -38,10 +38,11 @@ namespace ImageStretcher
             if (image != null)
             {
                 Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), result);
+                deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result);
                 e.Graphics.DrawImage(result, new Point(0, 0));
-              //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsleftarm);
-              //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsrightarm);
+                //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsleftarm);
+                //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsrightarm);
+                //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobshead);
                 result.Dispose();
             }
         }
@@ -58,7 +59,7 @@ namespace ImageStretcher
                 {
                     var temp = (Bitmap)Image.FromFile(name);
                     image = temp.Clone(new Rectangle(0, 0, temp.Width, temp.Height), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                    scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2));
+                    scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width);
                     deformer.GC_pacifier.Dispose();
                     deformer = new ImageDeformer(image);
                     pictureBox1.Invalidate();
@@ -136,7 +137,7 @@ namespace ImageStretcher
                 Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
                 for (int i = 0; i < 1000; ++i)
                 {
-                    deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), result, resolution);
+                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result, resolution);
                 }
                 s.Stop();
                 MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
@@ -145,7 +146,7 @@ namespace ImageStretcher
 
         private void button4_Click(object sender, EventArgs e)
         {
-            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), false);
+            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
             scalar.period = this.scalar.period;
             scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
@@ -162,7 +163,7 @@ namespace ImageStretcher
                     {
                         scalar.time += ((2 * Math.PI) / (31.4f));
                         GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                        deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), GIFbitmaps[i]);
+                        deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i], 2, true);
                         gif.AddFrame(GIFbitmaps[i], delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
                     }
                 }
@@ -190,7 +191,7 @@ namespace ImageStretcher
 
         private void button5_Click(object sender, EventArgs e)
         {
-            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), false);
+            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
             scalar.period = this.scalar.period;
             scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
@@ -204,7 +205,7 @@ namespace ImageStretcher
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
                     GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), GIFbitmaps[i]);
+                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
                     GIFbitmaps[i].Save(path + @"\" + i.ToString() + ".png");
                 }
                 MessageBox.Show("Finished exporting");
@@ -213,7 +214,7 @@ namespace ImageStretcher
 
         private void button6_Click(object sender, EventArgs e)
         {
-            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), false);
+            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
             scalar.period = this.scalar.period;
             scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
@@ -230,7 +231,7 @@ namespace ImageStretcher
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
                     GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    deformer.DeformImageToPolygon(scalar.WaveDeform, new Point(0, 0), GIFbitmaps[i]);
+                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
                 }
                 bool success = false;
                 do

@@ -23,18 +23,18 @@ namespace ImageStretcher
             imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
         }
 
-        public unsafe void DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap resultBitmap, int sectionwidth = 2)
+        public unsafe void DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap resultBitmap, int sectionwidth = 2, bool overridescale = false)
         {
             int width = imagedata.Width;
             int height = imagedata.Height;
 
             BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
-            if (imagedata.Width > 500)
+            if (imagedata.Width > 500 && !overridescale)
             {
                 sectionwidth += 4;
             }
-            else if (imagedata.Width > 1000)
+            else if (imagedata.Width > 1000 && !overridescale)
             {
                 sectionwidth += 8;
             }

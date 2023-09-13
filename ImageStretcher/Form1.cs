@@ -12,7 +12,6 @@ namespace ImageStretcher
     {
         System.Timers.Timer timer = new System.Timers.Timer(10);
         PointTransformer scalar;
-        ImageDeformer deformer;
         public Form1()
         {
             InitializeComponent();
@@ -72,7 +71,7 @@ namespace ImageStretcher
             if (image != null)
             {
                 Bitmap result = new Bitmap(image.Width, image.Height);
-                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result);
+                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result, resolution);
                 e.Graphics.DrawImage(result, 0, 0, image.Width * imagescale, image.Height * imagescale);
                 //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsleftarm);
                 //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsrightarm);
@@ -162,19 +161,15 @@ namespace ImageStretcher
 
         private void button3_Click(object sender, EventArgs e)
         {
-            int resolution;
-            if (int.TryParse(textBox4.Text, out resolution))
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            for (int i = 0; i < 1000; ++i)
             {
-                Stopwatch s = new Stopwatch();
-                s.Start();
-                Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                for (int i = 0; i < 1000; ++i)
-                {
-                    ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result, resolution);
-                }
-                s.Stop();
-                MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
+                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result, resolution);
             }
+            s.Stop();
+            MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -354,6 +349,23 @@ namespace ImageStretcher
             if (float.TryParse(textBox6.Text, out newscale))
             {
                 imagescale = newscale;
+            }
+        }
+        int resolution = 2;
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            float tempresolution;
+            if (float.TryParse(textBox4.Text, out tempresolution))
+            {
+                if (tempresolution > 1 || tempresolution == 0)
+                {
+                    textBox4.ForeColor = Color.Red;
+                }
+                else
+                {
+                    textBox4.ForeColor = Color.Black;
+                    resolution = (int)(2 / tempresolution);
+                }
             }
         }
     }

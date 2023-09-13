@@ -112,6 +112,8 @@ namespace ImageStretcher
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             resultBitmap.UnlockBits(outputData);
+
+            GC_pacifier.Dispose();
         }
 
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]

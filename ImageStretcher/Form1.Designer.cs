@@ -86,7 +86,7 @@
             button2.BackColor = Color.Lime;
             button2.FlatAppearance.BorderSize = 0;
             button2.FlatStyle = FlatStyle.Popup;
-            button2.Location = new Point(716, 200);
+            button2.Location = new Point(769, 236);
             button2.Name = "button2";
             button2.Size = new Size(104, 23);
             button2.TabIndex = 2;
@@ -117,7 +117,7 @@
             // textBox2
             // 
             textBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox2.Location = new Point(773, 99);
+            textBox2.Location = new Point(773, 97);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
             textBox2.TabIndex = 5;
@@ -127,7 +127,7 @@
             // textBox3
             // 
             textBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox3.Location = new Point(773, 132);
+            textBox3.Location = new Point(773, 128);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(100, 23);
             textBox3.TabIndex = 6;
@@ -138,7 +138,7 @@
             // 
             label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label2.AutoSize = true;
-            label2.Location = new Point(726, 104);
+            label2.Location = new Point(726, 100);
             label2.Name = "label2";
             label2.Size = new Size(41, 15);
             label2.TabIndex = 7;
@@ -148,7 +148,7 @@
             // 
             label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
-            label3.Location = new Point(704, 136);
+            label3.Location = new Point(704, 131);
             label3.Name = "label3";
             label3.Size = new Size(63, 15);
             label3.TabIndex = 8;
@@ -157,9 +157,9 @@
             // button3
             // 
             button3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button3.Location = new Point(708, 347);
+            button3.Location = new Point(769, 353);
             button3.Name = "button3";
-            button3.Size = new Size(84, 23);
+            button3.Size = new Size(104, 23);
             button3.TabIndex = 9;
             button3.Text = "Benchmark";
             button3.UseVisualStyleBackColor = true;
@@ -168,17 +168,18 @@
             // textBox4
             // 
             textBox4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox4.Location = new Point(774, 318);
+            textBox4.Location = new Point(773, 190);
             textBox4.Name = "textBox4";
             textBox4.Size = new Size(100, 23);
             textBox4.TabIndex = 10;
-            textBox4.Text = "10";
+            textBox4.Text = "1";
+            textBox4.TextChanged += textBox4_TextChanged;
             // 
             // label4
             // 
             label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
-            label4.Location = new Point(708, 321);
+            label4.Location = new Point(704, 193);
             label4.Name = "label4";
             label4.Size = new Size(63, 15);
             label4.TabIndex = 11;
@@ -187,7 +188,7 @@
             // button4
             // 
             button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button4.Location = new Point(716, 230);
+            button4.Location = new Point(769, 266);
             button4.Name = "button4";
             button4.Size = new Size(104, 23);
             button4.TabIndex = 12;
@@ -198,7 +199,7 @@
             // button5
             // 
             button5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button5.Location = new Point(716, 259);
+            button5.Location = new Point(769, 295);
             button5.Name = "button5";
             button5.Size = new Size(104, 23);
             button5.TabIndex = 13;
@@ -209,7 +210,7 @@
             // button6
             // 
             button6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button6.Location = new Point(716, 288);
+            button6.Location = new Point(769, 324);
             button6.Name = "button6";
             button6.Size = new Size(104, 23);
             button6.TabIndex = 14;
@@ -301,7 +302,7 @@
             // 
             label8.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label8.AutoSize = true;
-            label8.Location = new Point(733, 167);
+            label8.Location = new Point(733, 162);
             label8.Name = "label8";
             label8.Size = new Size(34, 15);
             label8.TabIndex = 17;
@@ -310,7 +311,7 @@
             // textBox6
             // 
             textBox6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox6.Location = new Point(773, 164);
+            textBox6.Location = new Point(773, 159);
             textBox6.Name = "textBox6";
             textBox6.Size = new Size(100, 23);
             textBox6.TabIndex = 18;

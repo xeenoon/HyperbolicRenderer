@@ -86,11 +86,16 @@ namespace ImageCollider
         bool customindices;
         private void ManualGenerateImage(Graphics graphics)
         {
+            if (image == null)
+            {
+                return;
+            }
+
             const int pointsize = 10;
             List<PointF> polygon = new List<PointF>();
             if (userdefinedpoints.Count >= 3 && !customindices)
             {
-                GrahamsAlgorithm(userdefinedpoints.OrderBy(p => p.position.Y).First().position, userdefinedpoints.Select(u=>u.position).ToList(), ref polygon);
+                GrahamsAlgorithm(userdefinedpoints.OrderBy(p => p.position.Y).First().position, userdefinedpoints.Select(u => u.position).ToList(), ref polygon);
                 graphics.DrawPolygon(new Pen(Color.Orange), polygon.ToArray());
             }
             if (userdefinedpoints.Count == 2)
@@ -100,7 +105,7 @@ namespace ImageCollider
 
             if (customindices && polygon.Count >= 3) //Order as set by the user
             {
-                foreach (PointF p in userdefinedpoints.OrderBy(v=>v.index).Where(v=>v.index != -1).Select(v=>v.position))
+                foreach (PointF p in userdefinedpoints.OrderBy(v => v.index).Where(v => v.index != -1).Select(v => v.position))
                 {
                     polygon.Add(p); //Add the point at its index
                 }
@@ -110,15 +115,18 @@ namespace ImageCollider
             foreach (Vertex v in userdefinedpoints)
             {
                 PointF p = v.position;
-                graphics.FillEllipse(new Pen(Color.Blue).Brush, p.X - (pointsize / 2), p.Y - (pointsize / 2), pointsize, pointsize);
-                if (polygon.Contains(p))
+                if (showmarkers)
                 {
-                    var index = polygon.IndexOf(v.position);
-                    if (customindices) 
+                    graphics.FillEllipse(new Pen(Color.Blue).Brush, p.X - (pointsize / 2), p.Y - (pointsize / 2), pointsize, pointsize);
+                    if (polygon.Contains(p))
                     {
-                        index = v.index;
+                        var index = polygon.IndexOf(v.position);
+                        if (customindices)
+                        {
+                            index = v.index;
+                        }
+                        graphics.DrawString(index.ToString(), new Font("Arial", 10), new Pen(Color.Black).Brush, p.X + 15, p.Y);
                     }
-                    graphics.DrawString(index.ToString(), new Font("Arial", 10), new Pen(Color.Black).Brush, p.X + 15, p.Y);
                 }
             }
 
@@ -181,6 +189,10 @@ namespace ImageCollider
                     }
                 }
             }
+            if (points.Count() == 0)
+            {
+                return;
+            }
             //Since all angles are positive, they can be easily ordered
             points = points.OrderBy(p => p.angle).ToList();
 
@@ -196,6 +208,7 @@ namespace ImageCollider
 
             GrahamsAlgorithm(points[0].position, points.Select(p => p.position).ToList(), ref highdefpoints);
             highdefpoints.Reverse();
+            userdefinedpoints.Clear();
             for (int i = 0; i < highdefpoints.Count; i++)
             {
                 PointF p = highdefpoints[i];
@@ -205,6 +218,7 @@ namespace ImageCollider
 
                     polygonpoints.Add(p);
                     data += string.Format("new {0}({1},{2}),", comboBox1.SelectedItem, adjustedpoint.X, adjustedpoint.Y);
+                    userdefinedpoints.Add(new Vertex(p, 0));
                 }
             }
 
@@ -303,7 +317,7 @@ namespace ImageCollider
             result.Add(last);
 
             List<PointF> nearbypoints = new List<PointF>();
-            double newresolution = 2;
+            double newresolution = 1;
             while (nearbypoints.Count() == 0)
             {
                 nearbypoints = points.Where(p => p.DistanceTo(last) < newresolution && !movedpoints.Contains(p)).ToList();
@@ -325,7 +339,7 @@ namespace ImageCollider
                     closestpoint = point;
                 }
             }
-            if ((result.Count() > (points.Count()) * 0.6f && last.DistanceTo(points[0]) < resolution*2) || movedpoints.Count() >= points.Count()-1)
+            if (result.Count() > points.Count() * 0.6f && last.DistanceTo(points[0]) < points.Min(p => p != points[0] ? p.DistanceTo(points[0]) : double.MaxValue))
             {
                 return;
             }
@@ -337,13 +351,7 @@ namespace ImageCollider
             repaintrequired = true;
             pictureBox1.Invalidate();
         }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            autogenerate = false;
-            repaintrequired = true;
-            pictureBox1.Invalidate();
-        }
+        
         int selectedvertex = -1;
         private void pictureBox1_Click(object sender, EventArgs e)
         {
@@ -366,7 +374,7 @@ namespace ImageCollider
                     {
                         if (userdefinedpoints[i].index >= closestpoint.index)
                         {
-                            userdefinedpoints[i] = new Vertex(userdefinedpoints[i].position, userdefinedpoints[i].index-1);
+                            userdefinedpoints[i] = new Vertex(userdefinedpoints[i].position, userdefinedpoints[i].index - 1);
                         }
                     }
                 }
@@ -424,7 +432,7 @@ namespace ImageCollider
                 int newidx;
                 if (int.TryParse(textBox4.Text, out newidx))
                 {
-                    if (userdefinedpoints.Any(u=>u.index == newidx)) //overwriting?
+                    if (userdefinedpoints.Any(u => u.index == newidx)) //overwriting?
                     {
                         //Increase the index of all other values
                         for (int i = 0; i < userdefinedpoints.Count; ++i)
@@ -441,7 +449,7 @@ namespace ImageCollider
                     {
                         if (userdefinedpoints[i].index >= userdefinedpoints[selectedvertex].index)
                         {
-                            userdefinedpoints[i] = new Vertex(userdefinedpoints[i].position, userdefinedpoints[i].index-1);
+                            userdefinedpoints[i] = new Vertex(userdefinedpoints[i].position, userdefinedpoints[i].index - 1);
                         }
                     }
 
@@ -456,6 +464,23 @@ namespace ImageCollider
                     MessageBox.Show("Invalid value given");
                 }
             }
+        }
+        bool showmarkers = true;
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            showmarkers = checkBox2.Checked;
+            repaintrequired = true;
+            pictureBox1.Invalidate();
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            repaintrequired = true;
+            autogenerate = !checkBox3.Checked;
+            checkBox2.Checked = checkBox3.Checked;
+
+            pictureBox1.Invalidate();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace ImageStretcher
     public partial class Form1 : Form
     {
         System.Timers.Timer timer = new System.Timers.Timer(10);
-        TimeScalar scalar;
+        PointTransformer scalar;
         ImageDeformer deformer;
         public Form1()
         {
@@ -19,7 +19,7 @@ namespace ImageStretcher
             timer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
             timer.Start();
             image = (Bitmap)pictureBox1.Image.Clone();
-            scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2));
+            scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2));
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
             deformer = new ImageDeformer(image);
@@ -38,7 +38,7 @@ namespace ImageStretcher
             if (image != null)
             {
                 Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result);
+                deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), result);
                 e.Graphics.DrawImage(result, new Point(0, 0));
                 result.Dispose();
             }
@@ -56,7 +56,7 @@ namespace ImageStretcher
                 {
                     var temp = (Bitmap)Image.FromFile(name);
                     image = temp.Clone(new Rectangle(0, 0, temp.Width, temp.Height), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                    scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2));
+                    scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2));
                     deformer.GC_pacifier.Dispose();
                     deformer = new ImageDeformer(image);
                     pictureBox1.Invalidate();
@@ -134,7 +134,7 @@ namespace ImageStretcher
                 Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
                 for (int i = 0; i < 1000; ++i)
                 {
-                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result, resolution);
+                    deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), result, resolution);
                 }
                 s.Stop();
                 MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
@@ -143,7 +143,7 @@ namespace ImageStretcher
 
         private void button4_Click(object sender, EventArgs e)
         {
-            TimeScalar scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2), false);
+            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), false);
             scalar.period = this.scalar.period;
             scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
@@ -160,7 +160,7 @@ namespace ImageStretcher
                     {
                         scalar.time += ((2 * Math.PI) / (31.4f));
                         GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                        deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
+                        deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), GIFbitmaps[i]);
                         gif.AddFrame(GIFbitmaps[i], delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
                     }
                 }
@@ -188,7 +188,7 @@ namespace ImageStretcher
 
         private void button5_Click(object sender, EventArgs e)
         {
-            TimeScalar scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2), false);
+            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), false);
             scalar.period = this.scalar.period;
             scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
@@ -202,7 +202,7 @@ namespace ImageStretcher
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
                     GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
+                    deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), GIFbitmaps[i]);
                     GIFbitmaps[i].Save(path + @"\" + i.ToString() + ".png");
                 }
                 MessageBox.Show("Finished exporting");
@@ -211,7 +211,7 @@ namespace ImageStretcher
 
         private void button6_Click(object sender, EventArgs e)
         {
-            TimeScalar scalar = new TimeScalar(new PointF(image.Width / 2, image.Height / 2), false);
+            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), false);
             scalar.period = this.scalar.period;
             scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
@@ -228,7 +228,7 @@ namespace ImageStretcher
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
                     GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
+                    deformer.DeformImageToPolygon(scalar.RightDeform, new Point(0, 0), GIFbitmaps[i]);
                 }
                 bool success = false;
                 do
@@ -264,45 +264,6 @@ namespace ImageStretcher
             }
             catch { return false; }
             return true;
-        }
-    }
-    public class TimeScalar
-    {
-        PointF centre;
-        System.Timers.Timer timer = new System.Timers.Timer();
-
-        public double time = 0;
-        public double period = 2;
-        public double amplitude = 0.05;
-        public double speed = 1;
-        public TimeScalar(PointF centre, bool usetimer = true)
-        {
-            this.centre = centre;
-            if (usetimer)
-            {
-                timer.Interval = 100;
-                timer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
-                timer.Start();
-            }
-        }
-        public void Update(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            time += 0.5f;
-        }
-        public System.Drawing.Point TransformPoint(System.Drawing.Point input)
-        {
-            PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
-
-            //Based on time, points will be scaled based on their angle to the centre
-            double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X) + Math.PI / 2;
-            float heightmultiplier = (float)((Math.Cos((angle * period * 2) + (time * speed))) * amplitude) + 1;
-            adjustedpoint.X *= heightmultiplier;
-            adjustedpoint.Y *= heightmultiplier;
-
-            adjustedpoint.X += centre.X;
-            adjustedpoint.Y += centre.Y;
-
-            return new System.Drawing.Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
         }
     }
 }

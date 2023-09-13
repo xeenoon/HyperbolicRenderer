@@ -15,16 +15,14 @@ namespace ImageStretcher
 {
     public class ImageDeformer
     {
-        BitmapData imagedata;
-        public Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
-        public ImageDeformer(Bitmap originalimage)
+        public static BitmapData imagedata;
+        public static Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
+
+        public static unsafe void DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, int sectionwidth = 2, bool overridescale = false)
         {
             GC_pacifier = (Bitmap)originalimage.Clone();
             imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
-        }
 
-        public unsafe void DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap resultBitmap, int sectionwidth = 2, bool overridescale = false)
-        {
             int width = imagedata.Width;
             int height = imagedata.Height;
 
@@ -119,7 +117,7 @@ namespace ImageStretcher
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         public static extern unsafe IntPtr memset(void* dest, int c, int count);
 
-        public unsafe byte* ResizeBitmapFast(BitmapData input, Rectangle areafrom, int newwidth, int newheight)
+        public static unsafe byte* ResizeBitmapFast(BitmapData input, Rectangle areafrom, int newwidth, int newheight)
         {
             const int bytesPerPixel = 4;
             int deststride = newwidth * bytesPerPixel;
@@ -141,7 +139,7 @@ namespace ImageStretcher
 
             return destPointer;
         }
-        private unsafe void ResizeCopy(BitmapData input, Rectangle areafrom, int newwidth, int newheight, BitmapData dest, Rectangle destrect)
+        private static unsafe void ResizeCopy(BitmapData input, Rectangle areafrom, int newwidth, int newheight, BitmapData dest, Rectangle destrect)
         {
             const int bytesPerPixel = 4;
 
@@ -160,7 +158,7 @@ namespace ImageStretcher
                 memset(destPointer + writestart + writestride, 0, (newwidth - width) * bytesPerPixel);
             }
         }
-        private unsafe void CopyRectangles(byte* sourcePtr, int sourceStride, byte* destinationPtr, int destinationStride, Rectangle sourceRect, Rectangle destinationRect)
+        private static unsafe void CopyRectangles(byte* sourcePtr, int sourceStride, byte* destinationPtr, int destinationStride, Rectangle sourceRect, Rectangle destinationRect)
         {
             const int bytesPerPixel = 4;
 
@@ -195,7 +193,7 @@ namespace ImageStretcher
                     bytesToCopy);
             }
         }
-        public unsafe void CopyRectangles(BitmapData input, BitmapData output, Rectangle sourcerectangle, Rectangle destinationRect)
+        public static unsafe void CopyRectangles(BitmapData input, BitmapData output, Rectangle sourcerectangle, Rectangle destinationRect)
         {
             CopyRectangles((byte*)input.Scan0.ToPointer(), input.Stride, (byte*)output.Scan0.ToPointer(), output.Stride, sourcerectangle, destinationRect);
         }

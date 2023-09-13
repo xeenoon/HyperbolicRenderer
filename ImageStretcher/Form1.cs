@@ -22,11 +22,45 @@ namespace ImageStretcher
             scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width);
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
-            deformer = new ImageDeformer(image);
         }
-
+        double lastlooptime;
+        int frameidx = 0;
+        bool direction = true;
         private void Update(object sender, System.Timers.ElapsedEventArgs e)
         {
+            lastlooptime += 10;
+            if (lastlooptime > delay && animating)
+            {
+                lastlooptime = 0;
+
+                if (direction)
+                {
+                    frameidx++;
+                }
+                else
+                {
+                    frameidx--;
+                }
+                if (frameidx == frames.Length)
+                {
+                    if (restartanimation)
+                    {
+                        frameidx = 0;
+                    }
+                    else
+                    {
+                        direction = false;
+                        frameidx -= 2;
+                    }
+                }
+                else if (frameidx == 0)
+                {
+                    direction = true;
+                }
+
+                image = frames[frameidx];
+                scalar.centre = new PointF(image.Width / 2, image.Height / 2);
+            }
             if (started)
             {
                 pictureBox1.Invalidate();
@@ -37,9 +71,9 @@ namespace ImageStretcher
         {
             if (image != null)
             {
-                Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result);
-                e.Graphics.DrawImage(result, new Point(0, 0));
+                Bitmap result = new Bitmap(image.Width, image.Height);
+                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result);
+                e.Graphics.DrawImage(result, 0, 0, image.Width * imagescale, image.Height * imagescale);
                 //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsleftarm);
                 //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsrightarm);
                 //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobshead);
@@ -57,11 +91,10 @@ namespace ImageStretcher
                 string extension = name.Split(".")[1];
                 if (extension == "png" || extension == "jpg")
                 {
+                    animating = false;
                     var temp = (Bitmap)Image.FromFile(name);
                     image = temp.Clone(new Rectangle(0, 0, temp.Width, temp.Height), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                     scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width);
-                    deformer.GC_pacifier.Dispose();
-                    deformer = new ImageDeformer(image);
                     pictureBox1.Invalidate();
                 }
             }
@@ -137,7 +170,7 @@ namespace ImageStretcher
                 Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
                 for (int i = 0; i < 1000; ++i)
                 {
-                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), result, resolution);
+                    ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result, resolution);
                 }
                 s.Stop();
                 MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
@@ -163,7 +196,7 @@ namespace ImageStretcher
                     {
                         scalar.time += ((2 * Math.PI) / (31.4f));
                         GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                        deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i], 2, true);
+                        ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, GIFbitmaps[i], 2, true);
                         gif.AddFrame(GIFbitmaps[i], delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
                     }
                 }
@@ -205,7 +238,7 @@ namespace ImageStretcher
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
                     GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
+                    ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, GIFbitmaps[i]);
                     GIFbitmaps[i].Save(path + @"\" + i.ToString() + ".png");
                 }
                 MessageBox.Show("Finished exporting");
@@ -231,12 +264,12 @@ namespace ImageStretcher
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
                     GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    deformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), GIFbitmaps[i]);
+                    ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, GIFbitmaps[i]);
                 }
                 bool success = false;
                 do
                 {
-                    success  = CreateVideo(GIFbitmaps.ToList(), outputFile, 10 * scalar.speed);
+                    success = CreateVideo(GIFbitmaps.ToList(), outputFile, 10 * scalar.speed);
                 } while (!success);
                 MessageBox.Show("Finished exporting");
             }
@@ -267,6 +300,61 @@ namespace ImageStretcher
             }
             catch { return false; }
             return true;
+        }
+        Bitmap[] frames;
+        private void button7_Click(object sender, EventArgs e)
+        {
+            string folder = SelectFolder();
+            if (folder != "")
+            {
+                Dictionary<int, Bitmap> animationframes = new Dictionary<int, Bitmap>();
+                foreach (string path in Directory.EnumerateFiles(folder))
+                {
+                    int fileno;
+                    if (int.TryParse(path.Split("\\").Last().Split('.')[0], out fileno))
+                    {
+                        if (animationframes.ContainsKey(fileno))
+                        {
+                            MessageBox.Show("Invalid animation sequence, frame + " + fileno.ToString() + " is repeated");
+                        }
+                        animationframes.Add(fileno, (Bitmap)Image.FromFile(path));
+                    }
+                }
+                frames = animationframes.OrderBy(a => a.Key).Select(a => a.Value).ToArray();
+
+                panel1.Visible = true; //Show the menu
+            }
+        }
+        int delay;
+        bool restartanimation;
+        bool animating;
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (!int.TryParse(textBox5.Text, out delay))
+            {
+                MessageBox.Show("Invalid FPS");
+            }
+            else
+            {
+                textBox5.Text = "";
+                restartanimation = comboBox1.SelectedIndex == 0;
+                panel1.Visible = false;
+                animating = true;
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+        float imagescale = 1;
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+            float newscale;
+            if (float.TryParse(textBox6.Text, out newscale))
+            {
+                imagescale = newscale;
+            }
         }
     }
 }

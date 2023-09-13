@@ -9,7 +9,7 @@ namespace ImageStretcher
 {
     public class PointTransformer
     {
-        PointF centre;
+        public PointF centre;
         System.Timers.Timer timer = new System.Timers.Timer();
 
         public double time = 0;

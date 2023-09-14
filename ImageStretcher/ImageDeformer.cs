@@ -89,10 +89,10 @@ namespace ImageStretcher
                     int finalyresolution = topdist + downdist;
 
                     // Ensure the new position is within bounds
-                    if (newtransformx < 0 ||
-                        newtransformy < 0 ||
-                        newtransformx > resultBitmap.Width - (finalxresolution) ||
-                        newtransformy > resultBitmap.Height - (finalyresolution) ||
+                    if (newtransformx + offset.X < 0 ||
+                        newtransformy + offset.Y < 0 ||
+                        newtransformx + offset.X > resultBitmap.Width - (finalxresolution) ||
+                        newtransformy + offset.Y > resultBitmap.Height - (finalyresolution) ||
                         finalxresolution <= 0 ||
                         finalyresolution <= 0
                         )
@@ -106,7 +106,7 @@ namespace ImageStretcher
                         finalxresolution, finalyresolution,
 
                         outputData,
-                        new Rectangle(newtransformx, newtransformy, finalxresolution, finalyresolution));
+                        new Rectangle(newtransformx + offset.X, newtransformy + offset.Y, finalxresolution, finalyresolution));
                 }
             }
             Marshal.FreeHGlobal((IntPtr)xCoordinates);

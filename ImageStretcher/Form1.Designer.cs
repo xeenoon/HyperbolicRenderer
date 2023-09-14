@@ -30,30 +30,33 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             pictureBox1 = new PictureBox();
-            button1 = new Button();
-            button2 = new Button();
-            label1 = new Label();
-            textBox1 = new TextBox();
-            textBox2 = new TextBox();
-            textBox3 = new TextBox();
-            label2 = new Label();
-            label3 = new Label();
-            button3 = new Button();
-            textBox4 = new TextBox();
-            label4 = new Label();
-            button4 = new Button();
-            button5 = new Button();
-            button6 = new Button();
-            button7 = new Button();
+            importButton = new Button();
+            timeButton = new Button();
+            speedLabel = new Label();
+            speedTextbox = new TextBox();
+            periodTextbox = new TextBox();
+            amplitudeTextbox = new TextBox();
+            periodLabel = new Label();
+            amplitudeLabel = new Label();
+            benchmarkButton = new Button();
+            resolutionTextbox = new TextBox();
+            resolutionLabel = new Label();
+            exportGIFButton = new Button();
+            exportFramesButton = new Button();
+            exportMP4Button = new Button();
+            importFramesButton = new Button();
             panel1 = new Panel();
-            button8 = new Button();
-            label7 = new Label();
-            comboBox1 = new ComboBox();
-            textBox5 = new TextBox();
-            label6 = new Label();
-            label5 = new Label();
-            label8 = new Label();
-            textBox6 = new TextBox();
+            animationImportButton = new Button();
+            loopLabel = new Label();
+            looptypeDropdown = new ComboBox();
+            delayTextbox = new TextBox();
+            delayLabel = new Label();
+            animationsettingsLabel = new Label();
+            scaleLabel = new Label();
+            scaleTextbox = new TextBox();
+            offsetLabel = new Label();
+            offsetTextbox = new TextBox();
+            outputsizeButton = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             panel1.SuspendLayout();
             SuspendLayout();
@@ -69,278 +72,311 @@
             pictureBox1.TabStop = false;
             pictureBox1.Paint += pictureBox1_Paint;
             // 
-            // button1
+            // importButton
             // 
-            button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button1.Location = new Point(707, 12);
-            button1.Name = "button1";
-            button1.Size = new Size(104, 23);
-            button1.TabIndex = 1;
-            button1.Text = "Import image";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            importButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            importButton.Location = new Point(707, 12);
+            importButton.Name = "importButton";
+            importButton.Size = new Size(104, 23);
+            importButton.TabIndex = 1;
+            importButton.Text = "Import image";
+            importButton.UseVisualStyleBackColor = true;
+            importButton.Click += ImportImage;
             // 
-            // button2
+            // timeButton
             // 
-            button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button2.BackColor = Color.Lime;
-            button2.FlatAppearance.BorderSize = 0;
-            button2.FlatStyle = FlatStyle.Popup;
-            button2.Location = new Point(769, 236);
-            button2.Name = "button2";
-            button2.Size = new Size(104, 23);
-            button2.TabIndex = 2;
-            button2.Text = "Start time";
-            button2.UseVisualStyleBackColor = false;
-            button2.Click += button2_Click;
+            timeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            timeButton.BackColor = Color.Lime;
+            timeButton.FlatAppearance.BorderSize = 0;
+            timeButton.FlatStyle = FlatStyle.Popup;
+            timeButton.Location = new Point(769, 279);
+            timeButton.Name = "timeButton";
+            timeButton.Size = new Size(107, 23);
+            timeButton.TabIndex = 2;
+            timeButton.Text = "Start time";
+            timeButton.UseVisualStyleBackColor = false;
+            timeButton.Click += StartStopButton;
             // 
-            // label1
+            // speedLabel
             // 
-            label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label1.AutoSize = true;
-            label1.Location = new Point(728, 69);
-            label1.Name = "label1";
-            label1.Size = new Size(39, 15);
-            label1.TabIndex = 3;
-            label1.Text = "Speed";
+            speedLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            speedLabel.AutoSize = true;
+            speedLabel.Location = new Point(728, 69);
+            speedLabel.Name = "speedLabel";
+            speedLabel.Size = new Size(39, 15);
+            speedLabel.TabIndex = 3;
+            speedLabel.Text = "Speed";
             // 
-            // textBox1
+            // speedTextbox
             // 
-            textBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox1.Location = new Point(773, 66);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(100, 23);
-            textBox1.TabIndex = 4;
-            textBox1.Text = "1";
-            textBox1.TextChanged += textBox1_TextChanged;
+            speedTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            speedTextbox.Location = new Point(773, 66);
+            speedTextbox.Name = "speedTextbox";
+            speedTextbox.Size = new Size(100, 23);
+            speedTextbox.TabIndex = 4;
+            speedTextbox.Text = "1";
+            speedTextbox.TextChanged += MenuItemTextChanged;
             // 
-            // textBox2
+            // periodTextbox
             // 
-            textBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox2.Location = new Point(773, 97);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(100, 23);
-            textBox2.TabIndex = 5;
-            textBox2.Text = "2";
-            textBox2.TextChanged += textBox1_TextChanged;
+            periodTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            periodTextbox.Location = new Point(773, 97);
+            periodTextbox.Name = "periodTextbox";
+            periodTextbox.Size = new Size(100, 23);
+            periodTextbox.TabIndex = 5;
+            periodTextbox.Text = "2";
+            periodTextbox.TextChanged += MenuItemTextChanged;
             // 
-            // textBox3
+            // amplitudeTextbox
             // 
-            textBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox3.Location = new Point(773, 128);
-            textBox3.Name = "textBox3";
-            textBox3.Size = new Size(100, 23);
-            textBox3.TabIndex = 6;
-            textBox3.Text = "0.05";
-            textBox3.TextChanged += textBox1_TextChanged;
+            amplitudeTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            amplitudeTextbox.Location = new Point(773, 128);
+            amplitudeTextbox.Name = "amplitudeTextbox";
+            amplitudeTextbox.Size = new Size(100, 23);
+            amplitudeTextbox.TabIndex = 6;
+            amplitudeTextbox.Text = "0.05";
+            amplitudeTextbox.TextChanged += MenuItemTextChanged;
             // 
-            // label2
+            // periodLabel
             // 
-            label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label2.AutoSize = true;
-            label2.Location = new Point(726, 100);
-            label2.Name = "label2";
-            label2.Size = new Size(41, 15);
-            label2.TabIndex = 7;
-            label2.Text = "Period";
+            periodLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            periodLabel.AutoSize = true;
+            periodLabel.Location = new Point(726, 100);
+            periodLabel.Name = "periodLabel";
+            periodLabel.Size = new Size(41, 15);
+            periodLabel.TabIndex = 7;
+            periodLabel.Text = "Period";
             // 
-            // label3
+            // amplitudeLabel
             // 
-            label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label3.AutoSize = true;
-            label3.Location = new Point(704, 131);
-            label3.Name = "label3";
-            label3.Size = new Size(63, 15);
-            label3.TabIndex = 8;
-            label3.Text = "Amplitude";
+            amplitudeLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            amplitudeLabel.AutoSize = true;
+            amplitudeLabel.Location = new Point(704, 131);
+            amplitudeLabel.Name = "amplitudeLabel";
+            amplitudeLabel.Size = new Size(63, 15);
+            amplitudeLabel.TabIndex = 8;
+            amplitudeLabel.Text = "Amplitude";
             // 
-            // button3
+            // benchmarkButton
             // 
-            button3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button3.Location = new Point(769, 353);
-            button3.Name = "button3";
-            button3.Size = new Size(104, 23);
-            button3.TabIndex = 9;
-            button3.Text = "Benchmark";
-            button3.UseVisualStyleBackColor = true;
-            button3.Click += button3_Click;
+            benchmarkButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            benchmarkButton.Location = new Point(769, 396);
+            benchmarkButton.Name = "benchmarkButton";
+            benchmarkButton.Size = new Size(107, 23);
+            benchmarkButton.TabIndex = 9;
+            benchmarkButton.Text = "Benchmark";
+            benchmarkButton.UseVisualStyleBackColor = true;
+            benchmarkButton.Click += Benchmark;
             // 
-            // textBox4
+            // resolutionTextbox
             // 
-            textBox4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox4.Location = new Point(773, 190);
-            textBox4.Name = "textBox4";
-            textBox4.Size = new Size(100, 23);
-            textBox4.TabIndex = 10;
-            textBox4.Text = "1";
-            textBox4.TextChanged += textBox4_TextChanged;
+            resolutionTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            resolutionTextbox.Location = new Point(773, 190);
+            resolutionTextbox.Name = "resolutionTextbox";
+            resolutionTextbox.Size = new Size(100, 23);
+            resolutionTextbox.TabIndex = 10;
+            resolutionTextbox.Text = "1";
+            resolutionTextbox.TextChanged += MenuItemTextChanged;
             // 
-            // label4
+            // resolutionLabel
             // 
-            label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label4.AutoSize = true;
-            label4.Location = new Point(704, 193);
-            label4.Name = "label4";
-            label4.Size = new Size(63, 15);
-            label4.TabIndex = 11;
-            label4.Text = "Resolution";
+            resolutionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            resolutionLabel.AutoSize = true;
+            resolutionLabel.Location = new Point(704, 193);
+            resolutionLabel.Name = "resolutionLabel";
+            resolutionLabel.Size = new Size(63, 15);
+            resolutionLabel.TabIndex = 11;
+            resolutionLabel.Text = "Resolution";
             // 
-            // button4
+            // exportGIFButton
             // 
-            button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button4.Location = new Point(769, 266);
-            button4.Name = "button4";
-            button4.Size = new Size(104, 23);
-            button4.TabIndex = 12;
-            button4.Text = "Export GIF";
-            button4.UseVisualStyleBackColor = true;
-            button4.Click += button4_Click;
+            exportGIFButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            exportGIFButton.Location = new Point(769, 309);
+            exportGIFButton.Name = "exportGIFButton";
+            exportGIFButton.Size = new Size(107, 23);
+            exportGIFButton.TabIndex = 12;
+            exportGIFButton.Text = "Export GIF";
+            exportGIFButton.UseVisualStyleBackColor = true;
+            exportGIFButton.Click += ExportGIF;
             // 
-            // button5
+            // exportFramesButton
             // 
-            button5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button5.Location = new Point(769, 295);
-            button5.Name = "button5";
-            button5.Size = new Size(104, 23);
-            button5.TabIndex = 13;
-            button5.Text = "Export Frames";
-            button5.UseVisualStyleBackColor = true;
-            button5.Click += button5_Click;
+            exportFramesButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            exportFramesButton.Location = new Point(769, 338);
+            exportFramesButton.Name = "exportFramesButton";
+            exportFramesButton.Size = new Size(107, 23);
+            exportFramesButton.TabIndex = 13;
+            exportFramesButton.Text = "Export Frames";
+            exportFramesButton.UseVisualStyleBackColor = true;
+            exportFramesButton.Click += ExportFrames;
             // 
-            // button6
+            // exportMP4Button
             // 
-            button6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button6.Location = new Point(769, 324);
-            button6.Name = "button6";
-            button6.Size = new Size(104, 23);
-            button6.TabIndex = 14;
-            button6.Text = "Export MP4";
-            button6.UseVisualStyleBackColor = true;
-            button6.Click += button6_Click;
+            exportMP4Button.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            exportMP4Button.Location = new Point(769, 367);
+            exportMP4Button.Name = "exportMP4Button";
+            exportMP4Button.Size = new Size(107, 23);
+            exportMP4Button.TabIndex = 14;
+            exportMP4Button.Text = "Export MP4";
+            exportMP4Button.UseVisualStyleBackColor = true;
+            exportMP4Button.Click += ExportMP4;
             // 
-            // button7
+            // importFramesButton
             // 
-            button7.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button7.Location = new Point(707, 37);
-            button7.Name = "button7";
-            button7.Size = new Size(104, 23);
-            button7.TabIndex = 15;
-            button7.Text = "Import frames";
-            button7.UseVisualStyleBackColor = true;
-            button7.Click += button7_Click;
+            importFramesButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            importFramesButton.Location = new Point(707, 37);
+            importFramesButton.Name = "importFramesButton";
+            importFramesButton.Size = new Size(104, 23);
+            importFramesButton.TabIndex = 15;
+            importFramesButton.Text = "Import frames";
+            importFramesButton.UseVisualStyleBackColor = true;
+            importFramesButton.Click += ImportAnimation;
             // 
             // panel1
             // 
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panel1.Controls.Add(button8);
-            panel1.Controls.Add(label7);
-            panel1.Controls.Add(comboBox1);
-            panel1.Controls.Add(textBox5);
-            panel1.Controls.Add(label6);
-            panel1.Controls.Add(label5);
+            panel1.Controls.Add(animationImportButton);
+            panel1.Controls.Add(loopLabel);
+            panel1.Controls.Add(looptypeDropdown);
+            panel1.Controls.Add(delayTextbox);
+            panel1.Controls.Add(delayLabel);
+            panel1.Controls.Add(animationsettingsLabel);
             panel1.Location = new Point(357, 171);
             panel1.Name = "panel1";
             panel1.Size = new Size(200, 141);
             panel1.TabIndex = 16;
             panel1.Visible = false;
             // 
-            // button8
+            // animationImportButton
             // 
-            button8.Location = new Point(55, 108);
-            button8.Name = "button8";
-            button8.Size = new Size(75, 23);
-            button8.TabIndex = 5;
-            button8.Text = "Import";
-            button8.UseVisualStyleBackColor = true;
-            button8.Click += button8_Click;
+            animationImportButton.Location = new Point(55, 108);
+            animationImportButton.Name = "animationImportButton";
+            animationImportButton.Size = new Size(75, 23);
+            animationImportButton.TabIndex = 5;
+            animationImportButton.Text = "Import";
+            animationImportButton.UseVisualStyleBackColor = true;
+            animationImportButton.Click += AnimationImportClick;
             // 
-            // label7
+            // loopLabel
             // 
-            label7.AutoSize = true;
-            label7.Location = new Point(3, 78);
-            label7.Name = "label7";
-            label7.Size = new Size(78, 15);
-            label7.TabIndex = 4;
-            label7.Text = "Loop settings";
+            loopLabel.AutoSize = true;
+            loopLabel.Location = new Point(3, 78);
+            loopLabel.Name = "loopLabel";
+            loopLabel.Size = new Size(78, 15);
+            loopLabel.TabIndex = 4;
+            loopLabel.Text = "Loop settings";
             // 
-            // comboBox1
+            // looptypeDropdown
             // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Items.AddRange(new object[] { "Restart", "Reverse at end" });
-            comboBox1.Location = new Point(87, 77);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(100, 23);
-            comboBox1.TabIndex = 3;
+            looptypeDropdown.FormattingEnabled = true;
+            looptypeDropdown.Items.AddRange(new object[] { "Restart", "Reverse at end" });
+            looptypeDropdown.Location = new Point(87, 77);
+            looptypeDropdown.Name = "looptypeDropdown";
+            looptypeDropdown.Size = new Size(100, 23);
+            looptypeDropdown.TabIndex = 3;
             // 
-            // textBox5
+            // delayTextbox
             // 
-            textBox5.Location = new Point(87, 48);
-            textBox5.Name = "textBox5";
-            textBox5.Size = new Size(100, 23);
-            textBox5.TabIndex = 2;
+            delayTextbox.Location = new Point(87, 48);
+            delayTextbox.Name = "delayTextbox";
+            delayTextbox.Size = new Size(100, 23);
+            delayTextbox.TabIndex = 2;
             // 
-            // label6
+            // delayLabel
             // 
-            label6.AutoSize = true;
-            label6.Location = new Point(19, 51);
-            label6.Name = "label6";
-            label6.Size = new Size(63, 15);
-            label6.TabIndex = 1;
-            label6.Text = "Delay (ms)";
+            delayLabel.AutoSize = true;
+            delayLabel.Location = new Point(19, 51);
+            delayLabel.Name = "delayLabel";
+            delayLabel.Size = new Size(63, 15);
+            delayLabel.TabIndex = 1;
+            delayLabel.Text = "Delay (ms)";
             // 
-            // label5
+            // animationsettingsLabel
             // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
-            label5.Location = new Point(0, 9);
-            label5.Name = "label5";
-            label5.Size = new Size(200, 30);
-            label5.TabIndex = 0;
-            label5.Text = "Animation settings";
+            animationsettingsLabel.AutoSize = true;
+            animationsettingsLabel.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
+            animationsettingsLabel.Location = new Point(0, 9);
+            animationsettingsLabel.Name = "animationsettingsLabel";
+            animationsettingsLabel.Size = new Size(200, 30);
+            animationsettingsLabel.TabIndex = 0;
+            animationsettingsLabel.Text = "Animation settings";
             // 
-            // label8
+            // scaleLabel
             // 
-            label8.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label8.AutoSize = true;
-            label8.Location = new Point(733, 162);
-            label8.Name = "label8";
-            label8.Size = new Size(34, 15);
-            label8.TabIndex = 17;
-            label8.Text = "Scale";
+            scaleLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            scaleLabel.AutoSize = true;
+            scaleLabel.Location = new Point(733, 162);
+            scaleLabel.Name = "scaleLabel";
+            scaleLabel.Size = new Size(34, 15);
+            scaleLabel.TabIndex = 17;
+            scaleLabel.Text = "Scale";
             // 
-            // textBox6
+            // scaleTextbox
             // 
-            textBox6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox6.Location = new Point(773, 159);
-            textBox6.Name = "textBox6";
-            textBox6.Size = new Size(100, 23);
-            textBox6.TabIndex = 18;
-            textBox6.Text = "1";
-            textBox6.TextChanged += textBox6_TextChanged;
+            scaleTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            scaleTextbox.Location = new Point(773, 159);
+            scaleTextbox.Name = "scaleTextbox";
+            scaleTextbox.Size = new Size(100, 23);
+            scaleTextbox.TabIndex = 18;
+            scaleTextbox.Text = "1";
+            scaleTextbox.TextChanged += MenuItemTextChanged;
+            // 
+            // offsetLabel
+            // 
+            offsetLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            offsetLabel.AutoSize = true;
+            offsetLabel.Location = new Point(728, 224);
+            offsetLabel.Name = "offsetLabel";
+            offsetLabel.Size = new Size(39, 15);
+            offsetLabel.TabIndex = 19;
+            offsetLabel.Text = "Offset";
+            // 
+            // offsetTextbox
+            // 
+            offsetTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            offsetTextbox.Location = new Point(773, 221);
+            offsetTextbox.Name = "offsetTextbox";
+            offsetTextbox.Size = new Size(100, 23);
+            offsetTextbox.TabIndex = 20;
+            offsetTextbox.Text = "0,0";
+            offsetTextbox.TextChanged += MenuItemTextChanged;
+            // 
+            // outputsizeButton
+            // 
+            outputsizeButton.Location = new Point(769, 250);
+            outputsizeButton.Name = "outputsizeButton";
+            outputsizeButton.Size = new Size(107, 23);
+            outputsizeButton.TabIndex = 21;
+            outputsizeButton.Text = "Set output size";
+            outputsizeButton.UseVisualStyleBackColor = true;
+            outputsizeButton.Click += SetOuputSize;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(888, 450);
-            Controls.Add(textBox6);
-            Controls.Add(label8);
+            Controls.Add(outputsizeButton);
+            Controls.Add(offsetTextbox);
+            Controls.Add(offsetLabel);
+            Controls.Add(scaleTextbox);
+            Controls.Add(scaleLabel);
             Controls.Add(panel1);
-            Controls.Add(button7);
-            Controls.Add(button6);
-            Controls.Add(button5);
-            Controls.Add(button4);
-            Controls.Add(label4);
-            Controls.Add(textBox4);
-            Controls.Add(button3);
-            Controls.Add(label3);
-            Controls.Add(label2);
-            Controls.Add(textBox3);
-            Controls.Add(textBox2);
-            Controls.Add(textBox1);
-            Controls.Add(label1);
-            Controls.Add(button2);
-            Controls.Add(button1);
+            Controls.Add(importFramesButton);
+            Controls.Add(exportMP4Button);
+            Controls.Add(exportFramesButton);
+            Controls.Add(exportGIFButton);
+            Controls.Add(resolutionLabel);
+            Controls.Add(resolutionTextbox);
+            Controls.Add(benchmarkButton);
+            Controls.Add(amplitudeLabel);
+            Controls.Add(periodLabel);
+            Controls.Add(amplitudeTextbox);
+            Controls.Add(periodTextbox);
+            Controls.Add(speedTextbox);
+            Controls.Add(speedLabel);
+            Controls.Add(timeButton);
+            Controls.Add(importButton);
             Controls.Add(pictureBox1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Form1";
@@ -356,29 +392,32 @@
         #endregion
 
         private PictureBox pictureBox1;
-        private Button button1;
-        private Button button2;
-        private Label label1;
-        private TextBox textBox1;
-        private TextBox textBox2;
-        private TextBox textBox3;
-        private Label label2;
-        private Label label3;
-        private Button button3;
-        private TextBox textBox4;
-        private Label label4;
-        private Button button4;
-        private Button button5;
-        private Button button6;
-        private Button button7;
+        private Button importButton;
+        private Button timeButton;
+        private Label speedLabel;
+        private TextBox speedTextbox;
+        private TextBox periodTextbox;
+        private TextBox amplitudeTextbox;
+        private Label periodLabel;
+        private Label amplitudeLabel;
+        private Button benchmarkButton;
+        private TextBox resolutionTextbox;
+        private Label resolutionLabel;
+        private Button exportGIFButton;
+        private Button exportFramesButton;
+        private Button exportMP4Button;
+        private Button importFramesButton;
         private Panel panel1;
-        private Label label6;
-        private Label label5;
-        private Label label7;
-        private ComboBox comboBox1;
-        private TextBox textBox5;
-        private Button button8;
-        private Label label8;
-        private TextBox textBox6;
+        private Label delayLabel;
+        private Label animationsettingsLabel;
+        private Label loopLabel;
+        private ComboBox looptypeDropdown;
+        private TextBox delayTextbox;
+        private Button animationImportButton;
+        private Label scaleLabel;
+        private TextBox scaleTextbox;
+        private Label offsetLabel;
+        private TextBox offsetTextbox;
+        private Button outputsizeButton;
     }
 }

@@ -10,13 +10,13 @@ namespace ImageStretcher
 {
     public partial class Form1 : Form
     {
-        System.Timers.Timer timer = new System.Timers.Timer(10);
+        System.Timers.Timer UpdateTimer = new System.Timers.Timer(10);
         PointTransformer scalar;
         public Form1()
         {
             InitializeComponent();
-            timer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
-            timer.Start();
+            UpdateTimer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
+            UpdateTimer.Start();
             image = (Bitmap)pictureBox1.Image.Clone();
             scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width);
             pictureBox1.Image = null;
@@ -70,17 +70,15 @@ namespace ImageStretcher
         {
             if (image != null)
             {
-                Bitmap result = new Bitmap(image.Width, image.Height);
-                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result, resolution);
-                e.Graphics.DrawImage(result, 0, 0, image.Width * imagescale, image.Height * imagescale);
-                //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsleftarm);
-                //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobsrightarm);
-                //  e.Graphics.DrawPolygon(new Pen(Color.Orange), PointTransformer.bobshead);
+                Bitmap result = new Bitmap(image.Width + offset.X*2, image.Height + offset.Y*2);
+                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, result, resolution);
+                e.Graphics.DrawImage(result, offset.X, offset.Y, result.Width * imagescale, result.Height * imagescale);
+
                 result.Dispose();
             }
         }
         Bitmap image;
-        private void button1_Click(object sender, EventArgs e)
+        private void ImportImage(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.ShowDialog(this);
@@ -100,66 +98,100 @@ namespace ImageStretcher
         }
         bool started = false;
         double lasttime = 0;
-        private void button2_Click(object sender, EventArgs e)
+        private void StartStopButton(object sender, EventArgs e)
         {
             started = !started;
             if (started)
             {
                 scalar.time = lasttime;
-                button2.BackColor = Color.Red;
-                button2.Text = "Stop";
+                timeButton.BackColor = Color.Red;
+                timeButton.Text = "Stop";
             }
             else
             {
-                button2.BackColor = Color.FromArgb(0, 255, 0);
-                button2.Text = "Start time";
+                timeButton.BackColor = Color.FromArgb(0, 255, 0);
+                timeButton.Text = "Start time";
                 lasttime = scalar.time;
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        float imagescale = 1;
+        int resolution = 2;
+        Point offset = new Point(0, 0);
+        private void MenuItemTextChanged(object sender, EventArgs e)
         {
             float outfloat;
             switch (((Control)sender).Name)
             {
-                case "textBox1": //speed
-                    if (float.TryParse(textBox1.Text, out outfloat))
+                case "speedTextbox":
+                    if (float.TryParse(speedTextbox.Text, out outfloat))
                     {
                         scalar.speed = outfloat;
                     }
                     break;
-                case "textBox2": //period
-                    if (float.TryParse(textBox2.Text, out outfloat))
+                case "periodTextbox":
+                    if (float.TryParse(periodTextbox.Text, out outfloat))
                     {
                         if (outfloat % 1 != 0)
                         {
-                            textBox2.ForeColor = Color.Red;
+                            periodTextbox.ForeColor = Color.Red;
                         }
                         else
                         {
-                            textBox2.ForeColor = Color.Black;
+                            periodTextbox.ForeColor = Color.Black;
                         }
                         scalar.period = outfloat;
                     }
                     break;
-                case "textBox3": //amplitude
-                    if (float.TryParse(textBox3.Text, out outfloat))
+                case "amplitudeTextbox":
+                    if (float.TryParse(amplitudeTextbox.Text, out outfloat))
                     {
                         if (outfloat > 0.3f)
                         {
-                            textBox3.ForeColor = Color.Red;
+                            amplitudeTextbox.ForeColor = Color.Red;
                         }
                         else
                         {
-                            textBox3.ForeColor = Color.Black;
+                            amplitudeTextbox.ForeColor = Color.Black;
                         }
                         scalar.amplitude = outfloat;
                     }
                     break;
+                case "scaleTextbox":
+                    float newscale;
+                    if (float.TryParse(scaleTextbox.Text, out newscale))
+                    {
+                        imagescale = newscale;
+                    }
+                    break;
+                case "resolutionTextbox":
+                    float tempresolution;
+                    if (float.TryParse(resolutionTextbox.Text, out tempresolution))
+                    {
+                        if (tempresolution > 1 || tempresolution == 0)
+                        {
+                            resolutionTextbox.ForeColor = Color.Red;
+                        }
+                        else
+                        {
+                            resolutionTextbox.ForeColor = Color.Black;
+                            resolution = (int)(2 / tempresolution);
+                        }
+                    }
+                    break;
+                case "offsetTextbox":
+                    if (offsetTextbox.Text.Contains(','))
+                    {
+                        int.TryParse(offsetTextbox.Text.Split(',')[0], out int x);
+                        int.TryParse(offsetTextbox.Text.Split(',')[1], out int y);
+
+                        offset.X = x;
+                        offset.Y = y;
+                    }
+                    break;
             }
         }
-
-        private void button3_Click(object sender, EventArgs e)
+        private void Benchmark(object sender, EventArgs e)
         {
             Stopwatch s = new Stopwatch();
             s.Start();
@@ -171,8 +203,7 @@ namespace ImageStretcher
             s.Stop();
             MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
         }
-
-        private void button4_Click(object sender, EventArgs e)
+        private void ExportGIF(object sender, EventArgs e)
         {
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
             scalar.period = this.scalar.period;
@@ -216,8 +247,7 @@ namespace ImageStretcher
             // Return an empty string if the user cancels the dialog
             return string.Empty;
         }
-
-        private void button5_Click(object sender, EventArgs e)
+        private void ExportFrames(object sender, EventArgs e)
         {
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
             scalar.period = this.scalar.period;
@@ -232,15 +262,14 @@ namespace ImageStretcher
                 for (int i = 0; i < frames; ++i)
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
-                    GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, GIFbitmaps[i]);
+                    GIFbitmaps[i] = new Bitmap(image.Width + offset.X * 2, image.Height + offset.Y * 2);
+                    ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, GIFbitmaps[i]);
                     GIFbitmaps[i].Save(path + @"\" + i.ToString() + ".png");
                 }
                 MessageBox.Show("Finished exporting");
             }
         }
-
-        private void button6_Click(object sender, EventArgs e)
+        private void ExportMP4(object sender, EventArgs e)
         {
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
             scalar.period = this.scalar.period;
@@ -269,7 +298,6 @@ namespace ImageStretcher
                 MessageBox.Show("Finished exporting");
             }
         }
-
         public bool CreateVideo(List<Bitmap> bitmaps, string outputFile, double fps)
         {
             int width = 640;
@@ -297,7 +325,7 @@ namespace ImageStretcher
             return true;
         }
         Bitmap[] frames;
-        private void button7_Click(object sender, EventArgs e)
+        private void ImportAnimation(object sender, EventArgs e)
         {
             string folder = SelectFolder();
             if (folder != "")
@@ -323,50 +351,27 @@ namespace ImageStretcher
         int delay;
         bool restartanimation;
         bool animating;
-        private void button8_Click(object sender, EventArgs e)
+        private void AnimationImportClick(object sender, EventArgs e)
         {
-            if (!int.TryParse(textBox5.Text, out delay))
+            if (!int.TryParse(delayTextbox.Text, out delay))
             {
                 MessageBox.Show("Invalid FPS");
             }
             else
             {
-                textBox5.Text = "";
-                restartanimation = comboBox1.SelectedIndex == 0;
+                delayTextbox.Text = "";
+                restartanimation = looptypeDropdown.SelectedIndex == 0;
                 panel1.Visible = false;
                 animating = true;
             }
         }
-
         private void Form1_Load(object sender, EventArgs e)
         {
 
         }
-        float imagescale = 1;
-        private void textBox6_TextChanged(object sender, EventArgs e)
+        private void SetOuputSize(object sender, EventArgs e)
         {
-            float newscale;
-            if (float.TryParse(textBox6.Text, out newscale))
-            {
-                imagescale = newscale;
-            }
-        }
-        int resolution = 2;
-        private void textBox4_TextChanged(object sender, EventArgs e)
-        {
-            float tempresolution;
-            if (float.TryParse(textBox4.Text, out tempresolution))
-            {
-                if (tempresolution > 1 || tempresolution == 0)
-                {
-                    textBox4.ForeColor = Color.Red;
-                }
-                else
-                {
-                    textBox4.ForeColor = Color.Black;
-                    resolution = (int)(2 / tempresolution);
-                }
-            }
+
         }
     }
 }

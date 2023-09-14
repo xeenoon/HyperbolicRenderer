@@ -45,7 +45,8 @@
             exportFramesButton = new Button();
             exportMP4Button = new Button();
             importFramesButton = new Button();
-            panel1 = new Panel();
+            ImportSettingsPanel = new Panel();
+            importSettingsCloseButton = new PictureBox();
             animationImportButton = new Button();
             loopLabel = new Label();
             looptypeDropdown = new ComboBox();
@@ -57,8 +58,17 @@
             offsetLabel = new Label();
             offsetTextbox = new TextBox();
             outputsizeButton = new Button();
+            ExportPanelSettings = new Panel();
+            exportSettingsCloseButton = new PictureBox();
+            finalExportButton = new Button();
+            framenameTextbox = new TextBox();
+            framenameLabel = new Label();
+            ExportSettingsTitleLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
-            panel1.SuspendLayout();
+            ImportSettingsPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
+            ExportPanelSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).BeginInit();
             SuspendLayout();
             // 
             // pictureBox1
@@ -208,7 +218,7 @@
             exportFramesButton.TabIndex = 13;
             exportFramesButton.Text = "Export Frames";
             exportFramesButton.UseVisualStyleBackColor = true;
-            exportFramesButton.Click += ExportFrames;
+            exportFramesButton.Click += ExportFramesClick;
             // 
             // exportMP4Button
             // 
@@ -232,20 +242,33 @@
             importFramesButton.UseVisualStyleBackColor = true;
             importFramesButton.Click += ImportAnimation;
             // 
-            // panel1
+            // ImportSettingsPanel
             // 
-            panel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panel1.Controls.Add(animationImportButton);
-            panel1.Controls.Add(loopLabel);
-            panel1.Controls.Add(looptypeDropdown);
-            panel1.Controls.Add(delayTextbox);
-            panel1.Controls.Add(delayLabel);
-            panel1.Controls.Add(animationsettingsLabel);
-            panel1.Location = new Point(357, 171);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(200, 141);
-            panel1.TabIndex = 16;
-            panel1.Visible = false;
+            ImportSettingsPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ImportSettingsPanel.BackColor = SystemColors.ActiveCaption;
+            ImportSettingsPanel.Controls.Add(importSettingsCloseButton);
+            ImportSettingsPanel.Controls.Add(animationImportButton);
+            ImportSettingsPanel.Controls.Add(loopLabel);
+            ImportSettingsPanel.Controls.Add(looptypeDropdown);
+            ImportSettingsPanel.Controls.Add(delayTextbox);
+            ImportSettingsPanel.Controls.Add(delayLabel);
+            ImportSettingsPanel.Controls.Add(animationsettingsLabel);
+            ImportSettingsPanel.Location = new Point(357, 155);
+            ImportSettingsPanel.Name = "ImportSettingsPanel";
+            ImportSettingsPanel.Size = new Size(200, 141);
+            ImportSettingsPanel.TabIndex = 16;
+            ImportSettingsPanel.Visible = false;
+            // 
+            // importSettingsCloseButton
+            // 
+            importSettingsCloseButton.Image = (Image)resources.GetObject("importSettingsCloseButton.Image");
+            importSettingsCloseButton.Location = new Point(177, 2);
+            importSettingsCloseButton.Name = "importSettingsCloseButton";
+            importSettingsCloseButton.Size = new Size(20, 20);
+            importSettingsCloseButton.SizeMode = PictureBoxSizeMode.StretchImage;
+            importSettingsCloseButton.TabIndex = 24;
+            importSettingsCloseButton.TabStop = false;
+            importSettingsCloseButton.Click += importSettingsCloseButton_Click;
             // 
             // animationImportButton
             // 
@@ -294,12 +317,12 @@
             // animationsettingsLabel
             // 
             animationsettingsLabel.AutoSize = true;
-            animationsettingsLabel.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
-            animationsettingsLabel.Location = new Point(0, 9);
+            animationsettingsLabel.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            animationsettingsLabel.Location = new Point(26, 9);
             animationsettingsLabel.Name = "animationsettingsLabel";
-            animationsettingsLabel.Size = new Size(200, 30);
+            animationsettingsLabel.Size = new Size(149, 25);
             animationsettingsLabel.TabIndex = 0;
-            animationsettingsLabel.Text = "Animation settings";
+            animationsettingsLabel.Text = "Import settings";
             // 
             // scaleLabel
             // 
@@ -351,17 +374,79 @@
             outputsizeButton.UseVisualStyleBackColor = true;
             outputsizeButton.Click += SetOuputSize;
             // 
+            // ExportPanelSettings
+            // 
+            ExportPanelSettings.BackColor = SystemColors.ActiveCaption;
+            ExportPanelSettings.Controls.Add(exportSettingsCloseButton);
+            ExportPanelSettings.Controls.Add(finalExportButton);
+            ExportPanelSettings.Controls.Add(framenameTextbox);
+            ExportPanelSettings.Controls.Add(framenameLabel);
+            ExportPanelSettings.Controls.Add(ExportSettingsTitleLabel);
+            ExportPanelSettings.Location = new Point(357, 171);
+            ExportPanelSettings.Name = "ExportPanelSettings";
+            ExportPanelSettings.Size = new Size(200, 100);
+            ExportPanelSettings.TabIndex = 22;
+            ExportPanelSettings.Visible = false;
+            // 
+            // exportSettingsCloseButton
+            // 
+            exportSettingsCloseButton.Image = (Image)resources.GetObject("exportSettingsCloseButton.Image");
+            exportSettingsCloseButton.Location = new Point(177, 3);
+            exportSettingsCloseButton.Name = "exportSettingsCloseButton";
+            exportSettingsCloseButton.Size = new Size(20, 20);
+            exportSettingsCloseButton.SizeMode = PictureBoxSizeMode.StretchImage;
+            exportSettingsCloseButton.TabIndex = 23;
+            exportSettingsCloseButton.TabStop = false;
+            exportSettingsCloseButton.Click += exportSettingsCloseButton_Click;
+            // 
+            // finalExportButton
+            // 
+            finalExportButton.Location = new Point(55, 68);
+            finalExportButton.Name = "finalExportButton";
+            finalExportButton.Size = new Size(75, 23);
+            finalExportButton.TabIndex = 3;
+            finalExportButton.Text = "Export";
+            finalExportButton.UseVisualStyleBackColor = true;
+            finalExportButton.Click += finalExportButton_Click;
+            // 
+            // framenameTextbox
+            // 
+            framenameTextbox.Location = new Point(87, 39);
+            framenameTextbox.Name = "framenameTextbox";
+            framenameTextbox.Size = new Size(100, 23);
+            framenameTextbox.TabIndex = 2;
+            // 
+            // framenameLabel
+            // 
+            framenameLabel.AutoSize = true;
+            framenameLabel.Location = new Point(6, 42);
+            framenameLabel.Name = "framenameLabel";
+            framenameLabel.Size = new Size(78, 15);
+            framenameLabel.TabIndex = 1;
+            framenameLabel.Text = "Frame names";
+            // 
+            // ExportSettingsTitleLabel
+            // 
+            ExportSettingsTitleLabel.AutoSize = true;
+            ExportSettingsTitleLabel.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            ExportSettingsTitleLabel.Location = new Point(29, 9);
+            ExportSettingsTitleLabel.Name = "ExportSettingsTitleLabel";
+            ExportSettingsTitleLabel.Size = new Size(147, 25);
+            ExportSettingsTitleLabel.TabIndex = 0;
+            ExportSettingsTitleLabel.Text = "Export settings";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(888, 450);
+            Controls.Add(ExportPanelSettings);
             Controls.Add(outputsizeButton);
             Controls.Add(offsetTextbox);
             Controls.Add(offsetLabel);
+            Controls.Add(ImportSettingsPanel);
             Controls.Add(scaleTextbox);
             Controls.Add(scaleLabel);
-            Controls.Add(panel1);
             Controls.Add(importFramesButton);
             Controls.Add(exportMP4Button);
             Controls.Add(exportFramesButton);
@@ -383,8 +468,12 @@
             Text = "Jello Machine";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
+            ImportSettingsPanel.ResumeLayout(false);
+            ImportSettingsPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).EndInit();
+            ExportPanelSettings.ResumeLayout(false);
+            ExportPanelSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -407,7 +496,7 @@
         private Button exportFramesButton;
         private Button exportMP4Button;
         private Button importFramesButton;
-        private Panel panel1;
+        private Panel ImportSettingsPanel;
         private Label delayLabel;
         private Label animationsettingsLabel;
         private Label loopLabel;
@@ -419,5 +508,12 @@
         private Label offsetLabel;
         private TextBox offsetTextbox;
         private Button outputsizeButton;
+        private Panel ExportPanelSettings;
+        private Button finalExportButton;
+        private TextBox framenameTextbox;
+        private Label framenameLabel;
+        private Label ExportSettingsTitleLabel;
+        private PictureBox exportSettingsCloseButton;
+        private PictureBox importSettingsCloseButton;
     }
 }

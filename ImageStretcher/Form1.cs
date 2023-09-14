@@ -70,7 +70,7 @@ namespace ImageStretcher
         {
             if (image != null)
             {
-                Bitmap result = new Bitmap(image.Width + offset.X*2, image.Height + offset.Y*2);
+                Bitmap result = new Bitmap(image.Width + offset.X * 2, image.Height + offset.Y * 2);
                 ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, result, resolution);
                 e.Graphics.DrawImage(result, offset.X, offset.Y, result.Width * imagescale, result.Height * imagescale);
 
@@ -247,7 +247,11 @@ namespace ImageStretcher
             // Return an empty string if the user cancels the dialog
             return string.Empty;
         }
-        private void ExportFrames(object sender, EventArgs e)
+        private void ExportFramesClick(object sender, EventArgs e)
+        {
+            ExportPanelSettings.Visible = true;
+        }
+        private void ExportFrames()
         {
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
             scalar.period = this.scalar.period;
@@ -264,7 +268,7 @@ namespace ImageStretcher
                     scalar.time += ((2 * Math.PI) / (31.4f));
                     GIFbitmaps[i] = new Bitmap(image.Width + offset.X * 2, image.Height + offset.Y * 2);
                     ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, GIFbitmaps[i]);
-                    GIFbitmaps[i].Save(path + @"\" + i.ToString() + ".png");
+                    GIFbitmaps[i].Save(string.Format("{0}\\{1}_{2}.png", path, animationname, i));
                 }
                 MessageBox.Show("Finished exporting");
             }
@@ -345,7 +349,7 @@ namespace ImageStretcher
                 }
                 frames = animationframes.OrderBy(a => a.Key).Select(a => a.Value).ToArray();
 
-                panel1.Visible = true; //Show the menu
+                ImportSettingsPanel.Visible = true; //Show the menu
             }
         }
         int delay;
@@ -361,7 +365,7 @@ namespace ImageStretcher
             {
                 delayTextbox.Text = "";
                 restartanimation = looptypeDropdown.SelectedIndex == 0;
-                panel1.Visible = false;
+                ImportSettingsPanel.Visible = false;
                 animating = true;
             }
         }
@@ -372,6 +376,25 @@ namespace ImageStretcher
         private void SetOuputSize(object sender, EventArgs e)
         {
 
+        }
+
+        string animationname;
+        private void finalExportButton_Click(object sender, EventArgs e)
+        {
+            animationname = framenameTextbox.Text;
+            ExportFrames();
+            framenameTextbox.Text = "";
+            ExportPanelSettings.Visible = false;
+        }
+
+        private void exportSettingsCloseButton_Click(object sender, EventArgs e)
+        {
+            ExportPanelSettings.Visible = false;
+        }
+
+        private void importSettingsCloseButton_Click(object sender, EventArgs e)
+        {
+            ImportSettingsPanel.Visible = false;
         }
     }
 }

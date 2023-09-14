@@ -72,8 +72,6 @@ namespace ImageStretcher
         {
             if (image != null)
             {
-
-
                 Bitmap result = new Bitmap(image.Width + offset.X * 2, image.Height + offset.Y * 2);
                 ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, result, resolution);
 
@@ -81,13 +79,17 @@ namespace ImageStretcher
 
                 foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
                 {
-                    if (polygon.Count >= 3)
+                    PointF[] offsetpolygon = new PointF[polygon.Count];
+                    for (int i = 0; i < polygon.Count; i++)
                     {
-                        e.Graphics.DrawPolygon(new Pen(Color.Black), polygon.ToArray());
+                        PointF point = polygon[i];
+                        PointF offsetedpoint = new PointF(point.X + offset.X, point.Y + offset.Y);
+                        e.Graphics.FillEllipse(new Pen(Color.Blue).Brush, new Rectangle((int)(offsetedpoint.X - 2), (int)(offsetedpoint.Y - 2), 4, 4));
+                        offsetpolygon[i] = offsetedpoint;
                     }
-                    foreach (var point in polygon)
+                    if (offsetpolygon.Count() >= 3)
                     {
-                        e.Graphics.FillEllipse(new Pen(Color.Blue).Brush, new Rectangle((int)(point.X - 2), (int)(point.Y - 2), 4, 4));
+                        e.Graphics.DrawPolygon(new Pen(Color.Black), offsetpolygon.ToArray());
                     }
                 }
 
@@ -203,17 +205,6 @@ namespace ImageStretcher
                     {
                         int.TryParse(offsetTextbox.Text.Split(',')[0], out int x);
                         int.TryParse(offsetTextbox.Text.Split(',')[1], out int y);
-
-                        foreach (var menuitem in menu.menuItems)
-                        {
-                            for (int i = 0; i < menuitem.polygonpoints.Count; ++i)
-                            {
-                                PointF old = menuitem.polygonpoints[i];
-                                //Remove the old offset
-                                //Add the new offset
-                                menuitem.polygonpoints[i] = new PointF((old.X - offset.X) + x, (old.Y - offset.Y) + y);
-                            }
-                        }
 
                         offset.X = x;
                         offset.Y = y;

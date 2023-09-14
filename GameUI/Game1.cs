@@ -1,5 +1,4 @@
-﻿using HyperbolicRenderer;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct3D9;
@@ -74,7 +73,6 @@ namespace GameUI
         public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
         public static Game1 game;
-        public static Map map;
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -86,24 +84,16 @@ namespace GameUI
 
             enemyship_texture = Content.Load<Texture2D>("enemyship");
 
-            EyeEnemy.frames[0] = Content.Load<Texture2D>("bosseyeframe_1" );
-            EyeEnemy.frames[1] = Content.Load<Texture2D>("bosseyeframe_2" );
-            EyeEnemy.frames[2] = Content.Load<Texture2D>("bosseyeframe_3" );
-            EyeEnemy.frames[3] = Content.Load<Texture2D>("bosseyeframe_4" );
-            EyeEnemy.frames[4] = Content.Load<Texture2D>("bosseyeframe_5" );
-            EyeEnemy.frames[5] = Content.Load<Texture2D>("bosseyeframe_6" );
-            EyeEnemy.frames[6] = Content.Load<Texture2D>("bosseyeframe_7" );
-            EyeEnemy.frames[7] = Content.Load<Texture2D>("bosseyeframe_8" );
-            EyeEnemy.frames[8] = Content.Load<Texture2D>("bosseyeframe_9" );
-            EyeEnemy.frames[9] = Content.Load<Texture2D>("bosseyeframe_10");
+            for (int i = 0; i < 10; ++i)
+            {
+                EyeEnemy.frames[i] = Content.Load<Texture2D>("Bosseyeframes\\eyeframe_" + i.ToString());
+            }
+            for (int i = 0; i < 33; ++i)
+            {
+                Asteroid.lavatextures[i] = Content.Load<Texture2D>("LavarockFrames\\lavarock_" + i.ToString());
+            }
 
             player = new PlayerShip(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
-
-            int mapsize = (int)(height / 2);
-            Map.extracells = 100;
-            map = new Map(4, mapsize, new System.Drawing.PointF(width/2,0));
-            map.GenerateVolume(0.769f, 0, 0, false);
-            map.BakeHeights(10);
         }
 
         protected override void UnloadContent()
@@ -140,18 +130,6 @@ namespace GameUI
             rendertime += s.ElapsedMilliseconds;
 
             base.Draw(gameTime);
-        }
-        public static Vector2 AdjustFunc(Vector2 input, Vector2 offset)
-        {
-            float offsetx = width / 4;
-
-            Vector2 newinput = new Vector2(input.X + offset.X + offsetx, input.Y + offset.Y);
-            Vector2 output = map.StretchPoint(new System.Drawing.PointF(newinput.X, newinput.Y)).ToVector2();
-            output.X -= offsetx;
-            output.X -= offset.X;
-            output.Y -= offset.Y;
-
-            return new Vector2((int)output.X, (int)output.Y);
         }
         internal void Reset()
         {

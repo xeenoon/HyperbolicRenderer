@@ -8,7 +8,12 @@ using System.Windows.Forms;
 
 namespace ImageStretcher
 {
-    internal class PolygonMenuItem
+    public enum StretchType
+    {
+        Jello,
+        Rotate
+    }
+    public class PolygonMenuItem
     {
         public const int BG_HEIGHT = 30;
         public static string[] transformoptions = new string[2] { "Jello", "Rotate" };
@@ -19,6 +24,15 @@ namespace ImageStretcher
         PictureBox visiblebutton = new PictureBox();
         PictureBox closebutton = new PictureBox();
         PolygonMenu menu;
+        public StretchType stretchType
+        {
+            get
+            {
+                string selected = transformoptions[dropdown.SelectedIndex];
+                return Enum.Parse<StretchType>(selected);
+                //return StretchType.Parse(StretchType,);
+            }
+        }
 
         public List<PointF> polygonpoints;
         Func<bool> Paint;
@@ -92,7 +106,7 @@ namespace ImageStretcher
             polygonpoints.AddRange(temp);
         }
     }
-    internal class PolygonMenu
+    public class PolygonMenu
     {
         Panel background;
         Button addbutton;

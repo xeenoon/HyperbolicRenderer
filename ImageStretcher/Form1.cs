@@ -19,10 +19,10 @@ namespace ImageStretcher
             UpdateTimer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
             UpdateTimer.Start();
             image = (Bitmap)pictureBox1.Image.Clone();
-            scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width);
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
             menu = new PolygonMenu(polygonMenu, addPolygonButton);
+            scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu);
         }
         double lastlooptime;
         int frameidx = 0;
@@ -110,7 +110,7 @@ namespace ImageStretcher
                     animating = false;
                     var temp = (Bitmap)Image.FromFile(name);
                     image = temp.Clone(new Rectangle(0, 0, temp.Width, temp.Height), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                    scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width);
+                    scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu);
                     pictureBox1.Invalidate();
                 }
             }
@@ -232,7 +232,7 @@ namespace ImageStretcher
         }
         private void ExportGIF(object sender, EventArgs e)
         {
-            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
+            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
             scalar.period = this.scalar.period;
             scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
@@ -280,7 +280,7 @@ namespace ImageStretcher
         }
         private void ExportFrames()
         {
-            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
+            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
             scalar.period = this.scalar.period;
             scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
@@ -302,7 +302,7 @@ namespace ImageStretcher
         }
         private void ExportMP4(object sender, EventArgs e)
         {
-            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, false);
+            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
             scalar.period = this.scalar.period;
             scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
@@ -439,6 +439,8 @@ namespace ImageStretcher
             if (menu.selecteditem != null)
             {
                 Point clickpos = pictureBox1.PointToClient(Cursor.Position);
+                clickpos.X -= offset.X;
+                clickpos.Y -= offset.Y;
                 if (ModifierKeys == Keys.Shift)
                 {
                     PointF closestpoint;

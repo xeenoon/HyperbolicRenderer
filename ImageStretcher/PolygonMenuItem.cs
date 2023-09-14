@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace ImageStretcher
             background.Controls.Add(dropdown);
             background.Controls.Add(visiblebutton);
             background.Controls.Add(closebutton);
+            background.Click += new EventHandler(Select);
 
             polygonlabel.Location = new Point(3, 6);
             polygonlabel.Text = "Unnamed";
@@ -67,11 +69,16 @@ namespace ImageStretcher
                 visiblebutton.Image = Resources.InvisibleIcon;
             }
         }
+        public void Select(object sender, EventArgs e)
+        {
+            menu.SelectItem(this);
+        }
     }
     internal class PolygonMenu
     {
         Panel background;
         Button addbutton;
+        PolygonMenuItem selecteditem;
         public List<PolygonMenuItem> menuItems = new List<PolygonMenuItem>();
 
         public PolygonMenu(Panel background, Button addbutton)
@@ -79,7 +86,20 @@ namespace ImageStretcher
             this.background = background;
             this.addbutton = addbutton;
         }
-
+        public void SelectItem(PolygonMenuItem polygonMenuItem)
+        {
+            if (selecteditem != null)
+            {
+                selecteditem.background.BackColor = Color.White;
+                if (polygonMenuItem == selecteditem)
+                {
+                    selecteditem = null;
+                    return;
+                }
+            }
+            polygonMenuItem.background.BackColor = Color.LightGray;
+            selecteditem = polygonMenuItem;
+        }
         public void AddItem(PolygonMenuItem menuItem)
         {
             menuItems.Add(menuItem);

@@ -442,6 +442,7 @@
             // 
             // polygonMenu
             // 
+            polygonMenu.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             polygonMenu.AutoScroll = true;
             polygonMenu.BackColor = SystemColors.Control;
             polygonMenu.BorderStyle = BorderStyle.FixedSingle;

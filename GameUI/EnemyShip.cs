@@ -32,7 +32,7 @@ namespace GameUI
             {
                 disappear = true;
             }
-            if (tag == "ASTEROID")
+            if (tag.Contains("ASTEROID"))
             {
                 disappear = true;
             }

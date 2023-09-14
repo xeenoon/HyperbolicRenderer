@@ -1,13 +1,12 @@
-﻿using HyperbolicRenderer;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct2D1.Effects;
-using SharpDX.Direct3D9;
+using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace GameUI
 {
@@ -16,6 +15,7 @@ namespace GameUI
         Large,
         Medium,
         Small,
+        Lava,
     }
     public class Asteroid : Sprite
     {
@@ -25,7 +25,8 @@ namespace GameUI
         double rotationspeed;
         public bool disappear;
         public Collider collider;
-        //public MoveableShape graphicalcollider;
+        public static Texture2D[] lavatextures = new Texture2D[33];
+        AsteroidType asteroidType;
 
         //Centre -83, -75
         public static Vector2[] largecolliderpoints  = new Vector2[55] { new Vector2(-8, 71), new Vector2(2, 68), new Vector2(11, 59), new Vector2(20, 52), new Vector2(30, 45), new Vector2(40, 41), new Vector2(49, 32), new Vector2(58, 23), new Vector2(61, 13), new Vector2(63, 3), new Vector2(72, -7), new Vector2(78, -17), new Vector2(77, -27), new Vector2(72, -37), new Vector2(73, -47), new Vector2(82, -55), new Vector2(75, -65), new Vector2(67, -71), new Vector2(60, -73), new Vector2(53, -75), new Vector2(44, -75), new Vector2(34, -75), new Vector2(26, -74), new Vector2(19, -73), new Vector2(11, -71), new Vector2(3, -68), new Vector2(-5, -65), new Vector2(-12, -61), new Vector2(-19, -57), new Vector2(-25, -54), new Vector2(-31, -49), new Vector2(-38, -44), new Vector2(-43, -40), new Vector2(-48, -34), new Vector2(-53, -29), new Vector2(-56, -22), new Vector2(-61, -16), new Vector2(-69, -10), new Vector2(-72, -5), new Vector2(-76, 3), new Vector2(-77, 10), new Vector2(-78, 15), new Vector2(-78, 22), new Vector2(-79, 30), new Vector2(-81, 37), new Vector2(-83, 43), new Vector2(-82, 52), new Vector2(-78, 59), new Vector2(-73, 66), new Vector2(-68, 72), new Vector2(-58, 72), new Vector2(-48, 67), new Vector2(-38, 65), new Vector2(-30, 67), new Vector2(-23, 70), }.Reverse().ToArray();
@@ -40,24 +41,30 @@ namespace GameUI
             this.speed = speed;
             this.direction = direction;
             //rotation = GameManager.RandomFloat(0, 50);
-            rotationspeed = GameManager.RandomFloat(0, 5);
-
+            this.asteroidType = asteroidType;
             Vector2[] colliderpoints = Array.Empty<Vector2>();
             switch (asteroidType)
             {
                 case AsteroidType.Large:
                     colliderpoints = largecolliderpoints;
+                    rotationspeed = GameManager.RandomFloat(1, 2);
                     break;
                 case AsteroidType.Medium:
+                    rotationspeed = GameManager.RandomFloat(1, 3);
                     colliderpoints = mediumcolliderpoints;
                     break;
                 case AsteroidType.Small:
+                    rotationspeed = GameManager.RandomFloat(1, 5);
                     colliderpoints = smallcolliderpoints;
+                    break;
+                case AsteroidType.Lava:
+                    rotationspeed = GameManager.RandomDouble();
+                    colliderpoints = lavacolliderpoints; // TODO dynamic collider
                     break;
             }
 
             //graphicalcollider = Game1.game.batcher.AddMoveableShape(colliderpoints.Copy().ToArray(), Color.White, Vector2.Zero);
-            collider = new Collider(colliderpoints, OnCollision, pos, "ASTEROID");
+            collider = new Collider(colliderpoints, OnCollision, pos, "ASTEROID_"+asteroidType.ToString());
             //graphicalcollider.Move(position);
         }
         public bool OnCollision(string tag)
@@ -68,21 +75,42 @@ namespace GameUI
                 //graphicalcollider.color = Color.Red;
                 return true;
             }
-            if (tag.Contains("BULLET"))
+            if (tag.Contains("BULLET") && asteroidType != AsteroidType.Lava)
             {
                 disappear = true;
                 return true;
             }
-            if (tag == "EYEENEMY")
+            if (tag == "EYEENEMY" && asteroidType != AsteroidType.Lava)
             {
                 disappear = true;
                 return true;
             }
             return false;
         }
+        double lasttime = Game1.game.totalseconds;
+        double timebetweenframes;
+        int framedrawidx = 0;
+        bool framedirection = true;
         public override void Draw()
         {
-            Game1.game.spriteBatch.Draw(texture, position, null, Color.White, (float)rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 1);
+            if (asteroidType == AsteroidType.Lava)
+            {
+                timebetweenframes += Game1.game.drawlooptime;
+                if (timebetweenframes > 0.05f) //Change frames every second
+                {
+                    ++framedrawidx;
+                    if (framedrawidx >= lavatextures.Count())
+                    {
+                        framedrawidx = 0;
+                    }
+                    timebetweenframes = 0;
+                }
+                Game1.game.spriteBatch.Draw(lavatextures[framedrawidx], position, null, Color.White, (float)rotation, new Vector2(lavatextures[framedrawidx].Width / 2, lavatextures[framedrawidx].Height / 2), 1f, SpriteEffects.None, 1);
+            }
+            else
+            {
+                Game1.game.spriteBatch.Draw(texture, position, null, Color.White, (float)rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 1);
+            }
         }
         public void Update()
         {
@@ -142,17 +170,21 @@ namespace GameUI
             }
 
             double randomsize = GameManager.RandomDouble();
-            if (randomsize > 0.7)
+            if (randomsize > 0.66)
             {
                Game1.asteroids.Add(new Asteroid(Game1.large_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(200, 500), AsteroidType.Large));
             }
-            else if (randomsize > 0.3)
+            else if (randomsize > 0.33)
             {
                Game1.asteroids.Add(new Asteroid(Game1.medium_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(400, 800), AsteroidType.Medium));
             }
-            else
+            else if(randomsize > 0.05)
             {
                Game1.asteroids.Add(new Asteroid(Game1.small_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(600, 1000), AsteroidType.Small));
+            }
+            else
+            {
+                Game1.asteroids.Add(new Asteroid(Game1.small_asteroidtexture, startposition, new Vector(xdirection, ydirection).GetUnitVector(), GameManager.RandomFloat(50, 100), AsteroidType.Lava));
             }
         }
     }

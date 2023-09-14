@@ -186,6 +186,13 @@ namespace GameUI
             {
                 disappear = true;
             }
+            if (tag.Contains("ASTEROID"))
+            {
+                if (tag == "ASTEROID_Lava")
+                {
+                    disappear = true;
+                }
+            }
             return false;
         }
 

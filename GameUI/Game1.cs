@@ -88,6 +88,10 @@ namespace GameUI
             {
                 EyeEnemy.frames[i] = Content.Load<Texture2D>("Bosseyeframes\\eyeframe_" + i.ToString());
             }
+            for (int i = 0; i < 33; ++i)
+            {
+                Asteroid.lavatextures[i] = Content.Load<Texture2D>("LavarockFrames\\lavarock_" + i.ToString());
+            }
 
             player = new PlayerShip(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
         }

@@ -1,5 +1,4 @@
-﻿using HyperbolicRenderer;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
@@ -32,6 +31,14 @@ namespace GameUI
             {
                 GameManager.Stop();
                 return true;
+            }
+            if (tag == "ASTEROID_Lava")
+            {
+                disappear = true;
+            }
+            if (tag.Contains("BULLET"))
+            {
+                disappear = true;
             }
             return false;
         }

@@ -55,6 +55,20 @@ namespace ImageStretcher
                                 return MakeJello(input);
                             case StretchType.Rotate:
                                 return Rotate(input);
+                            case StretchType.Horizontal:
+                                double maxy = menuItem.polygonpoints.Max(p => p.Y);
+                                maxy -= centre.Y;
+
+                                double miny = menuItem.polygonpoints.Min(p => p.Y);
+                                miny -= centre.Y;
+                                return HorizontalWave(input, maxy, miny);
+                            case StretchType.Vertical:
+                                double maxx = menuItem.polygonpoints.Max(p => p.X);
+                                maxx -= centre.X;
+
+                                double minx = menuItem.polygonpoints.Min(p => p.X);
+                                minx -= centre.X;
+                                return VerticalWave(input, maxx, minx);
                         }
                     }
                 }
@@ -106,15 +120,48 @@ namespace ImageStretcher
 
             return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
         }
-        public static PointF[] bobshead = new PointF[21] { new PointF(28, 3), new PointF(87, 7), new PointF(158, 7), new PointF(277, 7), new PointF(324, 14), new PointF(238, 170), new PointF(210, 188), new PointF(197, 212), new PointF(170, 221), new PointF(137, 219), new PointF(112, 199), new PointF(93, 183), new PointF(86, 178), new PointF(82, 173), new PointF(83, 165), new PointF(85, 158), new PointF(77, 149), new PointF(74, 137), new PointF(72, 132), new PointF(64, 121), new PointF(61, 99), };
-        public Point VerticalWave(Point input)
+        public Point HorizontalWave(Point input, double highestpoint, double lowestpoint)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
-            const double lowestpoint = 100;
-            double bottomdist = Math.Pow(Math.Max((lowestpoint - adjustedpoint.Y), 0), 2) / 100;
+            double edgedistance;
+            double halfway = (highestpoint + lowestpoint) / 2;
+            if (adjustedpoint.Y > halfway)
+            {
+                //Stretch slower upwards
+                edgedistance = Math.Pow(Math.Max((highestpoint - adjustedpoint.Y), 0), 2) / 100f;
+            }
+            else
+            {
+                //Stretch slower downwards
+                edgedistance = Math.Pow(Math.Max((adjustedpoint.Y - lowestpoint), 0), 2) / 100f;
+            }
 
-            adjustedpoint.X += (float)(Math.Sin(time * speed) * amplitude * bottomdist + 1 + amplitude);
+            adjustedpoint.X += (float)(Math.Sin(time * speed) * amplitude * edgedistance + 1 + amplitude);
+
+            adjustedpoint.X += centre.X;
+            adjustedpoint.Y += centre.Y;
+
+            return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
+        }
+        public Point VerticalWave(Point input, double highestpoint, double lowestpoint)
+        {
+            PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
+
+            double edgedistance;
+            double halfway = (highestpoint + lowestpoint) / 2;
+            if (adjustedpoint.X > halfway)
+            {
+                //Stretch slower upwards
+                edgedistance = Math.Pow(Math.Max((highestpoint - adjustedpoint.X), 0), 2) / 100f;
+            }
+            else
+            {
+                //Stretch slower downwards
+                edgedistance = Math.Pow(Math.Max((adjustedpoint.X - lowestpoint), 0), 2) / 100f;
+            }
+
+            adjustedpoint.Y += (float)(Math.Sin(time * speed) * amplitude * edgedistance + 1 + amplitude);
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;

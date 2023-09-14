@@ -11,12 +11,14 @@ namespace ImageStretcher
     public enum StretchType
     {
         Jello,
-        Rotate
+        Rotate,
+        Horizontal,
+        Vertical,
     }
     public class PolygonMenuItem
     {
         public const int BG_HEIGHT = 30;
-        public static string[] transformoptions = new string[2] { "Jello", "Rotate" };
+        public static string[] transformoptions = new string[4] { "Jello", "Rotate", "Horizontal", "Vertical" };
 
         public Panel background = new Panel() { Size = new Size(300, BG_HEIGHT), BackColor = Color.White, BorderStyle = BorderStyle.FixedSingle };
         Label polygonlabel = new Label();
@@ -55,6 +57,7 @@ namespace ImageStretcher
             dropdown.Location = new Point(95, 2);
             dropdown.Items.AddRange(transformoptions);
             dropdown.SelectedIndex = 0;
+            dropdown.DropDownStyle = ComboBoxStyle.DropDownList;
             
             visiblebutton.Location = new Point(225, 3);
             visiblebutton.Size = new Size(40, 20);

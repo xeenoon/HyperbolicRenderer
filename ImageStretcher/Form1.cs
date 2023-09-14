@@ -12,6 +12,7 @@ namespace ImageStretcher
     {
         System.Timers.Timer UpdateTimer = new System.Timers.Timer(10);
         PointTransformer scalar;
+        PolygonMenu menu;
         public Form1()
         {
             InitializeComponent();
@@ -21,6 +22,7 @@ namespace ImageStretcher
             scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width);
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
+            menu = new PolygonMenu(polygonMenu, addPolygonButton);
         }
         double lastlooptime;
         int frameidx = 0;
@@ -399,25 +401,8 @@ namespace ImageStretcher
 
         private void addPolygonButton_Click(object sender, EventArgs e)
         {
-            Panel background = new Panel() { Size = new Size(300, 30), BackColor = Color.White, BorderStyle = BorderStyle.FixedSingle };
-            Label polygonlabel = new Label();
-            ComboBox dropdown = new ComboBox();
-            PictureBox visiblebutton = new PictureBox();
-            PictureBox closebutton = new PictureBox();
-            background.Controls.Add(polygonlabel);
-            background.Controls.Add(dropdown);
-            background.Controls.Add(visiblebutton);
-            background.Controls.Add(closebutton);
-            polygonlabel.Location = new Point(3, 6);
-            polygonlabel.Text = "Polygon Name";
-            dropdown.Location = new Point(95, 2);
-            visiblebutton.Location = new Point(40, 20);
-            visiblebutton.Image = Resources.VisibleIcon;
-            closebutton.Location = new Point(274, 3);
-            closebutton.Image = Resources.CloseButtonIcon;
-
-            polygonMenu.Controls.Add(background);
-            background.Location = new Point(0,0);
+            new PolygonMenuItem(menu);
+            polygonMenu.ScrollControlIntoView(addPolygonButton);
         }
     }
 }

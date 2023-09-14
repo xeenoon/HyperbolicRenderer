@@ -66,20 +66,12 @@
             ExportSettingsTitleLabel = new Label();
             polygonMenu = new Panel();
             addPolygonButton = new Button();
-            panel2 = new Panel();
-            pictureBox3 = new PictureBox();
-            pictureBox2 = new PictureBox();
-            comboBox1 = new ComboBox();
-            label1 = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ImportSettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
             ExportPanelSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).BeginInit();
             polygonMenu.SuspendLayout();
-            panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             SuspendLayout();
             // 
             // pictureBox1
@@ -450,73 +442,24 @@
             // 
             // polygonMenu
             // 
+            polygonMenu.AutoScroll = true;
             polygonMenu.BackColor = SystemColors.Control;
+            polygonMenu.BorderStyle = BorderStyle.FixedSingle;
             polygonMenu.Controls.Add(addPolygonButton);
-            polygonMenu.Controls.Add(panel2);
-            polygonMenu.Location = new Point(720, 238);
+            polygonMenu.Location = new Point(709, 238);
             polygonMenu.Name = "polygonMenu";
-            polygonMenu.Size = new Size(300, 252);
+            polygonMenu.Size = new Size(325, 265);
             polygonMenu.TabIndex = 24;
             // 
             // addPolygonButton
             // 
-            addPolygonButton.Location = new Point(3, 33);
+            addPolygonButton.Location = new Point(3, 3);
             addPolygonButton.Name = "addPolygonButton";
             addPolygonButton.Size = new Size(99, 23);
             addPolygonButton.TabIndex = 1;
             addPolygonButton.Text = "Add polygon";
             addPolygonButton.UseVisualStyleBackColor = true;
             addPolygonButton.Click += addPolygonButton_Click;
-            // 
-            // panel2
-            // 
-            panel2.BackColor = Color.White;
-            panel2.BorderStyle = BorderStyle.FixedSingle;
-            panel2.Controls.Add(pictureBox3);
-            panel2.Controls.Add(pictureBox2);
-            panel2.Controls.Add(comboBox1);
-            panel2.Controls.Add(label1);
-            panel2.Location = new Point(0, 0);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(300, 30);
-            panel2.TabIndex = 0;
-            // 
-            // pictureBox3
-            // 
-            pictureBox3.Image = (Image)resources.GetObject("pictureBox3.Image");
-            pictureBox3.Location = new Point(228, 3);
-            pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(40, 20);
-            pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage;
-            pictureBox3.TabIndex = 1;
-            pictureBox3.TabStop = false;
-            // 
-            // pictureBox2
-            // 
-            pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
-            pictureBox2.Location = new Point(274, 3);
-            pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(20, 20);
-            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
-            pictureBox2.TabIndex = 24;
-            pictureBox2.TabStop = false;
-            // 
-            // comboBox1
-            // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(95, 2);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(127, 23);
-            comboBox1.TabIndex = 1;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(3, 6);
-            label1.Name = "label1";
-            label1.Size = new Size(86, 15);
-            label1.TabIndex = 0;
-            label1.Text = "Polygon Name";
             // 
             // Form1
             // 
@@ -559,10 +502,6 @@
             ExportPanelSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).EndInit();
             polygonMenu.ResumeLayout(false);
-            panel2.ResumeLayout(false);
-            panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -605,11 +544,6 @@
         private PictureBox exportSettingsCloseButton;
         private PictureBox importSettingsCloseButton;
         private Panel polygonMenu;
-        private Panel panel2;
-        private Label label1;
-        private ComboBox comboBox1;
-        private PictureBox pictureBox2;
-        private PictureBox pictureBox3;
         private Button addPolygonButton;
     }
 }

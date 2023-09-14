@@ -396,5 +396,28 @@ namespace ImageStretcher
         {
             ImportSettingsPanel.Visible = false;
         }
+
+        private void addPolygonButton_Click(object sender, EventArgs e)
+        {
+            Panel background = new Panel() { Size = new Size(300, 30), BackColor = Color.White, BorderStyle = BorderStyle.FixedSingle };
+            Label polygonlabel = new Label();
+            ComboBox dropdown = new ComboBox();
+            PictureBox visiblebutton = new PictureBox();
+            PictureBox closebutton = new PictureBox();
+            background.Controls.Add(polygonlabel);
+            background.Controls.Add(dropdown);
+            background.Controls.Add(visiblebutton);
+            background.Controls.Add(closebutton);
+            polygonlabel.Location = new Point(3, 6);
+            polygonlabel.Text = "Polygon Name";
+            dropdown.Location = new Point(95, 2);
+            visiblebutton.Location = new Point(40, 20);
+            visiblebutton.Image = Resources.VisibleIcon;
+            closebutton.Location = new Point(274, 3);
+            closebutton.Image = Resources.CloseButtonIcon;
+
+            polygonMenu.Controls.Add(background);
+            background.Location = new Point(0,0);
+        }
     }
 }

@@ -64,11 +64,22 @@
             framenameTextbox = new TextBox();
             framenameLabel = new Label();
             ExportSettingsTitleLabel = new Label();
+            polygonMenu = new Panel();
+            addPolygonButton = new Button();
+            panel2 = new Panel();
+            pictureBox3 = new PictureBox();
+            pictureBox2 = new PictureBox();
+            comboBox1 = new ComboBox();
+            label1 = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ImportSettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
             ExportPanelSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).BeginInit();
+            polygonMenu.SuspendLayout();
+            panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             SuspendLayout();
             // 
             // pictureBox1
@@ -77,7 +88,7 @@
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
             pictureBox1.Location = new Point(12, 12);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(668, 426);
+            pictureBox1.Size = new Size(691, 491);
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             pictureBox1.Paint += pictureBox1_Paint;
@@ -85,7 +96,7 @@
             // importButton
             // 
             importButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            importButton.Location = new Point(707, 12);
+            importButton.Location = new Point(816, 15);
             importButton.Name = "importButton";
             importButton.Size = new Size(104, 23);
             importButton.TabIndex = 1;
@@ -99,7 +110,7 @@
             timeButton.BackColor = Color.Lime;
             timeButton.FlatAppearance.BorderSize = 0;
             timeButton.FlatStyle = FlatStyle.Popup;
-            timeButton.Location = new Point(769, 279);
+            timeButton.Location = new Point(927, 199);
             timeButton.Name = "timeButton";
             timeButton.Size = new Size(107, 23);
             timeButton.TabIndex = 2;
@@ -111,7 +122,7 @@
             // 
             speedLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             speedLabel.AutoSize = true;
-            speedLabel.Location = new Point(728, 69);
+            speedLabel.Location = new Point(773, 47);
             speedLabel.Name = "speedLabel";
             speedLabel.Size = new Size(39, 15);
             speedLabel.TabIndex = 3;
@@ -120,7 +131,7 @@
             // speedTextbox
             // 
             speedTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            speedTextbox.Location = new Point(773, 66);
+            speedTextbox.Location = new Point(818, 44);
             speedTextbox.Name = "speedTextbox";
             speedTextbox.Size = new Size(100, 23);
             speedTextbox.TabIndex = 4;
@@ -130,7 +141,7 @@
             // periodTextbox
             // 
             periodTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            periodTextbox.Location = new Point(773, 97);
+            periodTextbox.Location = new Point(818, 75);
             periodTextbox.Name = "periodTextbox";
             periodTextbox.Size = new Size(100, 23);
             periodTextbox.TabIndex = 5;
@@ -140,7 +151,7 @@
             // amplitudeTextbox
             // 
             amplitudeTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            amplitudeTextbox.Location = new Point(773, 128);
+            amplitudeTextbox.Location = new Point(818, 106);
             amplitudeTextbox.Name = "amplitudeTextbox";
             amplitudeTextbox.Size = new Size(100, 23);
             amplitudeTextbox.TabIndex = 6;
@@ -151,7 +162,7 @@
             // 
             periodLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             periodLabel.AutoSize = true;
-            periodLabel.Location = new Point(726, 100);
+            periodLabel.Location = new Point(771, 78);
             periodLabel.Name = "periodLabel";
             periodLabel.Size = new Size(41, 15);
             periodLabel.TabIndex = 7;
@@ -161,7 +172,7 @@
             // 
             amplitudeLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             amplitudeLabel.AutoSize = true;
-            amplitudeLabel.Location = new Point(704, 131);
+            amplitudeLabel.Location = new Point(749, 109);
             amplitudeLabel.Name = "amplitudeLabel";
             amplitudeLabel.Size = new Size(63, 15);
             amplitudeLabel.TabIndex = 8;
@@ -170,7 +181,7 @@
             // benchmarkButton
             // 
             benchmarkButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            benchmarkButton.Location = new Point(769, 396);
+            benchmarkButton.Location = new Point(926, 168);
             benchmarkButton.Name = "benchmarkButton";
             benchmarkButton.Size = new Size(107, 23);
             benchmarkButton.TabIndex = 9;
@@ -181,7 +192,7 @@
             // resolutionTextbox
             // 
             resolutionTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            resolutionTextbox.Location = new Point(773, 190);
+            resolutionTextbox.Location = new Point(818, 168);
             resolutionTextbox.Name = "resolutionTextbox";
             resolutionTextbox.Size = new Size(100, 23);
             resolutionTextbox.TabIndex = 10;
@@ -192,7 +203,7 @@
             // 
             resolutionLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             resolutionLabel.AutoSize = true;
-            resolutionLabel.Location = new Point(704, 193);
+            resolutionLabel.Location = new Point(749, 171);
             resolutionLabel.Name = "resolutionLabel";
             resolutionLabel.Size = new Size(63, 15);
             resolutionLabel.TabIndex = 11;
@@ -201,7 +212,7 @@
             // exportGIFButton
             // 
             exportGIFButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            exportGIFButton.Location = new Point(769, 309);
+            exportGIFButton.Location = new Point(927, 74);
             exportGIFButton.Name = "exportGIFButton";
             exportGIFButton.Size = new Size(107, 23);
             exportGIFButton.TabIndex = 12;
@@ -212,7 +223,7 @@
             // exportFramesButton
             // 
             exportFramesButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            exportFramesButton.Location = new Point(769, 338);
+            exportFramesButton.Location = new Point(927, 105);
             exportFramesButton.Name = "exportFramesButton";
             exportFramesButton.Size = new Size(107, 23);
             exportFramesButton.TabIndex = 13;
@@ -223,7 +234,7 @@
             // exportMP4Button
             // 
             exportMP4Button.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            exportMP4Button.Location = new Point(769, 367);
+            exportMP4Button.Location = new Point(927, 136);
             exportMP4Button.Name = "exportMP4Button";
             exportMP4Button.Size = new Size(107, 23);
             exportMP4Button.TabIndex = 14;
@@ -234,7 +245,7 @@
             // importFramesButton
             // 
             importFramesButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            importFramesButton.Location = new Point(707, 37);
+            importFramesButton.Location = new Point(926, 15);
             importFramesButton.Name = "importFramesButton";
             importFramesButton.Size = new Size(104, 23);
             importFramesButton.TabIndex = 15;
@@ -244,7 +255,7 @@
             // 
             // ImportSettingsPanel
             // 
-            ImportSettingsPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ImportSettingsPanel.Anchor = AnchorStyles.None;
             ImportSettingsPanel.BackColor = SystemColors.ActiveCaption;
             ImportSettingsPanel.Controls.Add(importSettingsCloseButton);
             ImportSettingsPanel.Controls.Add(animationImportButton);
@@ -253,9 +264,9 @@
             ImportSettingsPanel.Controls.Add(delayTextbox);
             ImportSettingsPanel.Controls.Add(delayLabel);
             ImportSettingsPanel.Controls.Add(animationsettingsLabel);
-            ImportSettingsPanel.Location = new Point(357, 155);
+            ImportSettingsPanel.Location = new Point(424, 187);
             ImportSettingsPanel.Name = "ImportSettingsPanel";
-            ImportSettingsPanel.Size = new Size(200, 141);
+            ImportSettingsPanel.Size = new Size(213, 141);
             ImportSettingsPanel.TabIndex = 16;
             ImportSettingsPanel.Visible = false;
             // 
@@ -328,7 +339,7 @@
             // 
             scaleLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             scaleLabel.AutoSize = true;
-            scaleLabel.Location = new Point(733, 162);
+            scaleLabel.Location = new Point(778, 140);
             scaleLabel.Name = "scaleLabel";
             scaleLabel.Size = new Size(34, 15);
             scaleLabel.TabIndex = 17;
@@ -337,7 +348,7 @@
             // scaleTextbox
             // 
             scaleTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            scaleTextbox.Location = new Point(773, 159);
+            scaleTextbox.Location = new Point(818, 137);
             scaleTextbox.Name = "scaleTextbox";
             scaleTextbox.Size = new Size(100, 23);
             scaleTextbox.TabIndex = 18;
@@ -348,7 +359,7 @@
             // 
             offsetLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             offsetLabel.AutoSize = true;
-            offsetLabel.Location = new Point(728, 224);
+            offsetLabel.Location = new Point(773, 202);
             offsetLabel.Name = "offsetLabel";
             offsetLabel.Size = new Size(39, 15);
             offsetLabel.TabIndex = 19;
@@ -357,7 +368,7 @@
             // offsetTextbox
             // 
             offsetTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            offsetTextbox.Location = new Point(773, 221);
+            offsetTextbox.Location = new Point(818, 199);
             offsetTextbox.Name = "offsetTextbox";
             offsetTextbox.Size = new Size(100, 23);
             offsetTextbox.TabIndex = 20;
@@ -366,7 +377,8 @@
             // 
             // outputsizeButton
             // 
-            outputsizeButton.Location = new Point(769, 250);
+            outputsizeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            outputsizeButton.Location = new Point(924, 43);
             outputsizeButton.Name = "outputsizeButton";
             outputsizeButton.Size = new Size(107, 23);
             outputsizeButton.TabIndex = 21;
@@ -376,15 +388,16 @@
             // 
             // ExportPanelSettings
             // 
+            ExportPanelSettings.Anchor = AnchorStyles.None;
             ExportPanelSettings.BackColor = SystemColors.ActiveCaption;
             ExportPanelSettings.Controls.Add(exportSettingsCloseButton);
             ExportPanelSettings.Controls.Add(finalExportButton);
             ExportPanelSettings.Controls.Add(framenameTextbox);
             ExportPanelSettings.Controls.Add(framenameLabel);
             ExportPanelSettings.Controls.Add(ExportSettingsTitleLabel);
-            ExportPanelSettings.Location = new Point(357, 171);
+            ExportPanelSettings.Location = new Point(424, 203);
             ExportPanelSettings.Name = "ExportPanelSettings";
-            ExportPanelSettings.Size = new Size(200, 100);
+            ExportPanelSettings.Size = new Size(213, 100);
             ExportPanelSettings.TabIndex = 22;
             ExportPanelSettings.Visible = false;
             // 
@@ -435,11 +448,82 @@
             ExportSettingsTitleLabel.TabIndex = 0;
             ExportSettingsTitleLabel.Text = "Export settings";
             // 
+            // polygonMenu
+            // 
+            polygonMenu.BackColor = SystemColors.Control;
+            polygonMenu.Controls.Add(addPolygonButton);
+            polygonMenu.Controls.Add(panel2);
+            polygonMenu.Location = new Point(720, 238);
+            polygonMenu.Name = "polygonMenu";
+            polygonMenu.Size = new Size(300, 252);
+            polygonMenu.TabIndex = 24;
+            // 
+            // addPolygonButton
+            // 
+            addPolygonButton.Location = new Point(3, 33);
+            addPolygonButton.Name = "addPolygonButton";
+            addPolygonButton.Size = new Size(99, 23);
+            addPolygonButton.TabIndex = 1;
+            addPolygonButton.Text = "Add polygon";
+            addPolygonButton.UseVisualStyleBackColor = true;
+            addPolygonButton.Click += addPolygonButton_Click;
+            // 
+            // panel2
+            // 
+            panel2.BackColor = Color.White;
+            panel2.BorderStyle = BorderStyle.FixedSingle;
+            panel2.Controls.Add(pictureBox3);
+            panel2.Controls.Add(pictureBox2);
+            panel2.Controls.Add(comboBox1);
+            panel2.Controls.Add(label1);
+            panel2.Location = new Point(0, 0);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(300, 30);
+            panel2.TabIndex = 0;
+            // 
+            // pictureBox3
+            // 
+            pictureBox3.Image = (Image)resources.GetObject("pictureBox3.Image");
+            pictureBox3.Location = new Point(228, 3);
+            pictureBox3.Name = "pictureBox3";
+            pictureBox3.Size = new Size(40, 20);
+            pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox3.TabIndex = 1;
+            pictureBox3.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
+            pictureBox2.Location = new Point(274, 3);
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.Size = new Size(20, 20);
+            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox2.TabIndex = 24;
+            pictureBox2.TabStop = false;
+            // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(95, 2);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(127, 23);
+            comboBox1.TabIndex = 1;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(3, 6);
+            label1.Name = "label1";
+            label1.Size = new Size(86, 15);
+            label1.TabIndex = 0;
+            label1.Text = "Polygon Name";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(888, 450);
+            ClientSize = new Size(1035, 515);
+            Controls.Add(polygonMenu);
             Controls.Add(ExportPanelSettings);
             Controls.Add(outputsizeButton);
             Controls.Add(offsetTextbox);
@@ -474,6 +558,11 @@
             ExportPanelSettings.ResumeLayout(false);
             ExportPanelSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).EndInit();
+            polygonMenu.ResumeLayout(false);
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -515,5 +604,12 @@
         private Label ExportSettingsTitleLabel;
         private PictureBox exportSettingsCloseButton;
         private PictureBox importSettingsCloseButton;
+        private Panel polygonMenu;
+        private Panel panel2;
+        private Label label1;
+        private ComboBox comboBox1;
+        private PictureBox pictureBox2;
+        private PictureBox pictureBox3;
+        private Button addPolygonButton;
     }
 }

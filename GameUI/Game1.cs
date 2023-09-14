@@ -1,5 +1,4 @@
-﻿using HyperbolicRenderer;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct3D9;
@@ -74,7 +73,6 @@ namespace GameUI
         public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
         public static Game1 game;
-        public static Map map;
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -92,12 +90,6 @@ namespace GameUI
             }
 
             player = new PlayerShip(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
-
-            int mapsize = (int)(height / 2);
-            Map.extracells = 100;
-            map = new Map(4, mapsize, new System.Drawing.PointF(width/2,0));
-            map.GenerateVolume(0.769f, 0, 0, false);
-            map.BakeHeights(10);
         }
 
         protected override void UnloadContent()
@@ -134,18 +126,6 @@ namespace GameUI
             rendertime += s.ElapsedMilliseconds;
 
             base.Draw(gameTime);
-        }
-        public static Vector2 AdjustFunc(Vector2 input, Vector2 offset)
-        {
-            float offsetx = width / 4;
-
-            Vector2 newinput = new Vector2(input.X + offset.X + offsetx, input.Y + offset.Y);
-            Vector2 output = map.StretchPoint(new System.Drawing.PointF(newinput.X, newinput.Y)).ToVector2();
-            output.X -= offsetx;
-            output.X -= offset.X;
-            output.Y -= offset.Y;
-
-            return new Vector2((int)output.X, (int)output.Y);
         }
         internal void Reset()
         {

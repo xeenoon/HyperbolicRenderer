@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
-namespace HyperbolicRenderer
+namespace GameUI
 {
     public class Vector
     {
@@ -46,7 +45,7 @@ namespace HyperbolicRenderer
 
         public static Vector operator *(Vector a, double s)
         {
-             return new Vector(a.i * s, a.j * s);
+            return new Vector(a.i * s, a.j * s);
         }
         public static Vector operator /(Vector a, double s)
         {
@@ -80,7 +79,7 @@ namespace HyperbolicRenderer
             //AB = A + t(b-a)
 
             //b_minus_a = i, j
-            
+
             //r = (a+ct)i + (b+dt)j
 
             //a+ct = x
@@ -185,7 +184,7 @@ namespace HyperbolicRenderer
         }
         public double SubstituteY(double y)
         {
-            return (-b*c + a*d + c*y) / d;
+            return (-b * c + a * d + c * y) / d;
         }
     }
 }

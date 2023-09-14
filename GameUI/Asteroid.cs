@@ -25,7 +25,6 @@ namespace GameUI
         double rotationspeed;
         public bool disappear;
         public Collider collider;
-        ImageDeformer deformer;
         //public MoveableShape graphicalcollider;
 
         //Centre -83, -75
@@ -34,6 +33,8 @@ namespace GameUI
         public static Vector2[] mediumcolliderpoints = new Vector2[19]{ new Vector2(3,24),new Vector2(-4,20),new Vector2(-10,15),new Vector2(-17,13),new Vector2(-23,10),new Vector2(-30,4),new Vector2(-32,-5),new Vector2(-31,-10),new Vector2(-24,-17),new Vector2(-19,-23),new Vector2(-13,-25),new Vector2(-5,-25),new Vector2(3,-22),new Vector2(10,-20),new Vector2(17,-17),new Vector2(24,-9),new Vector2(30,1),new Vector2(31,11),new Vector2(21,20),};
         //Centre -16,-14
         public static Vector2[] smallcolliderpoints = new Vector2[10] { new Vector2(0, 13), new Vector2(-9, 12), new Vector2(-15, 8), new Vector2(-16, -1), new Vector2(-12, -10), new Vector2(-5, -14), new Vector2(5, -13), new Vector2(12, -9), new Vector2(15, 1), new Vector2(10, 11), };
+        //Centre -118,-108
+        public static Vector2[] lavacolliderpoints = new Vector2[32] { new Vector2(20, -107), new Vector2(-2, -107), new Vector2(-19, -106), new Vector2(-32, -102), new Vector2(-52, -95), new Vector2(-61, -76), new Vector2(-75, -72), new Vector2(-86, -54), new Vector2(-102, -31), new Vector2(-116, -19), new Vector2(-118, -4), new Vector2(-105, 25), new Vector2(-89, 47), new Vector2(-95, 64), new Vector2(-70, 85), new Vector2(-68, 99), new Vector2(-29, 104), new Vector2(-12, 96), new Vector2(11, 102), new Vector2(39, 96), new Vector2(53, 78), new Vector2(73, 63), new Vector2(94, 46), new Vector2(98, 26), new Vector2(108, 20), new Vector2(107, 6), new Vector2(116, -4), new Vector2(106, -31), new Vector2(108, -55), new Vector2(101, -68), new Vector2(78, -87), new Vector2(44, -99), };
         public Asteroid(Texture2D tex, Vector2 pos, Vector direction, double speed, AsteroidType asteroidType) : base(tex, pos)
         {
             this.speed = speed;

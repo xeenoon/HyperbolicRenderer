@@ -138,11 +138,7 @@ namespace GameUI
         {
             if (!disappear)
             {
-                var deformer = new ImageDeformer(texture);
-                Texture2D final = new Texture2D(Game1.game.GraphicsDevice, texture.Width * 4, texture.Height * 4);
-                Color[] colors = deformer.DeformImageToPolygon(Game1.AdjustFunc, texture.Width * 4, texture.Height * 4, position);
-                final.SetData(colors);
-                Game1.game.spriteBatch.Draw(final, position, null, Color.White, (float)rotation, new Vector2(final.Width / 2, final.Width / 2), 1f, SpriteEffects.None, 1);
+                Game1.game.spriteBatch.Draw(texture, position, null, Color.White, (float)rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 1);
             }
             else
             {

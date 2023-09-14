@@ -86,16 +86,10 @@ namespace GameUI
 
             enemyship_texture = Content.Load<Texture2D>("enemyship");
 
-            EyeEnemy.frames[0] = Content.Load<Texture2D>("bosseyeframe_1" );
-            EyeEnemy.frames[1] = Content.Load<Texture2D>("bosseyeframe_2" );
-            EyeEnemy.frames[2] = Content.Load<Texture2D>("bosseyeframe_3" );
-            EyeEnemy.frames[3] = Content.Load<Texture2D>("bosseyeframe_4" );
-            EyeEnemy.frames[4] = Content.Load<Texture2D>("bosseyeframe_5" );
-            EyeEnemy.frames[5] = Content.Load<Texture2D>("bosseyeframe_6" );
-            EyeEnemy.frames[6] = Content.Load<Texture2D>("bosseyeframe_7" );
-            EyeEnemy.frames[7] = Content.Load<Texture2D>("bosseyeframe_8" );
-            EyeEnemy.frames[8] = Content.Load<Texture2D>("bosseyeframe_9" );
-            EyeEnemy.frames[9] = Content.Load<Texture2D>("bosseyeframe_10");
+            for (int i = 0; i < 10; ++i)
+            {
+                EyeEnemy.frames[i] = Content.Load<Texture2D>("Bosseyeframes\\eyeframe_" + i.ToString());
+            }
 
             player = new PlayerShip(Game1.game.Content.Load<Texture2D>("Shipmodel"), new Vector2(width / 2, height / 2));
 

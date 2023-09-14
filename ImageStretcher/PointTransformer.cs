@@ -20,6 +20,7 @@ namespace ImageStretcher
         public PointTransformer(PointF centre, int width, bool usetimer = true)
         {
             this.centre = centre;
+            Pause();
             if (usetimer)
             {
                 timer.Interval = 100;
@@ -31,7 +32,7 @@ namespace ImageStretcher
         }
         public void Update(object sender, System.Timers.ElapsedEventArgs e)
         {
-            time += 0.5f;
+            time += increment;
         }
         public Point TransformPoint(Point input)
         {
@@ -108,6 +109,16 @@ namespace ImageStretcher
             adjustedpoint.Y += centre.Y;
 
             return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
+        }
+        double increment = 0.5;
+        internal void Pause()
+        {
+            increment = 0;
+        }
+
+        internal void Restart()
+        {
+            increment = 0.5f;
         }
     }
 }

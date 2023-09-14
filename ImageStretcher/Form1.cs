@@ -72,9 +72,24 @@ namespace ImageStretcher
         {
             if (image != null)
             {
+
+
                 Bitmap result = new Bitmap(image.Width + offset.X * 2, image.Height + offset.Y * 2);
                 ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, result, resolution);
-                e.Graphics.DrawImage(result, offset.X, offset.Y, result.Width * imagescale, result.Height * imagescale);
+
+                e.Graphics.DrawImage(result, 0, 0, result.Width * imagescale, result.Height * imagescale);
+
+                foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
+                {
+                    if (polygon.Count >= 3)
+                    {
+                        e.Graphics.DrawPolygon(new Pen(Color.Black), polygon.ToArray());
+                    }
+                    foreach (var point in polygon)
+                    {
+                        e.Graphics.FillEllipse(new Pen(Color.Blue).Brush, new Rectangle((int)(point.X - 2), (int)(point.Y - 2), 4, 4));
+                    }
+                }
 
                 result.Dispose();
             }
@@ -108,12 +123,14 @@ namespace ImageStretcher
                 scalar.time = lasttime;
                 timeButton.BackColor = Color.Red;
                 timeButton.Text = "Stop";
+                scalar.Restart();
             }
             else
             {
                 timeButton.BackColor = Color.FromArgb(0, 255, 0);
                 timeButton.Text = "Start time";
                 lasttime = scalar.time;
+                scalar.Pause();
             }
         }
 
@@ -187,11 +204,28 @@ namespace ImageStretcher
                         int.TryParse(offsetTextbox.Text.Split(',')[0], out int x);
                         int.TryParse(offsetTextbox.Text.Split(',')[1], out int y);
 
+                        foreach (var menuitem in menu.menuItems)
+                        {
+                            for (int i = 0; i < menuitem.polygonpoints.Count; ++i)
+                            {
+                                PointF old = menuitem.polygonpoints[i];
+                                //Remove the old offset
+                                //Add the new offset
+                                menuitem.polygonpoints[i] = new PointF((old.X - offset.X) + x, (old.Y - offset.Y) + y);
+                            }
+                        }
+
                         offset.X = x;
                         offset.Y = y;
                     }
                     break;
             }
+            pictureBox1.Invalidate();
+        }
+        private void Restart(object sender, EventArgs e)
+        {
+            scalar.time = 0;
+            pictureBox1.Invalidate();
         }
         private void Benchmark(object sender, EventArgs e)
         {
@@ -377,7 +411,7 @@ namespace ImageStretcher
         }
         private void SetOuputSize(object sender, EventArgs e)
         {
-
+            //TODO allow for user dragging to set output size
         }
 
         string animationname;
@@ -401,8 +435,34 @@ namespace ImageStretcher
 
         private void addPolygonButton_Click(object sender, EventArgs e)
         {
-            new PolygonMenuItem(menu);
+            new PolygonMenuItem(menu, Repaint);
             polygonMenu.ScrollControlIntoView(addPolygonButton);
+        }
+        bool Repaint()
+        {
+            pictureBox1.Invalidate();
+            return false;
+        }
+        private void AddPoint(object sender, EventArgs e)
+        {
+            if (menu.selecteditem != null)
+            {
+                Point clickpos = pictureBox1.PointToClient(Cursor.Position);
+                if (ModifierKeys == Keys.Shift)
+                {
+                    PointF closestpoint;
+                    if (menu.selecteditem.polygonpoints.Any(m => m.DistanceTo(clickpos) < 4))
+                    {
+                        closestpoint = menu.selecteditem.polygonpoints.Where(m => m.DistanceTo(clickpos) < 4).FirstOrDefault();
+                        menu.selecteditem.polygonpoints.Remove(closestpoint);
+                    }
+                }
+                else
+                {
+                    menu.selecteditem.AddPoint(clickpos);
+                }
+                pictureBox1.Invalidate();
+            }
         }
     }
 }

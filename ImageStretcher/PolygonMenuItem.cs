@@ -4,6 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ImageStretcher
 {
@@ -18,9 +19,15 @@ namespace ImageStretcher
         PictureBox visiblebutton = new PictureBox();
         PictureBox closebutton = new PictureBox();
         PolygonMenu menu;
-        public PolygonMenuItem(PolygonMenu menu)
+
+        public List<PointF> polygonpoints;
+        Func<bool> Paint;
+        public PolygonMenuItem(PolygonMenu menu, Func<bool> PaintFunc)
         {
+            this.Paint = PaintFunc;
             this.menu = menu;
+            polygonpoints = new List<PointF>();
+
             background.Controls.Add(polygonlabel);
             background.Controls.Add(dropdown);
             background.Controls.Add(visiblebutton);
@@ -54,13 +61,14 @@ namespace ImageStretcher
         public void Delete(object sender, EventArgs e)
         {
             menu.RemoveItem(this);
+            Paint();
         }
 
-        bool visible = true;
+        public bool visiblepolygon = true;
         public void ChangeVisibility(object sender, EventArgs e)
         {
-            visible = !visible;
-            if (visible)
+            visiblepolygon = !visiblepolygon;
+            if (visiblepolygon)
             {
                 visiblebutton.Image = Resources.VisibleIcon;
             }
@@ -68,17 +76,27 @@ namespace ImageStretcher
             {
                 visiblebutton.Image = Resources.InvisibleIcon;
             }
+            Paint();
         }
         public void Select(object sender, EventArgs e)
         {
             menu.SelectItem(this);
+        }
+
+        internal void AddPoint(Point clickpos)
+        {
+            polygonpoints.Add(clickpos);
+            List<PointF> temp = new List<PointF>();
+            PointManager.GrahamsAlgorithm(polygonpoints[0], polygonpoints, ref temp);
+            polygonpoints.Clear();
+            polygonpoints.AddRange(temp);
         }
     }
     internal class PolygonMenu
     {
         Panel background;
         Button addbutton;
-        PolygonMenuItem selecteditem;
+        public PolygonMenuItem selecteditem;
         public List<PolygonMenuItem> menuItems = new List<PolygonMenuItem>();
 
         public PolygonMenu(Panel background, Button addbutton)

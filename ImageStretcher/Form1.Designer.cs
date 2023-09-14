@@ -38,7 +38,7 @@
             amplitudeTextbox = new TextBox();
             periodLabel = new Label();
             amplitudeLabel = new Label();
-            benchmarkButton = new Button();
+            restartButton = new Button();
             resolutionTextbox = new TextBox();
             resolutionLabel = new Label();
             exportGIFButton = new Button();
@@ -78,11 +78,12 @@
             // 
             pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(12, 12);
+            pictureBox1.Location = new Point(-2, 0);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(691, 491);
+            pictureBox1.Size = new Size(705, 503);
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
+            pictureBox1.Click += AddPoint;
             pictureBox1.Paint += pictureBox1_Paint;
             // 
             // importButton
@@ -170,16 +171,16 @@
             amplitudeLabel.TabIndex = 8;
             amplitudeLabel.Text = "Amplitude";
             // 
-            // benchmarkButton
+            // restartButton
             // 
-            benchmarkButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            benchmarkButton.Location = new Point(926, 168);
-            benchmarkButton.Name = "benchmarkButton";
-            benchmarkButton.Size = new Size(107, 23);
-            benchmarkButton.TabIndex = 9;
-            benchmarkButton.Text = "Benchmark";
-            benchmarkButton.UseVisualStyleBackColor = true;
-            benchmarkButton.Click += Benchmark;
+            restartButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            restartButton.Location = new Point(926, 168);
+            restartButton.Name = "restartButton";
+            restartButton.Size = new Size(107, 23);
+            restartButton.TabIndex = 9;
+            restartButton.Text = "Restart";
+            restartButton.UseVisualStyleBackColor = true;
+            restartButton.Click += Restart;
             // 
             // resolutionTextbox
             // 
@@ -481,7 +482,7 @@
             Controls.Add(exportGIFButton);
             Controls.Add(resolutionLabel);
             Controls.Add(resolutionTextbox);
-            Controls.Add(benchmarkButton);
+            Controls.Add(restartButton);
             Controls.Add(amplitudeLabel);
             Controls.Add(periodLabel);
             Controls.Add(amplitudeTextbox);
@@ -518,7 +519,7 @@
         private TextBox amplitudeTextbox;
         private Label periodLabel;
         private Label amplitudeLabel;
-        private Button benchmarkButton;
+        private Button restartButton;
         private TextBox resolutionTextbox;
         private Label resolutionLabel;
         private Button exportGIFButton;

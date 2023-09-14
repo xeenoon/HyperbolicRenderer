@@ -14,7 +14,7 @@ namespace GameUI
     {
 //      MoveableShape graphicalcollider;
         public static Texture2D[] frames = new Texture2D[10];
-
+        const string tag = "EYEENEMY";
         //centre -64, -62
         Vector2[] colliderpoints = new Vector2[50] { new Vector2(25, 47), new Vector2(15, 51), new Vector2(6, 58), new Vector2(-3, 59), new Vector2(-10, 56), new Vector2(-16, 52), new Vector2(-23, 49), new Vector2(-29, 45), new Vector2(-38, 44), new Vector2(-47, 45), new Vector2(-54, 41), new Vector2(-55, 37), new Vector2(-56, 31), new Vector2(-55, 26), new Vector2(-52, 20), new Vector2(-55, 13), new Vector2(-59, 7), new Vector2(-63, 1), new Vector2(-61, -6), new Vector2(-56, -12), new Vector2(-53, -18), new Vector2(-53, -25), new Vector2(-55, -31), new Vector2(-55, -35), new Vector2(-56, -41), new Vector2(-49, -45), new Vector2(-42, -46), new Vector2(-34, -47), new Vector2(-28, -47), new Vector2(-21, -51), new Vector2(-14, -54), new Vector2(-9, -59), new Vector2(-2, -62), new Vector2(5, -60), new Vector2(12, -54), new Vector2(19, -52), new Vector2(26, -48), new Vector2(32, -47), new Vector2(40, -46), new Vector2(47, -46), new Vector2(54, -42), new Vector2(55, -32), new Vector2(50, -22), new Vector2(56, -12), new Vector2(61, -4), new Vector2(59, 6), new Vector2(53, 16), new Vector2(54, 26), new Vector2(55, 36), new Vector2(48, 44), };
         
@@ -84,7 +84,7 @@ namespace GameUI
                     double cannondistanceaway = Math.Sqrt(Math.Pow(texture.Height, 2) + Math.Pow(texture.Width, 2)) * 0.5f;
                     Vector cannonpoint = cannondirection * cannondistanceaway;
                     Vector2 cannonpointposition = new Vector2((float)(position.X + cannonpoint.i), (float)(position.Y + cannonpoint.j));
-                    Game1.projectiles.Add(new Bullet(Game1.bullettexture, cannonpointposition, new Vector(bulletdirection).GetUnitVector(), 7));
+                    Game1.projectiles.Add(new Bullet(Game1.bullettexture, cannonpointposition, new Vector(bulletdirection).GetUnitVector(), 7, tag));
                 }
 
                 lasttime = Game1.game.totalseconds;
@@ -173,7 +173,12 @@ namespace GameUI
                     }
                     timebetweenframes = 0;
                 }
-                Game1.game.spriteBatch.Draw(frames[framedrawidx], position, null, Color.White, (float)rotation, origin, 1f, SpriteEffects.None, 1);
+
+                var deformer = new ImageDeformer(frames[framedrawidx]);
+                Texture2D final = new Texture2D(Game1.game.GraphicsDevice, texture.Width * 4, texture.Height * 4);
+                Color[] colors = deformer.DeformImageToPolygon(Game1.AdjustFunc, texture.Width * 4, texture.Height * 4, position);
+                final.SetData(colors);
+                Game1.game.spriteBatch.Draw(final, position, null, Color.White, (float)rotation, new Vector2(final.Width / 2, final.Width / 2), 1f, SpriteEffects.None, 1);
             }
             else
             {
@@ -182,7 +187,7 @@ namespace GameUI
         }
         public override bool OnCollision(string tag)
         {
-            if (tag == "BULLET")
+            if (tag == "BULLET:PLAYER")
             {
                 disappear = true;
             }

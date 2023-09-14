@@ -7,11 +7,17 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>bob-removebg-preview.ico</ApplicationIcon>
+    <AssemblyName>Jello-Machine</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ManagedCuda-11" Version="11.4.47" />
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+    <Content Include="bob-removebg-preview.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AnimatedGif" Version="1.0.5" />
+    <PackageReference Include="Splicer" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>

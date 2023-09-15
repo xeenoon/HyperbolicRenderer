@@ -50,23 +50,25 @@ namespace ImageStretcher
                         switch (menuItem.stretchType)
                         {
                             case StretchType.Jello:
-                                return MakeJello(input, menuItem.period, menuItem.amplitude);
-                            case StretchType.Rotate:
-                                return Rotate(input, menuItem.period, menuItem.amplitude);
+                                return MakeJello(input, menuItem.period, menuItem.amplitude, menuItem.offset);
+                            case StretchType.RotateLeft:
+                                return RotateLeft(input, menuItem.period, menuItem.amplitude, menuItem.offset);
+                            case StretchType.RotateRight:
+                                return RotateRight(input, menuItem.period, menuItem.amplitude, menuItem.offset);
                             case StretchType.Horizontal:
                                 double maxy = menuItem.polygonpoints.Max(p => p.Y);
                                 maxy -= centre.Y;
 
                                 double miny = menuItem.polygonpoints.Min(p => p.Y);
                                 miny -= centre.Y;
-                                return HorizontalWave(input, maxy, miny, menuItem.period, menuItem.amplitude);
+                                return HorizontalWave(input, maxy, miny, menuItem.period, menuItem.amplitude, menuItem.offset);
                             case StretchType.Vertical:
                                 double maxx = menuItem.polygonpoints.Max(p => p.X);
                                 maxx -= centre.X;
 
                                 double minx = menuItem.polygonpoints.Min(p => p.X);
                                 minx -= centre.X;
-                                return VerticalWave(input, maxx, minx, menuItem.period, menuItem.amplitude);
+                                return VerticalWave(input, maxx, minx, menuItem.period, menuItem.amplitude, menuItem.offset);
                         }
                     }
                 }
@@ -74,13 +76,13 @@ namespace ImageStretcher
             return input;
         }
 
-        public Point MakeJello(Point input, int period, double amplitude)
+        public Point MakeJello(Point input, int period, double amplitude, double offset)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
             //Based on time, points will be scaled based on their angle to the centre
             double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X) + Math.PI / 2;
-            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed)) * amplitude) + (1+amplitude));
+            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed) + offset) * amplitude) + (1+amplitude));
             
             adjustedpoint.X *= heightmultiplier;
             adjustedpoint.Y *= heightmultiplier;
@@ -90,20 +92,14 @@ namespace ImageStretcher
 
             return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
         }
-
-
-
-
-        public static PointF[] bobsrightarm = new PointF[16] { new PointF(206, 3), new PointF(199, 6), new PointF(188, 11), new PointF(187, 22), new PointF(200, 38), new PointF(200, 50), new PointF(212, 71), new PointF(218, 98), new PointF(224, 120), new PointF(264, 114), new PointF(256, 80), new PointF(248, 60), new PointF(239, 36), new PointF(230, 18), new PointF(222, 11), new PointF(213, 4), }; public static PointF[] bobsleftarm = new PointF[11] { new PointF(70, 132), new PointF(54, 138), new PointF(48, 151), new PointF(52, 168), new PointF(60, 179), new PointF(68, 186), new PointF(73, 195), new PointF(84, 204), new PointF(93, 190), new PointF(92, 187), new PointF(94, 178), };
-
-        public Point Rotate(Point input, int period, double amplitude)
+        public Point RotateLeft(Point input, int period, double amplitude, double offset)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
             //period defines speed
             //amplitude defines rotation amount
             amplitude = Math.Min(Math.PI/2, amplitude);
             double angle = PointManager.GetAngle(centre, input);
-            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed)) * amplitude));
+            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed) + offset) * amplitude));
             angle += heightmultiplier;
             double radius = Math.Sqrt(adjustedpoint.X * adjustedpoint.X + adjustedpoint.Y * adjustedpoint.Y);
 
@@ -115,7 +111,26 @@ namespace ImageStretcher
 
             return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
         }
-        public Point HorizontalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude)
+        public Point RotateRight(Point input, int period, double amplitude, double offset)
+        {
+            PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
+            //period defines speed
+            //amplitude defines rotation amount
+            amplitude = Math.Min(Math.PI / 2, amplitude);
+            double angle = PointManager.GetAngle(centre, input);
+            float heightmultiplier = -(float)((Math.Sin((angle * period * 2) + (time * speed) + offset) * amplitude));
+            angle += heightmultiplier;
+            double radius = Math.Sqrt(adjustedpoint.X * adjustedpoint.X + adjustedpoint.Y * adjustedpoint.Y);
+
+            adjustedpoint.X = (float)(Math.Cos(angle) * radius);
+            adjustedpoint.Y = (float)(Math.Sin(angle) * radius);
+
+            adjustedpoint.X += centre.X;
+            adjustedpoint.Y += centre.Y;
+
+            return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
+        }
+        public Point HorizontalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude, double offset)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
@@ -132,14 +147,14 @@ namespace ImageStretcher
                 edgedistance = Math.Pow(Math.Max((adjustedpoint.Y - lowestpoint), 0), 2) / 100f;
             }
 
-            adjustedpoint.X += (float)(Math.Sin(time * speed) * amplitude * edgedistance + 1 + amplitude);
+            adjustedpoint.X += (float)(Math.Sin(time * speed + offset) * amplitude * edgedistance + 1 + amplitude);
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
 
             return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
         }
-        public Point VerticalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude)
+        public Point VerticalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude, double offset)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
@@ -156,7 +171,7 @@ namespace ImageStretcher
                 edgedistance = Math.Pow(Math.Max((adjustedpoint.X - lowestpoint), 0), 2) / 100f;
             }
 
-            adjustedpoint.Y += (float)(Math.Sin(time * speed) * amplitude * edgedistance + 1 + amplitude);
+            adjustedpoint.Y += (float)(Math.Sin(time * speed + offset) * amplitude * edgedistance + 1 + amplitude);
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;

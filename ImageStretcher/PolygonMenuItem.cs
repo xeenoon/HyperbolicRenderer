@@ -11,14 +11,15 @@ namespace ImageStretcher
     public enum StretchType
     {
         Jello,
-        Rotate,
+        RotateLeft,
+        RotateRight,
         Horizontal,
         Vertical,
     }
     public class PolygonMenuItem
     {
-        public const int BG_HEIGHT = 100;
-        public static string[] transformoptions = new string[4] { "Jello", "Rotate", "Horizontal", "Vertical" };
+        public const int BG_HEIGHT = 130;
+        public static string[] transformoptions = new string[5] { "Jello", "RotateLeft", "RotateRight", "Horizontal", "Vertical" };
 
         public Panel background = new Panel() { Size = new Size(300, BG_HEIGHT), BackColor = Color.White, BorderStyle = BorderStyle.FixedSingle };
         Label polygonlabel = new Label();
@@ -29,11 +30,16 @@ namespace ImageStretcher
         Label periodLabel = new Label();
         TextBox periodTextbox = new TextBox();
 
+
+        Label offsetLabel = new Label();
+        TextBox offsetTextbox = new TextBox();
+
         Label amplitudeLabel = new Label();
         TextBox amplitudeTextbox = new TextBox();
 
         public double amplitude=0.05;
-        public int period=2;
+        public int period = 2;
+        public double offset = 0;
 
         public StretchType stretchType
         {
@@ -60,6 +66,8 @@ namespace ImageStretcher
             background.Controls.Add(amplitudeTextbox);
             background.Controls.Add(periodLabel);
             background.Controls.Add(periodTextbox);
+            background.Controls.Add(offsetLabel);
+            background.Controls.Add(offsetTextbox);
 
             background.Click += new EventHandler(Select);
 
@@ -104,6 +112,15 @@ namespace ImageStretcher
             periodTextbox.Text = "2";
             periodTextbox.TextChanged += new EventHandler(PeriodTextChange);
 
+            offsetLabel.Location = new Point(3, 100);
+            offsetLabel.AutoSize = true;
+            offsetLabel.Text = "Offset";
+
+            offsetTextbox.Location = new Point(80, 95);
+            offsetTextbox.Size = new Size(80, 20);
+            offsetTextbox.Text = "2";
+            offsetTextbox.TextChanged += new EventHandler(OffsetTextChange);
+
 
             menu.AddItem(this);
         }
@@ -147,6 +164,13 @@ namespace ImageStretcher
             if (int.TryParse(periodTextbox.Text, out int temp))
             {
                 period = temp;
+            }
+        }
+        void OffsetTextChange(object sender, EventArgs e)
+        {
+            if (int.TryParse(periodTextbox.Text, out int temp))
+            {
+                offset = temp;
             }
         }
         void AmplitudeTextChange(object sender, EventArgs e)

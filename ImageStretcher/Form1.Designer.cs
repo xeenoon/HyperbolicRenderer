@@ -32,10 +32,6 @@
             pictureBox1 = new PictureBox();
             importButton = new Button();
             timeButton = new Button();
-            periodTextbox = new TextBox();
-            amplitudeTextbox = new TextBox();
-            periodLabel = new Label();
-            amplitudeLabel = new Label();
             restartButton = new Button();
             exportGIFButton = new Button();
             exportFramesButton = new Button();
@@ -95,7 +91,7 @@
             timeButton.BackColor = Color.Lime;
             timeButton.FlatAppearance.BorderSize = 0;
             timeButton.FlatStyle = FlatStyle.Popup;
-            timeButton.Location = new Point(813, 209);
+            timeButton.Location = new Point(814, 73);
             timeButton.Name = "timeButton";
             timeButton.Size = new Size(107, 23);
             timeButton.TabIndex = 2;
@@ -103,50 +99,10 @@
             timeButton.UseVisualStyleBackColor = false;
             timeButton.Click += StartStopButton;
             // 
-            // periodTextbox
-            // 
-            periodTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            periodTextbox.Location = new Point(782, 102);
-            periodTextbox.Name = "periodTextbox";
-            periodTextbox.Size = new Size(100, 23);
-            periodTextbox.TabIndex = 5;
-            periodTextbox.Text = "2";
-            periodTextbox.TextChanged += MenuItemTextChanged;
-            // 
-            // amplitudeTextbox
-            // 
-            amplitudeTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            amplitudeTextbox.Location = new Point(782, 133);
-            amplitudeTextbox.Name = "amplitudeTextbox";
-            amplitudeTextbox.Size = new Size(100, 23);
-            amplitudeTextbox.TabIndex = 6;
-            amplitudeTextbox.Text = "0.05";
-            amplitudeTextbox.TextChanged += MenuItemTextChanged;
-            // 
-            // periodLabel
-            // 
-            periodLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            periodLabel.AutoSize = true;
-            periodLabel.Location = new Point(735, 105);
-            periodLabel.Name = "periodLabel";
-            periodLabel.Size = new Size(41, 15);
-            periodLabel.TabIndex = 7;
-            periodLabel.Text = "Period";
-            // 
-            // amplitudeLabel
-            // 
-            amplitudeLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            amplitudeLabel.AutoSize = true;
-            amplitudeLabel.Location = new Point(713, 136);
-            amplitudeLabel.Name = "amplitudeLabel";
-            amplitudeLabel.Size = new Size(63, 15);
-            amplitudeLabel.TabIndex = 8;
-            amplitudeLabel.Text = "Amplitude";
-            // 
             // restartButton
             // 
             restartButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            restartButton.Location = new Point(926, 209);
+            restartButton.Location = new Point(927, 73);
             restartButton.Name = "restartButton";
             restartButton.Size = new Size(107, 23);
             restartButton.TabIndex = 9;
@@ -358,9 +314,9 @@
             polygonMenu.BackColor = SystemColors.Control;
             polygonMenu.BorderStyle = BorderStyle.FixedSingle;
             polygonMenu.Controls.Add(addPolygonButton);
-            polygonMenu.Location = new Point(709, 238);
+            polygonMenu.Location = new Point(709, 102);
             polygonMenu.Name = "polygonMenu";
-            polygonMenu.Size = new Size(325, 265);
+            polygonMenu.Size = new Size(325, 401);
             polygonMenu.TabIndex = 24;
             // 
             // addPolygonButton
@@ -387,10 +343,6 @@
             Controls.Add(exportFramesButton);
             Controls.Add(exportGIFButton);
             Controls.Add(restartButton);
-            Controls.Add(amplitudeLabel);
-            Controls.Add(periodLabel);
-            Controls.Add(amplitudeTextbox);
-            Controls.Add(periodTextbox);
             Controls.Add(timeButton);
             Controls.Add(importButton);
             Controls.Add(pictureBox1);
@@ -415,10 +367,6 @@
         private PictureBox pictureBox1;
         private Button importButton;
         private Button timeButton;
-        private TextBox periodTextbox;
-        private TextBox amplitudeTextbox;
-        private Label periodLabel;
-        private Label amplitudeLabel;
         private Button restartButton;
         private Button exportGIFButton;
         private Button exportFramesButton;

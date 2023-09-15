@@ -17,7 +17,7 @@ namespace ImageStretcher
     }
     public class PolygonMenuItem
     {
-        public const int BG_HEIGHT = 30;
+        public const int BG_HEIGHT = 100;
         public static string[] transformoptions = new string[4] { "Jello", "Rotate", "Horizontal", "Vertical" };
 
         public Panel background = new Panel() { Size = new Size(300, BG_HEIGHT), BackColor = Color.White, BorderStyle = BorderStyle.FixedSingle };
@@ -26,13 +26,21 @@ namespace ImageStretcher
         PictureBox visiblebutton = new PictureBox();
         PictureBox closebutton = new PictureBox();
         PolygonMenu menu;
+        Label periodLabel = new Label();
+        TextBox periodTextbox = new TextBox();
+
+        Label amplitudeLabel = new Label();
+        TextBox amplitudeTextbox = new TextBox();
+
+        public double amplitude=0.05;
+        public int period=2;
+
         public StretchType stretchType
         {
             get
             {
                 string selected = transformoptions[dropdown.SelectedIndex];
                 return Enum.Parse<StretchType>(selected);
-                //return StretchType.Parse(StretchType,);
             }
         }
 
@@ -48,10 +56,16 @@ namespace ImageStretcher
             background.Controls.Add(dropdown);
             background.Controls.Add(visiblebutton);
             background.Controls.Add(closebutton);
+            background.Controls.Add(amplitudeLabel);
+            background.Controls.Add(amplitudeTextbox);
+            background.Controls.Add(periodLabel);
+            background.Controls.Add(periodTextbox);
+
             background.Click += new EventHandler(Select);
 
             polygonlabel.Location = new Point(3, 6);
             polygonlabel.Text = "Unnamed";
+            polygonlabel.Font = new Font("Arial", 12, FontStyle.Bold);
             polygonlabel.AutoSize = true;
            
             dropdown.Location = new Point(95, 2);
@@ -71,6 +85,25 @@ namespace ImageStretcher
             closebutton.Image = Resources.CloseButtonIcon;
             closebutton.SizeMode = PictureBoxSizeMode.StretchImage;
             closebutton.Click += new EventHandler(Delete);
+
+            amplitudeLabel.Location = new Point(3, 40);
+            amplitudeLabel.AutoSize = true;
+            amplitudeLabel.Text = "Amplitude";
+
+            amplitudeTextbox.Location = new Point(80, 35);
+            amplitudeTextbox.Size = new Size(80,20);
+            amplitudeTextbox.Text = "0.05";
+            amplitudeTextbox.TextChanged += new EventHandler(AmplitudeTextChange);
+
+            periodLabel.Location = new Point(3, 70);
+            periodLabel.AutoSize = true;
+            periodLabel.Text = "Period";
+
+            periodTextbox.Location = new Point(80, 65);
+            periodTextbox.Size = new Size(80, 20);
+            periodTextbox.Text = "2";
+            periodTextbox.TextChanged += new EventHandler(PeriodTextChange);
+
 
             menu.AddItem(this);
         }
@@ -107,6 +140,21 @@ namespace ImageStretcher
             PointManager.GrahamsAlgorithm(polygonpoints[0], polygonpoints, ref temp);
             polygonpoints.Clear();
             polygonpoints.AddRange(temp);
+        }
+
+        void PeriodTextChange(object sender, EventArgs e)
+        {
+            if (int.TryParse(periodTextbox.Text, out int temp))
+            {
+                period = temp;
+            }
+        }
+        void AmplitudeTextChange(object sender, EventArgs e)
+        {
+            if (double.TryParse(amplitudeTextbox.Text, out double temp))
+            {
+                amplitude = temp;
+            }
         }
     }
     public class PolygonMenu

@@ -13,8 +13,6 @@ namespace ImageStretcher
         System.Timers.Timer timer = new System.Timers.Timer();
 
         public double time = 0;
-        public double period = 2;
-        public double amplitude = 0.05;
         public double speed = 1;
         public int width;
         public PolygonMenu polygonMenu;
@@ -52,32 +50,31 @@ namespace ImageStretcher
                         switch (menuItem.stretchType)
                         {
                             case StretchType.Jello:
-                                return MakeJello(input);
+                                return MakeJello(input, menuItem.period, menuItem.amplitude);
                             case StretchType.Rotate:
-                                return Rotate(input);
+                                return Rotate(input, menuItem.period, menuItem.amplitude);
                             case StretchType.Horizontal:
                                 double maxy = menuItem.polygonpoints.Max(p => p.Y);
                                 maxy -= centre.Y;
 
                                 double miny = menuItem.polygonpoints.Min(p => p.Y);
                                 miny -= centre.Y;
-                                return HorizontalWave(input, maxy, miny);
+                                return HorizontalWave(input, maxy, miny, menuItem.period, menuItem.amplitude);
                             case StretchType.Vertical:
                                 double maxx = menuItem.polygonpoints.Max(p => p.X);
                                 maxx -= centre.X;
 
                                 double minx = menuItem.polygonpoints.Min(p => p.X);
                                 minx -= centre.X;
-                                return VerticalWave(input, maxx, minx);
+                                return VerticalWave(input, maxx, minx, menuItem.period, menuItem.amplitude);
                         }
                     }
                 }
             }
             return input;
-            //return MakeJello(input);
         }
 
-        public Point MakeJello(Point input)
+        public Point MakeJello(Point input, int period, double amplitude)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
@@ -99,7 +96,7 @@ namespace ImageStretcher
 
         public static PointF[] bobsrightarm = new PointF[16] { new PointF(206, 3), new PointF(199, 6), new PointF(188, 11), new PointF(187, 22), new PointF(200, 38), new PointF(200, 50), new PointF(212, 71), new PointF(218, 98), new PointF(224, 120), new PointF(264, 114), new PointF(256, 80), new PointF(248, 60), new PointF(239, 36), new PointF(230, 18), new PointF(222, 11), new PointF(213, 4), }; public static PointF[] bobsleftarm = new PointF[11] { new PointF(70, 132), new PointF(54, 138), new PointF(48, 151), new PointF(52, 168), new PointF(60, 179), new PointF(68, 186), new PointF(73, 195), new PointF(84, 204), new PointF(93, 190), new PointF(92, 187), new PointF(94, 178), };
 
-        public Point Rotate(Point input)
+        public Point Rotate(Point input, int period, double amplitude)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
             double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X);
@@ -120,7 +117,7 @@ namespace ImageStretcher
 
             return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
         }
-        public Point HorizontalWave(Point input, double highestpoint, double lowestpoint)
+        public Point HorizontalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
@@ -144,7 +141,7 @@ namespace ImageStretcher
 
             return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
         }
-        public Point VerticalWave(Point input, double highestpoint, double lowestpoint)
+        public Point VerticalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 

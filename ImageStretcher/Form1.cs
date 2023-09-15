@@ -139,34 +139,6 @@ namespace ImageStretcher
             float outfloat;
             switch (((Control)sender).Name)
             {
-                case "periodTextbox":
-                    if (float.TryParse(periodTextbox.Text, out outfloat))
-                    {
-                        if (outfloat % 1 != 0)
-                        {
-                            periodTextbox.ForeColor = Color.Red;
-                        }
-                        else
-                        {
-                            periodTextbox.ForeColor = Color.Black;
-                        }
-                        scalar.period = outfloat;
-                    }
-                    break;
-                case "amplitudeTextbox":
-                    if (float.TryParse(amplitudeTextbox.Text, out outfloat))
-                    {
-                        if (outfloat > 0.3f)
-                        {
-                            amplitudeTextbox.ForeColor = Color.Red;
-                        }
-                        else
-                        {
-                            amplitudeTextbox.ForeColor = Color.Black;
-                        }
-                        scalar.amplitude = outfloat;
-                    }
-                    break;
                 case "offsetTextbox":
                     if (offsetTextbox.Text.Contains(','))
                     {
@@ -200,11 +172,10 @@ namespace ImageStretcher
         private void ExportGIF(object sender, EventArgs e)
         {
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
-            scalar.period = this.scalar.period;
-            scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
             //const float timeamt = 2;
-            int frames = (int)((scalar.period * 4) / (Math.PI * 2)) * 33;
+            int frames = (int)((menu.menuItems.Max(m => m.period) * 4) / (Math.PI * 2)) * 33;
+            //choose the largest period, if the user specifies periods that dont line up, its their problem
 
             Bitmap[] GIFbitmaps = new Bitmap[frames];
             string path = SelectFolder();
@@ -249,12 +220,12 @@ namespace ImageStretcher
         private void ExportFrames()
         {
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
-            scalar.period = this.scalar.period;
-            scalar.amplitude = this.scalar.amplitude;
             scalar.speed = this.scalar.speed;
+            //const float timeamt = 2;
+            int frames = (int)((menu.menuItems.Max(m => m.period) * 4) / (Math.PI * 2)) * 33;
+            //choose the largest period, if the user specifies periods that dont line up, its their problem
 
             string path = SelectFolder();
-            int frames = (int)((scalar.period * 4) / (Math.PI * 2)) * 33;
             if (path != "")
             {
                 Bitmap[] GIFbitmaps = new Bitmap[frames];

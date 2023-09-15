@@ -66,6 +66,7 @@
             ExportSettingsTitleLabel = new Label();
             polygonMenu = new Panel();
             addPolygonButton = new Button();
+            exportAreaLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ImportSettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
@@ -463,11 +464,24 @@
             addPolygonButton.UseVisualStyleBackColor = true;
             addPolygonButton.Click += addPolygonButton_Click;
             // 
+            // exportAreaLabel
+            // 
+            exportAreaLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            exportAreaLabel.AutoSize = true;
+            exportAreaLabel.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            exportAreaLabel.Location = new Point(527, 3);
+            exportAreaLabel.Name = "exportAreaLabel";
+            exportAreaLabel.Size = new Size(173, 25);
+            exportAreaLabel.TabIndex = 25;
+            exportAreaLabel.Text = "Select export area";
+            exportAreaLabel.Visible = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1035, 515);
+            Controls.Add(exportAreaLabel);
             Controls.Add(polygonMenu);
             Controls.Add(ExportPanelSettings);
             Controls.Add(outputsizeButton);
@@ -547,5 +561,6 @@
         private PictureBox importSettingsCloseButton;
         private Panel polygonMenu;
         private Button addPolygonButton;
+        private Label exportAreaLabel;
     }
 }

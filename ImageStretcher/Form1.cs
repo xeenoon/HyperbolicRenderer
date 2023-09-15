@@ -72,10 +72,10 @@ namespace ImageStretcher
         {
             if (image != null)
             {
-                Bitmap result = new Bitmap(image.Width + offset.X * 2, image.Height + offset.Y * 2);
+                Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
                 ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, result, resolution);
 
-                e.Graphics.DrawImage(result, 0, 0, result.Width * imagescale, result.Height * imagescale);
+                e.Graphics.DrawImage(result, 0, 0, result.Width, result.Height);
 
                 foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
                 {
@@ -136,7 +136,6 @@ namespace ImageStretcher
             }
         }
 
-        float imagescale = 1;
         int resolution = 2;
         Point offset = new Point(0, 0);
         private void MenuItemTextChanged(object sender, EventArgs e)
@@ -178,11 +177,11 @@ namespace ImageStretcher
                         scalar.amplitude = outfloat;
                     }
                     break;
-                case "scaleTextbox":
+                case "scaleTextbox": //TODO REMOVE
                     float newscale;
                     if (float.TryParse(scaleTextbox.Text, out newscale))
                     {
-                        imagescale = newscale;
+                        //imagescale = newscale;
                     }
                     break;
                 case "resolutionTextbox":
@@ -248,8 +247,9 @@ namespace ImageStretcher
                     for (int i = 0; i < frames; ++i)
                     {
                         scalar.time += ((2 * Math.PI) / (31.4f));
-                        GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                        ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, GIFbitmaps[i], 2, true);
+                        Bitmap temp = new Bitmap(image.Width + offset.X*2, image.Height + offset.X*2);
+                        var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, temp, 2, true);
+                        GIFbitmaps[i] = temp.Clone(new Rectangle(data.left, data.top, data.right-data.left, data.bottom-data.top), PixelFormat.Format32bppRgb);
                         gif.AddFrame(GIFbitmaps[i], delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
                     }
                 }
@@ -293,8 +293,9 @@ namespace ImageStretcher
                 for (int i = 0; i < frames; ++i)
                 {
                     scalar.time += ((2 * Math.PI) / (31.4f));
-                    GIFbitmaps[i] = new Bitmap(image.Width + offset.X * 2, image.Height + offset.Y * 2);
-                    ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, GIFbitmaps[i]);
+                    var temp = new Bitmap(image.Width + offset.X * 2, image.Height + offset.Y * 2);
+                    var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, temp, 2, true);
+                    GIFbitmaps[i] = temp.Clone(new Rectangle(data.left, data.top, data.right - data.left, data.bottom - data.top), PixelFormat.DontCare);
                     GIFbitmaps[i].Save(string.Format("{0}\\{1}_{2}.png", path, animationname, i));
                 }
                 MessageBox.Show("Finished exporting");

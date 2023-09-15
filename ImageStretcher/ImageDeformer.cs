@@ -13,15 +13,31 @@ using System.Threading.Tasks;
 
 namespace ImageStretcher
 {
+    public struct DeformData
+    {
+        public int left = int.MaxValue;
+        public int right = int.MinValue;
+        public int top = int.MinValue;
+        public int bottom = int.MaxValue;
+
+        public DeformData()
+        {
+            left = int.MaxValue;
+            right = int.MinValue;
+            top = int.MaxValue;
+            bottom = int.MinValue;
+        }
+    }
     public class ImageDeformer
     {
         public static BitmapData imagedata;
         public static Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
 
-        public static unsafe void DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, int sectionwidth = 2, bool overridescale = false)
+        public static unsafe DeformData DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, int sectionwidth = 2, bool overridescale = false)
         {
             GC_pacifier = (Bitmap)originalimage.Clone();
             imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
+            DeformData deformData = new DeformData();
 
             int width = imagedata.Width;
             int height = imagedata.Height;
@@ -99,6 +115,10 @@ namespace ImageStretcher
                     {
                         continue;
                     }
+                    deformData.left = Math.Min(deformData.left, newtransformx + offset.X);
+                    deformData.right = Math.Max(deformData.right, newtransformx + offset.X);
+                    deformData.top = Math.Min(deformData.top, newtransformy + offset.Y);
+                    deformData.bottom = Math.Max(deformData.bottom, newtransformy + offset.Y);
 
                     //Resize the section to fit, and copy it into the result
                     ResizeCopy(imagedata,
@@ -114,6 +134,7 @@ namespace ImageStretcher
             resultBitmap.UnlockBits(outputData);
 
             GC_pacifier.Dispose();
+            return deformData;
         }
 
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]

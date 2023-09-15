@@ -1,10 +1,6 @@
 using System.Diagnostics;
 using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 using AnimatedGif;
-using Splicer.Renderer;
-using Splicer.Timeline;
-using Splicer.WindowsMedia;
 
 namespace ImageStretcher
 {
@@ -143,12 +139,6 @@ namespace ImageStretcher
             float outfloat;
             switch (((Control)sender).Name)
             {
-                case "speedTextbox":
-                    if (float.TryParse(speedTextbox.Text, out outfloat))
-                    {
-                        scalar.speed = outfloat;
-                    }
-                    break;
                 case "periodTextbox":
                     if (float.TryParse(periodTextbox.Text, out outfloat))
                     {
@@ -175,28 +165,6 @@ namespace ImageStretcher
                             amplitudeTextbox.ForeColor = Color.Black;
                         }
                         scalar.amplitude = outfloat;
-                    }
-                    break;
-                case "scaleTextbox": //TODO REMOVE
-                    float newscale;
-                    if (float.TryParse(scaleTextbox.Text, out newscale))
-                    {
-                        //imagescale = newscale;
-                    }
-                    break;
-                case "resolutionTextbox":
-                    float tempresolution;
-                    if (float.TryParse(resolutionTextbox.Text, out tempresolution))
-                    {
-                        if (tempresolution > 1 || tempresolution == 0)
-                        {
-                            resolutionTextbox.ForeColor = Color.Red;
-                        }
-                        else
-                        {
-                            resolutionTextbox.ForeColor = Color.Black;
-                            resolution = (int)(2 / tempresolution);
-                        }
                     }
                     break;
                 case "offsetTextbox":
@@ -247,9 +215,9 @@ namespace ImageStretcher
                     for (int i = 0; i < frames; ++i)
                     {
                         scalar.time += ((2 * Math.PI) / (31.4f));
-                        Bitmap temp = new Bitmap(image.Width + offset.X*2, image.Height + offset.X*2);
+                        Bitmap temp = new Bitmap(image.Width + offset.X * 2, image.Height + offset.X * 2);
                         var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, temp, 2, true);
-                        GIFbitmaps[i] = temp.Clone(new Rectangle(data.left, data.top, data.right-data.left, data.bottom-data.top), PixelFormat.Format32bppRgb);
+                        GIFbitmaps[i] = temp.Clone(new Rectangle(data.left, data.top, data.right - data.left, data.bottom - data.top), PixelFormat.Format32bppRgb);
                         gif.AddFrame(GIFbitmaps[i], delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
                     }
                 }
@@ -301,61 +269,6 @@ namespace ImageStretcher
                 MessageBox.Show("Finished exporting");
             }
         }
-        private void ExportMP4(object sender, EventArgs e)
-        {
-            PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
-            scalar.period = this.scalar.period;
-            scalar.amplitude = this.scalar.amplitude;
-            scalar.speed = this.scalar.speed;
-
-            string path = SelectFolder();
-            int frames = (int)((scalar.period * 4) / (Math.PI * 2)) * 33;
-            if (path != "")
-            {
-                string outputFile = path + @"\vid.mp4";
-
-                Bitmap[] GIFbitmaps = new Bitmap[frames];
-
-                for (int i = 0; i < frames; ++i)
-                {
-                    scalar.time += ((2 * Math.PI) / (31.4f));
-                    GIFbitmaps[i] = new Bitmap(image.Width, image.Height);
-                    ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, GIFbitmaps[i]);
-                }
-                bool success = false;
-                do
-                {
-                    success = CreateVideo(GIFbitmaps.ToList(), outputFile, 10 * scalar.speed);
-                } while (!success);
-                MessageBox.Show("Finished exporting");
-            }
-        }
-        public bool CreateVideo(List<Bitmap> bitmaps, string outputFile, double fps)
-        {
-            int width = 640;
-            int height = 480;
-            if (bitmaps == null || bitmaps.Count == 0) return false;
-            try
-            {
-                using (ITimeline timeline = new DefaultTimeline(fps))
-                {
-                    IGroup group = timeline.AddVideoGroup(32, width, height);
-                    ITrack videoTrack = group.AddTrack();
-
-                    int i = 0;
-                    double miniDuration = 1.0 / fps;
-                    foreach (var bmp in bitmaps)
-                    {
-                        IClip clip = videoTrack.AddImage(bmp, 0, i * miniDuration, (i + 1) * miniDuration);
-                    }
-                    timeline.AddAudioGroup();
-                    IRenderer renderer = new WindowsMediaRenderer(timeline, outputFile, WindowsMediaProfiles.HighQualityVideo);
-                    renderer.Render();
-                }
-            }
-            catch { return false; }
-            return true;
-        }
         Bitmap[] frames;
         private void ImportAnimation(object sender, EventArgs e)
         {
@@ -400,10 +313,6 @@ namespace ImageStretcher
         private void Form1_Load(object sender, EventArgs e)
         {
 
-        }
-        private void SetOuputSize(object sender, EventArgs e)
-        {
-            //TODO allow for user dragging to set output size
         }
 
         string animationname;

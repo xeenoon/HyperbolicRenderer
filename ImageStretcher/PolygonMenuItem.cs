@@ -118,7 +118,7 @@ namespace ImageStretcher
 
             offsetTextbox.Location = new Point(80, 95);
             offsetTextbox.Size = new Size(80, 20);
-            offsetTextbox.Text = "2";
+            offsetTextbox.Text = "0";
             offsetTextbox.TextChanged += new EventHandler(OffsetTextChange);
 
 

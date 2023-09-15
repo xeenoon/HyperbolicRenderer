@@ -99,18 +99,16 @@ namespace ImageStretcher
         public Point Rotate(Point input, int period, double amplitude)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
-            double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X);
+            //period defines speed
+            //amplitude defines rotation amount
+            amplitude = Math.Min(Math.PI/2, amplitude);
+            double angle = PointManager.GetAngle(centre, input);
+            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed)) * amplitude));
+            angle += heightmultiplier;
+            double radius = Math.Sqrt(adjustedpoint.X * adjustedpoint.X + adjustedpoint.Y * adjustedpoint.Y);
 
-            double radius = adjustedpoint.DistanceTo(new PointF(0, 0));
-            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed)) * amplitude) + (1 + amplitude));
-            angle *= heightmultiplier;
-
-            var xscale = (float)Math.Cos(angle);
-            var yscale = (float)Math.Sin(angle);
-
-            //transform more for more distances
-            adjustedpoint.X = (float)(xscale * radius);
-            adjustedpoint.Y = (float)(yscale * radius);
+            adjustedpoint.X = (float)(Math.Cos(angle) * radius);
+            adjustedpoint.Y = (float)(Math.Sin(angle) * radius);
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;

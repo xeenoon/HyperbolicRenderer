@@ -32,14 +32,14 @@ namespace ImageStretcher
                 }
             }
 
-            double smallestangle = double.MaxValue;
+            double smallestdistance = double.MaxValue;
             PointF closestpoint = new PointF();
             foreach (var point in nearbypoints)
             {
-                double angle = GetAngle(last, point);
-                if (angle < smallestangle)
+                double distance = last.DistanceTo(point);
+                if (distance < smallestdistance)
                 {
-                    smallestangle = angle;
+                    smallestdistance = distance;
                     closestpoint = point;
                 }
             }
@@ -49,12 +49,12 @@ namespace ImageStretcher
             }
             GrahamsAlgorithm(closestpoint, points, ref result);
         }
-        private static double GetAngle(PointF start, PointF end)
+        public static double GetAngle(PointF start, PointF end)
         {
-            float ychange = -(end.Y - start.Y);
+            float ychange = (end.Y - start.Y);
             float xchange = (end.X - start.X);
 
-            double angle = Math.Atan(Math.Abs(ychange / xchange));
+            double angle = Math.Atan(ychange / xchange);
 
             //Check each quadrant
             if (ychange >= 0 && xchange >= 0) //NE stays the same
@@ -63,7 +63,7 @@ namespace ImageStretcher
             }
             else if (ychange < 0 && xchange > 0) //SE
             {
-                angle = Math.PI + angle;
+               // angle = Math.PI + angle;
             }
             else if (ychange < 0 && xchange < 0) //SW
             {
@@ -71,7 +71,7 @@ namespace ImageStretcher
             }
             else if (ychange > 0 && xchange < 0) //NW
             {
-                angle = Math.PI - angle;
+                angle = Math.PI + angle;
             }
 
             if (ychange == 0 && xchange > 0)

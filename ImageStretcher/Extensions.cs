@@ -61,5 +61,15 @@ namespace ImageStretcher
             }
             return inside;
         }
+
+        public static string IterateString(this List<PointF> points)
+        {
+            string result = "";
+            foreach(var point in points)
+            {
+                result += string.Format("({0},{1}),", point.X, point.Y);
+            }
+            return result;
+        }
     }
 }

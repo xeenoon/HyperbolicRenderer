@@ -22,20 +22,20 @@ namespace ImageStretcher
         public static string[] transformoptions = new string[5] { "Jello", "RotateLeft", "RotateRight", "Horizontal", "Vertical" };
 
         public Panel background = new Panel() { Size = new Size(300, BG_HEIGHT), BackColor = Color.White, BorderStyle = BorderStyle.FixedSingle };
-        Label polygonlabel = new Label();
-        ComboBox dropdown = new ComboBox();
-        PictureBox visiblebutton = new PictureBox();
-        PictureBox closebutton = new PictureBox();
-        PolygonMenu menu;
-        Label periodLabel = new Label();
-        TextBox periodTextbox = new TextBox();
+        public TextBox polygonlabel = new TextBox();
+        public ComboBox dropdown = new ComboBox();
+        public PictureBox visiblebutton = new PictureBox();
+        public PictureBox closebutton = new PictureBox();
+        public PolygonMenu menu;
+        public Label periodLabel = new Label();
+        public TextBox periodTextbox = new TextBox();
 
 
-        Label offsetLabel = new Label();
-        TextBox offsetTextbox = new TextBox();
+        public Label offsetLabel = new Label();
+        public TextBox offsetTextbox = new TextBox();
 
-        Label amplitudeLabel = new Label();
-        TextBox amplitudeTextbox = new TextBox();
+        public Label amplitudeLabel = new Label();
+        public TextBox amplitudeTextbox = new TextBox();
 
         public double amplitude=0.05;
         public int period = 2;
@@ -72,7 +72,10 @@ namespace ImageStretcher
             background.Click += new EventHandler(Select);
 
             polygonlabel.Location = new Point(3, 6);
+            polygonlabel.BorderStyle = BorderStyle.None;
+            polygonlabel.BackColor = Color.White;
             polygonlabel.Text = "Unnamed";
+            polygonlabel.Size = new Size(90, 30);
             polygonlabel.Font = new Font("Arial", 12, FontStyle.Bold);
             polygonlabel.AutoSize = true;
            
@@ -198,6 +201,7 @@ namespace ImageStretcher
             if (selecteditem != null)
             {
                 selecteditem.background.BackColor = Color.White;
+                selecteditem.polygonlabel.BackColor = Color.White;
                 if (polygonMenuItem == selecteditem)
                 {
                     selecteditem = null;
@@ -205,6 +209,7 @@ namespace ImageStretcher
                 }
             }
             polygonMenuItem.background.BackColor = Color.LightGray;
+            polygonMenuItem.polygonlabel.BackColor = Color.LightGray;
             selecteditem = polygonMenuItem;
         }
         public void AddItem(PolygonMenuItem menuItem)

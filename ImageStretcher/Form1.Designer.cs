@@ -54,6 +54,8 @@
             ExportSettingsTitleLabel = new Label();
             polygonMenu = new Panel();
             addPolygonButton = new Button();
+            saveButton = new Button();
+            ImportSettingsButton = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ImportSettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
@@ -329,11 +331,33 @@
             addPolygonButton.UseVisualStyleBackColor = true;
             addPolygonButton.Click += addPolygonButton_Click;
             // 
+            // saveButton
+            // 
+            saveButton.Location = new Point(706, 44);
+            saveButton.Name = "saveButton";
+            saveButton.Size = new Size(104, 23);
+            saveButton.TabIndex = 25;
+            saveButton.Text = "Save settings";
+            saveButton.UseVisualStyleBackColor = true;
+            saveButton.Click += SaveButtonClick;
+            // 
+            // ImportSettingsButton
+            // 
+            ImportSettingsButton.Location = new Point(706, 15);
+            ImportSettingsButton.Name = "ImportSettingsButton";
+            ImportSettingsButton.Size = new Size(104, 23);
+            ImportSettingsButton.TabIndex = 26;
+            ImportSettingsButton.Text = "Import settings";
+            ImportSettingsButton.UseVisualStyleBackColor = true;
+            ImportSettingsButton.Click += ImportSettingsButton_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1035, 515);
+            Controls.Add(ImportSettingsButton);
+            Controls.Add(saveButton);
             Controls.Add(polygonMenu);
             Controls.Add(ExportPanelSettings);
             Controls.Add(offsetTextbox);
@@ -389,5 +413,7 @@
         private PictureBox importSettingsCloseButton;
         private Panel polygonMenu;
         private Button addPolygonButton;
+        private Button saveButton;
+        private Button ImportSettingsButton;
     }
 }

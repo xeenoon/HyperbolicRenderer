@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Security.Cryptography.Pkcs;
 using AnimatedGif;
 
 namespace ImageStretcher
@@ -336,6 +337,119 @@ namespace ImageStretcher
                     menu.selecteditem.AddPoint(clickpos);
                 }
                 pictureBox1.Invalidate();
+            }
+        }
+
+        private void SaveButtonClick(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialogue = new SaveFileDialog();
+            saveFileDialogue.ShowDialog();
+            if (saveFileDialogue.FileName != "")
+            {
+                if (!File.Exists(saveFileDialogue.FileName))
+                {
+                    var file = File.Create(saveFileDialogue.FileName);
+                    file.Dispose();
+                }
+                File.WriteAllText(saveFileDialogue.FileName, GetFileData());
+            }
+        }
+        public string GetFileData()
+        {
+            //File printed in this format:
+            /*
+             * ModuleName
+             * {
+             * TransformOptions,
+             * Period,
+             * Amplitude,
+             * Offset,
+             * [(point1.x, point1.y),(point2.x,point2.y)]
+             * };
+             */
+            string result = "";
+            foreach (var menuitem in menu.menuItems)
+            {
+                result += string.Format("{0}{{{1},{2},{3},{4},[{5}]}};",
+                    menuitem.polygonlabel.Text,
+                    menuitem.stretchType.ToString(),
+                    menuitem.period,
+                    menuitem.amplitude,
+                    menuitem.offset,
+                    menuitem.polygonpoints.IterateString());
+            }
+
+            return result;
+        }
+        public void ParseFileData(string filepath)
+        {
+            //File printed in this format:
+            /*
+             * ModuleName
+             * {
+             * TransformOptions,
+             * Period,
+             * Amplitude,
+             * Offset,
+             * [(point1.x, point1.y),(point2.x,point2.y)]
+             * };
+             */
+            string filedata = File.ReadAllText(filepath);
+            foreach (var module in filedata.Split(';'))
+            {
+                if (module == "")
+                {
+                    continue;
+                }
+                string name = module.Split('{')[0];
+                string data = module.Substring(name.Length + 1);
+                data = data.Substring(0, data.Length - 1); //Remove the curly brackets
+                string[] datas = data.Split(",");
+                StretchType stretchType = Enum.Parse<StretchType>(datas[0]);
+                int period;
+                int.TryParse(datas[1], out period);
+                double amplitude;
+                double.TryParse(datas[2], out amplitude);
+                double offset;
+                double.TryParse(datas[3], out offset);
+
+                string pointdata = data.Substring(datas[0].Length + datas[1].Length + datas[2].Length + datas[3].Length + 5);
+                pointdata = pointdata.Substring(0, pointdata.Length - 2);
+                string[] points = pointdata.Split("),(");
+                List<PointF> polygonpoints = new List<PointF>();
+                foreach (var pointstr in points)
+                {
+                    string[] point = pointstr.Replace("(", "").Replace(")", "").Split(',');
+
+                    float.TryParse(point[0], out float x);
+                    float.TryParse(point[1], out float y);
+
+                    polygonpoints.Add(new PointF(x, y));
+                }
+
+                var menuitem = new PolygonMenuItem(menu, Repaint);
+                menuitem.polygonlabel.Text = name;
+                menuitem.dropdown.SelectedIndex = (int)stretchType;
+                menuitem.period = period;
+                menuitem.periodTextbox.Text = period.ToString();
+                menuitem.amplitude = amplitude;
+                menuitem.amplitudeTextbox.Text = amplitude.ToString();
+                menuitem.offset = offset;
+                menuitem.offsetTextbox.Text = offset.ToString();
+                menuitem.polygonpoints = polygonpoints;
+
+                polygonMenu.ScrollControlIntoView(addPolygonButton);
+            }
+            pictureBox1.Invalidate();
+        }
+
+        private void ImportSettingsButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.ShowDialog();
+            if (openFileDialog.FileName != "" && File.Exists(openFileDialog.FileName))
+            {
+                ParseFileData(openFileDialog.FileName);
             }
         }
     }

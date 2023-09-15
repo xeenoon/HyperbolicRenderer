@@ -333,6 +333,7 @@
             // 
             // saveButton
             // 
+            saveButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             saveButton.Location = new Point(706, 44);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(104, 23);
@@ -343,6 +344,7 @@
             // 
             // ImportSettingsButton
             // 
+            ImportSettingsButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             ImportSettingsButton.Location = new Point(706, 15);
             ImportSettingsButton.Name = "ImportSettingsButton";
             ImportSettingsButton.Size = new Size(104, 23);

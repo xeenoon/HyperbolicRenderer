@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Security.Cryptography.Pkcs;
 using AnimatedGif;
 
@@ -174,23 +175,29 @@ namespace ImageStretcher
         {
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
             scalar.speed = this.scalar.speed;
-            //const float timeamt = 2;
-            int frames = (int)((menu.menuItems.Max(m => m.period) * 4) / (Math.PI * 2)) * 33;
-            //choose the largest period, if the user specifies periods that dont line up, its their problem
 
-            Bitmap[] GIFbitmaps = new Bitmap[frames];
-            string path = SelectFolder();
-            if (path != "")
+            SaveFileDialog saveFileDialogue = new SaveFileDialog();
+            saveFileDialogue.ShowDialog();
+            if (saveFileDialogue.FileName != "")
             {
-                using (var gif = AnimatedGif.AnimatedGif.Create(path + @"\gif.gif", 33))
+
+                if (!saveFileDialogue.FileName.Contains('.') || saveFileDialogue.FileName.Split('.')[1] != "gif") //TODO add this into the fileopen dialogue
                 {
-                    for (int i = 0; i < frames; ++i)
+                    MessageBox.Show("Must save as GIF");
+                    return;
+                }
+                if (!File.Exists(saveFileDialogue.FileName))
+                {
+                    var file = File.Create(saveFileDialogue.FileName);
+                    file.Dispose();
+                }
+                using (var gif = AnimatedGif.AnimatedGif.Create(saveFileDialogue.FileName, 33))
+                {
+                    var frames = GetFrames();
+                    foreach (var bmp in frames)
                     {
-                        scalar.time += ((2 * Math.PI) / (31.4f));
-                        Bitmap temp = new Bitmap(image.Width + offset.X * 2, image.Height + offset.X * 2);
-                        var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, temp, 2, true);
-                        GIFbitmaps[i] = temp.Clone(new Rectangle(data.left, data.top, data.right - data.left, data.bottom - data.top), PixelFormat.Format32bppRgb);
-                        gif.AddFrame(GIFbitmaps[i], delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
+                        gif.AddFrame(bmp, delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
+
                     }
                 }
             }
@@ -223,23 +230,47 @@ namespace ImageStretcher
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
             scalar.speed = this.scalar.speed;
             //const float timeamt = 2;
-            int frames = (int)((menu.menuItems.Max(m => m.period) * 4) / (Math.PI * 2)) * 33;
             //choose the largest period, if the user specifies periods that dont line up, its their problem
 
             string path = SelectFolder();
             if (path != "")
             {
-                Bitmap[] GIFbitmaps = new Bitmap[frames];
-                for (int i = 0; i < frames; ++i)
+                Bitmap[] array = GetFrames();
+                for (int i = 0; i < array.Length; i++)
                 {
-                    scalar.time += ((2 * Math.PI) / (31.4f));
-                    var temp = new Bitmap(image.Width + offset.X * 2, image.Height + offset.Y * 2);
-                    var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, temp, 2, true);
-                    GIFbitmaps[i] = temp.Clone(new Rectangle(data.left, data.top, data.right - data.left, data.bottom - data.top), PixelFormat.DontCare);
-                    GIFbitmaps[i].Save(string.Format("{0}\\{1}_{2}.png", path, animationname, i));
+                    Bitmap? bmp = array[i];
+                    bmp.Save(string.Format("{0}\\{1}_{2}.png", path, animationname, i));
                 }
+
                 MessageBox.Show("Finished exporting");
             }
+        }
+        public Bitmap[] GetFrames()
+        {
+            int frames = (int)((menu.menuItems.Max(m => m.period) * 4) / (Math.PI * 2)) * 33;
+
+            Bitmap[] GIFbitmaps = new Bitmap[frames];
+            Bitmap[] tempbitmaps = new Bitmap[(int)frames];
+            int minleft = int.MaxValue;
+            int mintop = int.MaxValue;
+            int maxright = int.MinValue;
+            int maxbottom = int.MinValue;
+            for (int i = 0; i < frames; ++i)
+            {
+                scalar.time += ((2 * Math.PI) / (31.4f));
+                tempbitmaps[i] = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+                var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, tempbitmaps[i], 2, true);
+                minleft = Math.Min(minleft, data.left);
+                mintop = Math.Min(mintop, data.top);
+                maxright = Math.Max(maxright, data.right);
+                maxbottom = Math.Max(maxbottom, data.bottom);
+            }
+            for (int i = 0; i < tempbitmaps.Length; i++)
+            {
+                Bitmap temp = tempbitmaps[i];
+                GIFbitmaps[i] = temp.Clone(new Rectangle(minleft, mintop, maxright - minleft, maxbottom - mintop), PixelFormat.DontCare);
+            }
+            return GIFbitmaps;
         }
         Bitmap[] frames;
         private void ImportAnimation(object sender, EventArgs e)

@@ -33,7 +33,7 @@ namespace ImageStretcher
         public static BitmapData imagedata;
         public static Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
 
-        public static unsafe DeformData DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, int sectionwidth = 2, bool overridescale = false)
+        public static unsafe DeformData DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, bool overridescale = false)
         {
             GC_pacifier = (Bitmap)originalimage.Clone();
             imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
@@ -44,18 +44,8 @@ namespace ImageStretcher
 
             BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
-            if (imagedata.Width > 500 && !overridescale)
-            {
-                sectionwidth += 4;
-            }
-            else if (imagedata.Width > 1000 && !overridescale)
-            {
-                sectionwidth += 8;
-            }
-            int sectionradius = sectionwidth / 2;
-
-            int numRows = ((height - sectionradius) / sectionwidth) + 2;
-            int numCols = ((width - sectionradius) / sectionwidth) + 2; //Add 2 to store elements behind and infront
+            int numRows = height + 2;
+            int numCols = width + 2; //Add 2 to store elements behind and infront
 
             int numElements = (numRows) * (numCols);
 
@@ -67,7 +57,7 @@ namespace ImageStretcher
                 {
                     int index = row * (numCols) + col;
 
-                    Point blockcentre = new Point((col * sectionwidth) - (sectionradius), (row * sectionwidth) - (sectionradius));
+                    Point blockcentre = new Point(col, row);
                     Point newtransform = DeformFunction(blockcentre);
 
 
@@ -83,9 +73,6 @@ namespace ImageStretcher
                 {
                     int index = row * numCols + col;
 
-                    int blockcentrex = ((col - 1) * sectionwidth);
-                    int blockcentrey = ((row - 1) * sectionwidth);
-
                     int newtransformx = xCoordinates[index];
                     int newtransformy = yCoordinates[index];
 
@@ -99,10 +86,10 @@ namespace ImageStretcher
                         continue;
                     }
 
-                    newtransformx -= (int)Math.Ceiling(leftdist / 2f); //Travel half the distance to the left point
-                    newtransformy -= (int)Math.Ceiling(topdist / 2f); //Travel half the distance to the top point
-                    int finalxresolution = (int)(Math.Ceiling((leftdist + rightdist)/2f));
-                    int finalyresolution = (int)(Math.Ceiling((topdist + downdist)/2f));
+                    newtransformx -= (int)(leftdist / 2f); //Travel half the distance to the left point
+                    newtransformy -= (int)(topdist / 2f); //Travel half the distance to the top point
+                    int finalxresolution = (int)(((leftdist + rightdist)/2f));
+                    int finalyresolution = (int)(((topdist + downdist)/2f));
                     //finalxresolution = sectionwidth;
                     //finalyresolution = sectionwidth;
 
@@ -112,21 +99,21 @@ namespace ImageStretcher
                         newtransformx + offset.X > resultBitmap.Width - (finalxresolution) ||
                         newtransformy + offset.Y > resultBitmap.Height - (finalyresolution) ||
                         finalxresolution <= 0 ||
-                        finalyresolution <= 0
+                        finalyresolution <= 0 ||
+                        finalxresolution >= int.MaxValue ||
+                        finalyresolution >= int.MaxValue
                         )
                     {
                         continue;
                     }
-                    deformData.left = Math.Min(deformData.left, newtransformx + offset.X);
-                    deformData.right = Math.Max(deformData.right, newtransformx + offset.X);
-                    deformData.top = Math.Min(deformData.top, newtransformy + offset.Y);
+                    deformData.left   = Math.Min(deformData.left, newtransformx + offset.X);
+                    deformData.right  = Math.Max(deformData.right, newtransformx + offset.X);
+                    deformData.top    = Math.Min(deformData.top, newtransformy + offset.Y);
                     deformData.bottom = Math.Max(deformData.bottom, newtransformy + offset.Y);
 
                     //Resize the section to fit, and copy it into the result
                     SmootheResizeCopy(imagedata,
-                        new Rectangle(blockcentrex, blockcentrey, sectionwidth, sectionwidth),
-                        finalxresolution, finalyresolution,
-
+                        col, row,
                         outputData,
                         new Rectangle(newtransformx + offset.X, newtransformy + offset.Y, finalxresolution, finalyresolution));
                 }
@@ -141,71 +128,19 @@ namespace ImageStretcher
 
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         public static extern unsafe IntPtr memset(void* dest, int c, int count);
-
-        public static unsafe byte* ResizeBitmapFast(BitmapData input, Rectangle areafrom, int newwidth, int newheight)
-        {
-            const int bytesPerPixel = 4;
-            int deststride = newwidth * bytesPerPixel;
-
-            // Pointer to the first pixel of the source and destination bitmaps
-            byte* srcPointer = (byte*)(input.Scan0 + (areafrom.X * bytesPerPixel) + (areafrom.Y * input.Stride));
-            byte* destPointer = (byte*)Marshal.AllocHGlobal(deststride * newheight);
-
-            for (int y = 0; y < newheight; y++)
-            {
-                int maxy = Math.Min(y, input.Height - 1 - areafrom.Y);
-                int width = Math.Min(newwidth, input.Width - 1 - areafrom.X);
-                int writestride = width * bytesPerPixel;
-                int writestart = (y * deststride);
-
-                if (srcPointer[0] < 100) //Copying something with a low alpha value?
-                {
-                    writestart = 0;
-                }
-                Buffer.MemoryCopy(srcPointer + (maxy * input.Stride), destPointer + writestart, writestride, writestride);
-                memset(destPointer + writestart + writestride, 0, (newwidth-width)*bytesPerPixel);
-            }
-
-            return destPointer;
-        }
-        private static unsafe void ResizeCopy(BitmapData input, Rectangle areafrom, int newwidth, int newheight, BitmapData dest, Rectangle destrect)
+        private static unsafe void SmootheResizeCopy(BitmapData input, int xinput, int yinput, BitmapData dest, Rectangle destrect)
         {
             const int bytesPerPixel = 4;
 
             // Pointer to the first pixel of the source and destination bitmaps
-            byte* srcPointer = (byte*)(input.Scan0 + (areafrom.X * bytesPerPixel) + (areafrom.Y * input.Stride));
+            byte* srcPointer = (byte*)(input.Scan0 + (xinput * bytesPerPixel) + (yinput * input.Stride));
             byte* destPointer = (byte*)(dest.Scan0 + (destrect.X * bytesPerPixel) + (destrect.Y * dest.Stride));
 
-            for (int y = 0; y < newheight; y++)
+            for (int y = 0; y < destrect.Height; ++y)
             {
-                int maxy = Math.Min(y, input.Height - 1 - areafrom.Y);
-                int width = Math.Min(newwidth, input.Width - 1 - areafrom.X);
-                int writestride = width * bytesPerPixel;
-                int writestart = (y * dest.Stride);
-
-                Buffer.MemoryCopy(srcPointer + (maxy * input.Stride), destPointer + writestart, writestride, writestride);
-                memset(destPointer + writestart + writestride, 0, (newwidth - width) * bytesPerPixel);
-            }
-        }
-        private static unsafe void SmootheResizeCopy(BitmapData input, Rectangle areafrom, int newwidth, int newheight, BitmapData dest, Rectangle destrect)
-        {
-            const int bytesPerPixel = 4;
-
-            // Pointer to the first pixel of the source and destination bitmaps
-            byte* srcPointer = (byte*)(input.Scan0 + (areafrom.X * bytesPerPixel) + (areafrom.Y * input.Stride));
-            byte* destPointer = (byte*)(dest.Scan0 + (destrect.X * bytesPerPixel) + (destrect.Y * dest.Stride));
-
-            float scalex = (float)areafrom.Width / newwidth;
-            float scaley = (float)areafrom.Height / newheight;
-
-            for (int y = 0; y < newheight; y++)
-            {
-                for (int x = 0; x < newwidth; x++)
+                for (int x = 0;x < destrect.Width; ++x) //Really really really inefficient
                 {
-                    int newy = ((int)(scaley * y)) * input.Stride;
-                    int newx = ((int)(scalex * x)) * bytesPerPixel;
-
-                    Buffer.MemoryCopy(srcPointer + newy + newx, destPointer + y*dest.Stride + x * bytesPerPixel, bytesPerPixel, bytesPerPixel);
+                    Buffer.MemoryCopy(srcPointer, destPointer + y * dest.Stride + x * bytesPerPixel, bytesPerPixel, bytesPerPixel);
                 }
             }
         }

@@ -71,7 +71,7 @@ namespace ImageStretcher
             if (image != null)
             {
                 Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, result, resolution);
+                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, result);
 
                 e.Graphics.DrawImage(result, 0, 0, result.Width, result.Height);
 
@@ -166,7 +166,7 @@ namespace ImageStretcher
             Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             for (int i = 0; i < 1000; ++i)
             {
-                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result, resolution);
+                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result);
             }
             s.Stop();
             MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
@@ -259,7 +259,7 @@ namespace ImageStretcher
             {
                 scalar.time += ((2 * Math.PI) / (31.4f));
                 tempbitmaps[i] = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, tempbitmaps[i], 2, true);
+                var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, tempbitmaps[i], true);
                 minleft = Math.Min(minleft, data.left);
                 mintop = Math.Min(mintop, data.top);
                 maxright = Math.Max(maxright, data.right);

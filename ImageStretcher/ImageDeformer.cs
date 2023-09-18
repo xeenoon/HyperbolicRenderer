@@ -99,10 +99,12 @@ namespace ImageStretcher
                         continue;
                     }
 
-                    newtransformx -= leftdist / 2; //Travel half the distance to the left point
-                    newtransformy -= topdist / 2; //Travel half the distance to the top point
-                    int finalxresolution = leftdist + rightdist;
-                    int finalyresolution = topdist + downdist;
+                    newtransformx -= (int)Math.Ceiling(leftdist / 2f); //Travel half the distance to the left point
+                    newtransformy -= (int)Math.Ceiling(topdist / 2f); //Travel half the distance to the top point
+                    int finalxresolution = (int)(Math.Ceiling((leftdist + rightdist)/2f));
+                    int finalyresolution = (int)(Math.Ceiling((topdist + downdist)/2f));
+                    //finalxresolution = sectionwidth;
+                    //finalyresolution = sectionwidth;
 
                     // Ensure the new position is within bounds
                     if (newtransformx + offset.X < 0 ||
@@ -121,7 +123,7 @@ namespace ImageStretcher
                     deformData.bottom = Math.Max(deformData.bottom, newtransformy + offset.Y);
 
                     //Resize the section to fit, and copy it into the result
-                    ResizeCopy(imagedata,
+                    SmootheResizeCopy(imagedata,
                         new Rectangle(blockcentrex, blockcentrey, sectionwidth, sectionwidth),
                         finalxresolution, finalyresolution,
 
@@ -148,7 +150,7 @@ namespace ImageStretcher
             // Pointer to the first pixel of the source and destination bitmaps
             byte* srcPointer = (byte*)(input.Scan0 + (areafrom.X * bytesPerPixel) + (areafrom.Y * input.Stride));
             byte* destPointer = (byte*)Marshal.AllocHGlobal(deststride * newheight);
-            
+
             for (int y = 0; y < newheight; y++)
             {
                 int maxy = Math.Min(y, input.Height - 1 - areafrom.Y);
@@ -156,6 +158,10 @@ namespace ImageStretcher
                 int writestride = width * bytesPerPixel;
                 int writestart = (y * deststride);
 
+                if (srcPointer[0] < 100) //Copying something with a low alpha value?
+                {
+                    writestart = 0;
+                }
                 Buffer.MemoryCopy(srcPointer + (maxy * input.Stride), destPointer + writestart, writestride, writestride);
                 memset(destPointer + writestart + writestride, 0, (newwidth-width)*bytesPerPixel);
             }
@@ -179,6 +185,28 @@ namespace ImageStretcher
 
                 Buffer.MemoryCopy(srcPointer + (maxy * input.Stride), destPointer + writestart, writestride, writestride);
                 memset(destPointer + writestart + writestride, 0, (newwidth - width) * bytesPerPixel);
+            }
+        }
+        private static unsafe void SmootheResizeCopy(BitmapData input, Rectangle areafrom, int newwidth, int newheight, BitmapData dest, Rectangle destrect)
+        {
+            const int bytesPerPixel = 4;
+
+            // Pointer to the first pixel of the source and destination bitmaps
+            byte* srcPointer = (byte*)(input.Scan0 + (areafrom.X * bytesPerPixel) + (areafrom.Y * input.Stride));
+            byte* destPointer = (byte*)(dest.Scan0 + (destrect.X * bytesPerPixel) + (destrect.Y * dest.Stride));
+
+            float scalex = (float)areafrom.Width / newwidth;
+            float scaley = (float)areafrom.Height / newheight;
+
+            for (int y = 0; y < newheight; y++)
+            {
+                for (int x = 0; x < newwidth; x++)
+                {
+                    int newy = ((int)(scaley * y)) * input.Stride;
+                    int newx = ((int)(scalex * x)) * bytesPerPixel;
+
+                    Buffer.MemoryCopy(srcPointer + newy + newx, destPointer + y*dest.Stride + x * bytesPerPixel, bytesPerPixel, bytesPerPixel);
+                }
             }
         }
         private static unsafe void CopyRectangles(byte* sourcePtr, int sourceStride, byte* destinationPtr, int destinationStride, Rectangle sourceRect, Rectangle destinationRect)

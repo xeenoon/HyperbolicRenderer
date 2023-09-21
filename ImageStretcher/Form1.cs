@@ -27,11 +27,14 @@ namespace ImageStretcher
             originalimage[0] = image;
             framecollection.GenerateFrames(originalimage);
             Resize += framecollection.Resize;
+            this.WindowState = FormWindowState.Maximized;
+
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.DrawImage(framecollection.selectedframe.preview.Image, new Point(offset.X, offset.Y));
+            var image = framecollection.selectedframe.preview.Image;
+            e.Graphics.DrawImage(image, new Point(offset.X, offset.Y));
 
             foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
             {
@@ -429,6 +432,14 @@ namespace ImageStretcher
             {
                 ParseFileData(openFileDialog.FileName);
             }
+        }
+
+        private void AnimationEditor_Resize(object sender, EventArgs e)
+        {
+            offset = new Point(pictureBox1.Width / 2 - image.Width / 2, pictureBox1.Height / 2 - image.Height / 2);
+            offsetTextbox.Text = string.Format("{0},{1}", offset.X, offset.Y);
+
+            pictureBox1.Invalidate();
         }
     }
 }

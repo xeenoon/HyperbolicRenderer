@@ -363,7 +363,7 @@
             frameViewer.Size = new Size(698, 175);
             frameViewer.TabIndex = 27;
             // 
-            // Form1
+            // AnimationEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -385,9 +385,10 @@
             Controls.Add(pictureBox1);
             DoubleBuffered = true;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Name = "Form1";
+            Name = "AnimationEditor";
             Text = "Jello Machine";
             Load += Form1_Load;
+            Resize += AnimationEditor_Resize;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ImportSettingsPanel.ResumeLayout(false);
             ImportSettingsPanel.PerformLayout();

@@ -56,6 +56,7 @@
             addPolygonButton = new Button();
             saveButton = new Button();
             ImportSettingsButton = new Button();
+            frameViewer = new Panel();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ImportSettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
@@ -70,7 +71,7 @@
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
             pictureBox1.Location = new Point(-2, 0);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(705, 503);
+            pictureBox1.Size = new Size(700, 506);
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             pictureBox1.Click += AddPoint;
@@ -156,7 +157,7 @@
             ImportSettingsPanel.Controls.Add(delayTextbox);
             ImportSettingsPanel.Controls.Add(delayLabel);
             ImportSettingsPanel.Controls.Add(animationsettingsLabel);
-            ImportSettingsPanel.Location = new Point(424, 187);
+            ImportSettingsPanel.Location = new Point(424, 189);
             ImportSettingsPanel.Name = "ImportSettingsPanel";
             ImportSettingsPanel.Size = new Size(213, 141);
             ImportSettingsPanel.TabIndex = 16;
@@ -256,7 +257,7 @@
             ExportPanelSettings.Controls.Add(framenameTextbox);
             ExportPanelSettings.Controls.Add(framenameLabel);
             ExportPanelSettings.Controls.Add(ExportSettingsTitleLabel);
-            ExportPanelSettings.Location = new Point(424, 203);
+            ExportPanelSettings.Location = new Point(424, 205);
             ExportPanelSettings.Name = "ExportPanelSettings";
             ExportPanelSettings.Size = new Size(213, 100);
             ExportPanelSettings.TabIndex = 22;
@@ -318,7 +319,7 @@
             polygonMenu.Controls.Add(addPolygonButton);
             polygonMenu.Location = new Point(709, 102);
             polygonMenu.Name = "polygonMenu";
-            polygonMenu.Size = new Size(325, 401);
+            polygonMenu.Size = new Size(325, 404);
             polygonMenu.TabIndex = 24;
             // 
             // addPolygonButton
@@ -353,11 +354,20 @@
             ImportSettingsButton.UseVisualStyleBackColor = true;
             ImportSettingsButton.Click += ImportSettingsButton_Click;
             // 
+            // frameViewer
+            // 
+            frameViewer.BackColor = Color.Black;
+            frameViewer.Location = new Point(0, 408);
+            frameViewer.Name = "frameViewer";
+            frameViewer.Size = new Size(700, 110);
+            frameViewer.TabIndex = 27;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1035, 515);
+            ClientSize = new Size(1035, 518);
+            Controls.Add(frameViewer);
             Controls.Add(ImportSettingsButton);
             Controls.Add(saveButton);
             Controls.Add(polygonMenu);
@@ -417,5 +427,6 @@
         private Button addPolygonButton;
         private Button saveButton;
         private Button ImportSettingsButton;
+        private Panel frameViewer;
     }
 }

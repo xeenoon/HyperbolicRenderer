@@ -21,6 +21,9 @@ namespace ImageStretcher
             pictureBox1.Invalidate();
             menu = new PolygonMenu(polygonMenu, addPolygonButton);
             scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu);
+
+            FrameCollection frames = new FrameCollection(frameViewer);
+            frames.GenerateFrames();
         }
         double lastlooptime;
         int frameidx = 0;

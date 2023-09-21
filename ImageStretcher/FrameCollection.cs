@@ -19,7 +19,7 @@ namespace ImageStretcher
             {
                 Size = new Size(80, 100),
                 BackColor = Color.White,
-                Location = new Point(5,5),
+                Location = new Point(5,15),
             };
 
             preview = new PictureBox();
@@ -38,11 +38,11 @@ namespace ImageStretcher
     internal class FrameCollection
     {
         Panel bgpanel;
-
+        ScrollBar scrollBar;
         public FrameCollection(Panel bgpanel)
         {
             this.bgpanel = bgpanel;
-            bgpanel.AutoScroll = true;
+            bgpanel.AutoScroll = false;
             bgpanel.VerticalScroll.Enabled = false;
             bgpanel.VerticalScroll.Visible = false;
             bgpanel.VerticalScroll.Maximum = 0;
@@ -50,14 +50,16 @@ namespace ImageStretcher
             bgpanel.HorizontalScroll.Visible = false;
             bgpanel.HorizontalScroll.Maximum = 0;
 
-
-            bgpanel.AutoScroll = true;
+            scrollBar = new ScrollBar(10, bgpanel);
         }
 
         public void GenerateFrames(Bitmap[] frames)
         {
             bgpanel.Controls.Clear();
             bgpanel.Controls.Add(new Frame().backgroundpanel);
+
+            scrollBar = new ScrollBar(10, bgpanel);
+
             for (int i = 0; i < frames.Length; ++i)
             {
                 Frame frame = new Frame();
@@ -68,7 +70,8 @@ namespace ImageStretcher
                 frame.preview.Image = frames[i];
                 frame.preview.SizeMode = PictureBoxSizeMode.StretchImage;
             }
-
+            scrollBar.SetOffset();
+            bgpanel.Invalidate();
         }
     }
 }

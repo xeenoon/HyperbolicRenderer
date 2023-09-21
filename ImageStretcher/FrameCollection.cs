@@ -19,7 +19,7 @@ namespace ImageStretcher
             {
                 Size = new Size(80, 100),
                 BackColor = Color.White,
-                Location = new Point(5,15),
+                Location = new Point(10,15),
             };
 
             preview = new PictureBox();
@@ -39,18 +39,24 @@ namespace ImageStretcher
     {
         Panel bgpanel;
         ScrollBar scrollBar;
-        public FrameCollection(Panel bgpanel)
+        Form parent;
+        public FrameCollection(Panel bgpanel, Form parent)
         {
+            this.parent = parent;
             this.bgpanel = bgpanel;
             bgpanel.AutoScroll = false;
             bgpanel.VerticalScroll.Enabled = false;
             bgpanel.VerticalScroll.Visible = false;
             bgpanel.VerticalScroll.Maximum = 0;
+            bgpanel.HorizontalScroll.Minimum = int.MaxValue;
+
             bgpanel.HorizontalScroll.Enabled = false;
             bgpanel.HorizontalScroll.Visible = false;
-            bgpanel.HorizontalScroll.Maximum = 0;
+            bgpanel.HorizontalScroll.Maximum = int.MaxValue;
+            bgpanel.HorizontalScroll.Minimum = 0;
+            bgpanel.AutoScroll = true;
 
-            scrollBar = new ScrollBar(10, bgpanel);
+            scrollBar = new ScrollBar(10, bgpanel, parent);
         }
 
         public void GenerateFrames(Bitmap[] frames)
@@ -58,8 +64,9 @@ namespace ImageStretcher
             bgpanel.Controls.Clear();
             bgpanel.Controls.Add(new Frame().backgroundpanel);
 
-            scrollBar = new ScrollBar(10, bgpanel);
+            scrollBar = new ScrollBar(10, bgpanel, parent);
 
+            int farright = 100;
             for (int i = 0; i < frames.Length; ++i)
             {
                 Frame frame = new Frame();
@@ -69,7 +76,13 @@ namespace ImageStretcher
                 frame.name.Text = i.ToString();
                 frame.preview.Image = frames[i];
                 frame.preview.SizeMode = PictureBoxSizeMode.StretchImage;
+                farright = frame.backgroundpanel.Right;
             }
+            Panel buffer = new Panel();
+            buffer.Location = new Point(farright, 0);
+            buffer.Size = new Size(10, 100);
+            buffer.Name = "BUFFER";
+            bgpanel.Controls.Add(buffer);
             scrollBar.SetOffset();
             bgpanel.Invalidate();
         }

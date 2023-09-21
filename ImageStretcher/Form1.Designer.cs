@@ -359,7 +359,7 @@
             frameViewer.BackColor = Color.Black;
             frameViewer.Location = new Point(0, 408);
             frameViewer.Name = "frameViewer";
-            frameViewer.Size = new Size(700, 127);
+            frameViewer.Size = new Size(698, 175);
             frameViewer.TabIndex = 27;
             // 
             // Form1

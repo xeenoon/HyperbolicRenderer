@@ -18,7 +18,7 @@ namespace ImageStretcher
         public Panel parent;
         PictureBox scrollviewarea;
 
-        public ScrollBar(int height, Panel parent)
+        public ScrollBar(int height, Panel parent, Form main)
         {
             this.height = height;
             this.width = parent.Width;
@@ -27,7 +27,9 @@ namespace ImageStretcher
             scrollviewarea = new PictureBox();
             scrollviewarea.Size = new Size(parent.Width, height);
             scrollviewarea.Image = new Bitmap(parent.Width, height);
-            parent.Controls.Add(scrollviewarea);
+            main.Controls.Add(scrollviewarea);
+            scrollviewarea.Location = parent.Location;
+            scrollviewarea.BringToFront();
 
             scrollviewarea.MouseDown += new MouseEventHandler(MouseDown);
             scrollviewarea.MouseUp += new MouseEventHandler(MouseUp);
@@ -35,20 +37,22 @@ namespace ImageStretcher
 
             Draw();
         }
+        float scrollstepsize;
         public void SetOffset()
         {
-            int highestpixel = parent.Controls.Cast<Control>().ToList().Max(c=>c.Right) + 5; //Find the furtherest right, with a buffer of 5
+            int highestpixel = parent.Controls.Cast<Control>().ToList().Max(c=>c.Right) + height; //Find the furtherest right, with a buffer of 5
             if (highestpixel > maxwidth)
             {
                 //Scale width
-                width = (int)(maxwidth * (maxwidth / (float)highestpixel)) - 5;
+                scrollstepsize = (float)(highestpixel) / (maxwidth-height);
+                width = (int)(maxwidth * (maxwidth / (float)highestpixel));
             }
             Draw();
         }
         public void Draw()
         {
             var graphics = Graphics.FromImage(scrollviewarea.Image);
-            graphics.Clear(Color.Transparent);
+            graphics.Clear(Color.Black);
             graphics.FillEllipse  (new Pen(Color.Gray).Brush, offset, 0, 10, height);
             graphics.FillEllipse  (new Pen(Color.Gray).Brush, width - 20 + offset, 0, 10, height);
             graphics.FillRectangle(new Pen(Color.Gray).Brush, offset + height/2, 0, width-20, height);
@@ -56,10 +60,11 @@ namespace ImageStretcher
         }
         int mousedownx;
         bool mousedown;
+
         public void MouseDown(object sender, EventArgs e)
         {
             mousedown = true;
-            var cursorpos = parent.PointToClient(Cursor.Position);
+            var cursorpos = scrollviewarea.PointToClient(Cursor.Position);
             mousedownx = cursorpos.X;
         }
         int moveticks = 0;
@@ -68,12 +73,16 @@ namespace ImageStretcher
             if (mousedown)
             {
                 ++moveticks;
-                var cursorpos = parent.PointToClient(Cursor.Position);
-                offset = Math.Max(0, cursorpos.X - mousedownx);
-                offset = Math.Min(maxwidth - width + height, offset);
+                var cursorpos = scrollviewarea.PointToClient(Cursor.Position);
+                offset = Math.Min(maxwidth - width + height / 2, Math.Max(height / 2, cursorpos.X - mousedownx));
 
-                //MouseMove is updated too often
                 Draw();
+                
+                parent.HorizontalScroll.Value = (int)((offset-height/2) * scrollstepsize);
+                if (parent.HorizontalScroll.Visible == true || parent.AutoScroll == true)
+                {
+                    parent.HorizontalScroll.Visible = false;
+                }
             }
         }
         public void MouseUp(object sender, EventArgs e)

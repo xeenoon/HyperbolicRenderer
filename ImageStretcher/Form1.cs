@@ -24,7 +24,7 @@ namespace ImageStretcher
             menu = new PolygonMenu(polygonMenu, addPolygonButton);
             scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu);
 
-            framecollection = new FrameCollection(frameViewer);
+            framecollection = new FrameCollection(frameViewer, this);
             framecollection.GenerateFrames(new Bitmap[0]);
 
             //  hScrollBar1.Paint += hScrollBar1_Paint;

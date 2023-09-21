@@ -46,7 +46,7 @@ namespace ImageStretcher
 
             int numRows = height + 2;
             int numCols = width + 2; //Add 2 to store elements behind and infront
-
+            
             int numElements = (numRows) * (numCols);
 
             int* xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
@@ -60,9 +60,8 @@ namespace ImageStretcher
                     Point blockcentre = new Point(col, row);
                     Point newtransform = DeformFunction(blockcentre);
 
-
-                    xCoordinates[index] = (int)newtransform.X;
-                    yCoordinates[index] = (int)newtransform.Y;
+                    xCoordinates[index] = newtransform.X;
+                    yCoordinates[index] = newtransform.Y;
                 }
             }
 
@@ -86,12 +85,8 @@ namespace ImageStretcher
                         continue;
                     }
 
-                    newtransformx -= (int)(leftdist / 2f); //Travel half the distance to the left point
-                    newtransformy -= (int)(topdist / 2f); //Travel half the distance to the top point
-                    int finalxresolution = (int)(((leftdist + rightdist)/2f));
-                    int finalyresolution = (int)(((topdist + downdist)/2f));
-                    //finalxresolution = sectionwidth;
-                    //finalyresolution = sectionwidth;
+                    int finalxresolution = (leftdist + rightdist);
+                    int finalyresolution = (topdist + downdist);
 
                     // Ensure the new position is within bounds
                     if (newtransformx + offset.X < 0 ||
@@ -138,7 +133,7 @@ namespace ImageStretcher
 
             for (int y = 0; y < destrect.Height; ++y)
             {
-                for (int x = 0;x < destrect.Width; ++x) //Really really really inefficient
+                for (int x = 0; x < destrect.Width; ++x) //Really really really inefficient
                 {
                     Buffer.MemoryCopy(srcPointer, destPointer + y * dest.Stride + x * bytesPerPixel, bytesPerPixel, bytesPerPixel);
                 }

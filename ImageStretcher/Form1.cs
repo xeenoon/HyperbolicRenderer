@@ -25,7 +25,10 @@ namespace ImageStretcher
             scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu);
 
             framecollection = new FrameCollection(frameViewer, this);
-            framecollection.GenerateFrames(new Bitmap[0]);
+
+            Bitmap[] originalimage = new Bitmap[1];
+            originalimage[0] = image;
+            framecollection.GenerateFrames(originalimage);
 
             //  hScrollBar1.Paint += hScrollBar1_Paint;
         }
@@ -159,7 +162,9 @@ namespace ImageStretcher
         double lasttime = 0;
         private void StartStopButton(object sender, EventArgs e)
         {
-            framecollection.GenerateFrames(GetFrames());
+            Bitmap[] originalimage = new Bitmap[1];
+            originalimage[0] = image;
+            framecollection.GenerateFrames(originalimage.Concat(GetFrames()).ToArray());
         }
 
         int resolution = 2;

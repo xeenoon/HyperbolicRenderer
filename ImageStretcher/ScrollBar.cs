@@ -58,14 +58,12 @@ namespace ImageStretcher
             graphics.FillRectangle(new Pen(Color.Gray).Brush, offset + height/2, 0, width-20, height);
             scrollviewarea.Invalidate();
         }
-        int mousedownx;
         bool mousedown;
 
         public void MouseDown(object sender, EventArgs e)
         {
             mousedown = true;
-            var cursorpos = scrollviewarea.PointToClient(Cursor.Position);
-            mousedownx = cursorpos.X;
+            MouseMove(sender, e);
         }
         int moveticks = 0;
         public void MouseMove(object sender, EventArgs e)
@@ -74,7 +72,8 @@ namespace ImageStretcher
             {
                 ++moveticks;
                 var cursorpos = scrollviewarea.PointToClient(Cursor.Position);
-                offset = Math.Min(maxwidth - width + height / 2, Math.Max(height / 2, cursorpos.X - mousedownx));
+                cursorpos.X -= width / 2;
+                offset = Math.Min(maxwidth - width + height / 2, Math.Max(height / 2, cursorpos.X));
 
                 Draw();
                 

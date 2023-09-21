@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,8 +14,10 @@ namespace ImageStretcher
         public Panel backgroundpanel;
         public PictureBox preview;
         public Label name;
-        public Frame() 
+        FrameCollection frames;
+        public Frame(FrameCollection frames)
         {
+            this.frames = frames;
             backgroundpanel = new Panel()
             {
                 Size = new Size(80, 100),
@@ -33,13 +36,31 @@ namespace ImageStretcher
             name.Size = new Size(80,20);
             name.Text = "Master";
             name.TextAlign = ContentAlignment.MiddleCenter;
+            backgroundpanel.Click += Click;
+            preview.Click += Click;
+            name.Click += Click;
+        }
+        public void Click(object sender, EventArgs e)
+        {
+            if (frames.selectedframe == this)
+            {
+                frames.selectedframe = frames.master;
+                backgroundpanel.BackColor = Color.White;
+                frames.master.backgroundpanel.BackColor = Color.LightGray;
+            }
+
+            frames.selectedframe.backgroundpanel.BackColor = Color.White;
+            frames.selectedframe = this;
+            backgroundpanel.BackColor = Color.LightGray;
         }
     }
-    internal class FrameCollection
+    public class FrameCollection
     {
         Panel bgpanel;
         ScrollBar scrollBar;
         Form parent;
+        public Frame selectedframe = null;
+        public Frame master;
         public FrameCollection(Panel bgpanel, Form parent)
         {
             this.parent = parent;
@@ -62,17 +83,24 @@ namespace ImageStretcher
         public void GenerateFrames(Bitmap[] frames)
         {
             bgpanel.Controls.Clear();
-            bgpanel.Controls.Add(new Frame().backgroundpanel);
+            Frame master = new Frame(this);
+            master.preview.Image = frames[0];
+            master.preview.SizeMode = PictureBoxSizeMode.StretchImage;
+            master.backgroundpanel.BackColor = Color.LightGray;
+            selectedframe = master;
+            this.master = master;
+
+            bgpanel.Controls.Add(master.backgroundpanel);
 
             scrollBar = new ScrollBar(10, bgpanel, parent);
 
             int farright = 100;
-            for (int i = 0; i < frames.Length; ++i)
+            for (int i = 1; i < frames.Length; ++i)
             {
-                Frame frame = new Frame();
+                Frame frame = new Frame(this);
                 var bg = frame.backgroundpanel;
                 bgpanel.Controls.Add(bg);
-                bg.Location = new Point(bg.Location.X + 90 * (i+1), bg.Location.Y);
+                bg.Location = new Point(bg.Location.X + 90 * (i), bg.Location.Y);
                 frame.name.Text = i.ToString();
                 frame.preview.Image = frames[i];
                 frame.preview.SizeMode = PictureBoxSizeMode.StretchImage;

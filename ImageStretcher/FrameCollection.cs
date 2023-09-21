@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ImageStretcher
 {
     public class Frame
     {
         public Panel backgroundpanel;
-        PictureBox preview;
-        Label name;
+        public PictureBox preview;
+        public Label name;
         public Frame() 
         {
             backgroundpanel = new Panel()
@@ -41,12 +42,33 @@ namespace ImageStretcher
         public FrameCollection(Panel bgpanel)
         {
             this.bgpanel = bgpanel;
+            bgpanel.AutoScroll = true;
+            bgpanel.VerticalScroll.Enabled = false;
+            bgpanel.VerticalScroll.Visible = false;
+            bgpanel.VerticalScroll.Maximum = 0;
+            bgpanel.HorizontalScroll.Enabled = false;
+            bgpanel.HorizontalScroll.Visible = false;
+            bgpanel.HorizontalScroll.Maximum = 0;
+
+
+            bgpanel.AutoScroll = true;
         }
 
-        public void GenerateFrames()
+        public void GenerateFrames(Bitmap[] frames)
         {
-            Frame frame = new Frame();
-            bgpanel.Controls.Add(frame.backgroundpanel);
+            bgpanel.Controls.Clear();
+            bgpanel.Controls.Add(new Frame().backgroundpanel);
+            for (int i = 0; i < frames.Length; ++i)
+            {
+                Frame frame = new Frame();
+                var bg = frame.backgroundpanel;
+                bgpanel.Controls.Add(bg);
+                bg.Location = new Point(bg.Location.X + 90 * (i+1), bg.Location.Y);
+                frame.name.Text = i.ToString();
+                frame.preview.Image = frames[i];
+                frame.preview.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+
         }
     }
 }

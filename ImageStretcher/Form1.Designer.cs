@@ -31,7 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             pictureBox1 = new PictureBox();
             importButton = new Button();
-            timeButton = new Button();
+            generateButton = new Button();
             restartButton = new Button();
             exportGIFButton = new Button();
             exportFramesButton = new Button();
@@ -88,19 +88,19 @@
             importButton.UseVisualStyleBackColor = true;
             importButton.Click += ImportImage;
             // 
-            // timeButton
+            // generateButton
             // 
-            timeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            timeButton.BackColor = Color.Lime;
-            timeButton.FlatAppearance.BorderSize = 0;
-            timeButton.FlatStyle = FlatStyle.Popup;
-            timeButton.Location = new Point(814, 73);
-            timeButton.Name = "timeButton";
-            timeButton.Size = new Size(107, 23);
-            timeButton.TabIndex = 2;
-            timeButton.Text = "Start time";
-            timeButton.UseVisualStyleBackColor = false;
-            timeButton.Click += StartStopButton;
+            generateButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            generateButton.BackColor = SystemColors.ActiveCaption;
+            generateButton.FlatAppearance.BorderSize = 0;
+            generateButton.FlatStyle = FlatStyle.Popup;
+            generateButton.Location = new Point(814, 73);
+            generateButton.Name = "generateButton";
+            generateButton.Size = new Size(107, 23);
+            generateButton.TabIndex = 2;
+            generateButton.Text = "Generate frames";
+            generateButton.UseVisualStyleBackColor = false;
+            generateButton.Click += StartStopButton;
             // 
             // restartButton
             // 
@@ -379,7 +379,7 @@
             Controls.Add(exportFramesButton);
             Controls.Add(exportGIFButton);
             Controls.Add(restartButton);
-            Controls.Add(timeButton);
+            Controls.Add(generateButton);
             Controls.Add(importButton);
             Controls.Add(pictureBox1);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -402,7 +402,7 @@
 
         private PictureBox pictureBox1;
         private Button importButton;
-        private Button timeButton;
+        private Button generateButton;
         private Button restartButton;
         private Button exportGIFButton;
         private Button exportFramesButton;

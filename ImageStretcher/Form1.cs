@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.Pkcs;
 using AnimatedGif;
 
@@ -10,6 +11,7 @@ namespace ImageStretcher
     {
         System.Timers.Timer UpdateTimer = new System.Timers.Timer(10);
         PointTransformer scalar;
+        FrameCollection framecollection;
         PolygonMenu menu;
         public Form1()
         {
@@ -22,9 +24,46 @@ namespace ImageStretcher
             menu = new PolygonMenu(polygonMenu, addPolygonButton);
             scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu);
 
-            FrameCollection frames = new FrameCollection(frameViewer);
-            frames.GenerateFrames();
+            framecollection = new FrameCollection(frameViewer);
+            framecollection.GenerateFrames(new Bitmap[0]);
+
+            //  hScrollBar1.Paint += hScrollBar1_Paint;
         }
+        private void hScrollBar1_Paint(object sender, PaintEventArgs e)
+        {
+            HScrollBar scrollBar = (HScrollBar)sender;
+            e.Graphics.Clear(Color.White); // Clear the scrollbar to a background color
+
+            // Replace Color.Red with your desired color
+            using (SolidBrush brush = new SolidBrush(Color.Red))
+            {
+                int thumbX = CalculateThumbPosition(scrollBar);
+                int thumbWidth = CalculateThumbSize(scrollBar);
+                int thumbHeight = scrollBar.Height;
+
+                // Draw the thumb
+                e.Graphics.FillRectangle(brush, thumbX, 0, thumbWidth, thumbHeight);
+            }
+        }
+
+        private int CalculateThumbPosition(HScrollBar scrollBar)
+        {
+            int thumbMin = scrollBar.Minimum;
+            int thumbMax = scrollBar.Maximum - scrollBar.LargeChange + 1;
+            int thumbValue = scrollBar.Value;
+
+            // Calculate the thumb position within the scrollbar's range
+            return (int)(((float)(thumbValue - thumbMin) / (thumbMax - thumbMin)) * (scrollBar.Width - scrollBar.LargeChange));
+        }
+
+        private int CalculateThumbSize(HScrollBar scrollBar)
+        {
+            int thumbSize = scrollBar.LargeChange;
+
+            // Ensure the thumb size is at least 16 pixels (you can adjust this value)
+            return Math.Max(thumbSize, 16);
+        }
+
         double lastlooptime;
         int frameidx = 0;
         bool direction = true;
@@ -120,21 +159,7 @@ namespace ImageStretcher
         double lasttime = 0;
         private void StartStopButton(object sender, EventArgs e)
         {
-            started = !started;
-            if (started)
-            {
-                scalar.time = lasttime;
-                timeButton.BackColor = Color.Red;
-                timeButton.Text = "Stop";
-                scalar.Restart();
-            }
-            else
-            {
-                timeButton.BackColor = Color.FromArgb(0, 255, 0);
-                timeButton.Text = "Start time";
-                lasttime = scalar.time;
-                scalar.Pause();
-            }
+            framecollection.GenerateFrames(GetFrames());
         }
 
         int resolution = 2;
@@ -250,6 +275,10 @@ namespace ImageStretcher
         }
         public Bitmap[] GetFrames()
         {
+            if (menu.menuItems.Count == 0)
+            {
+                return new Bitmap[0];
+            }
             int frames = (int)((menu.menuItems.Max(m => m.period) * 4) / (Math.PI * 2)) * 33;
 
             Bitmap[] GIFbitmaps = new Bitmap[frames];

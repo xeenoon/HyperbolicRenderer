@@ -52,16 +52,17 @@ namespace ImageStretcher
             frames.selectedframe.backgroundpanel.BackColor = Color.White;
             frames.selectedframe = this;
             backgroundpanel.BackColor = Color.LightGray;
+            frames.parent.pictureBox1.Invalidate();
         }
     }
     public class FrameCollection
     {
         Panel bgpanel;
         ScrollBar scrollBar;
-        Form parent;
+        public AnimationEditor parent;
         public Frame selectedframe = null;
         public Frame master;
-        public FrameCollection(Panel bgpanel, Form parent)
+        public FrameCollection(Panel bgpanel, AnimationEditor parent)
         {
             this.parent = parent;
             this.bgpanel = bgpanel;
@@ -92,6 +93,7 @@ namespace ImageStretcher
 
             bgpanel.Controls.Add(master.backgroundpanel);
 
+            scrollBar.Dispose();
             scrollBar = new ScrollBar(10, bgpanel, parent);
 
             int farright = 100;
@@ -113,6 +115,15 @@ namespace ImageStretcher
             bgpanel.Controls.Add(buffer);
             scrollBar.SetOffset();
             bgpanel.Invalidate();
+        }
+        public void Resize(object sender, EventArgs e)
+        {
+            int oldoffset = scrollBar.offset;
+            scrollBar.Dispose();
+            scrollBar = new ScrollBar(10, bgpanel, parent);
+            scrollBar.SetOffset();
+            scrollBar.offset = oldoffset;
+            scrollBar.Draw();
         }
     }
 }

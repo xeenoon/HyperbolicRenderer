@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace ImageStretcher
 {
-    internal class ScrollBar
+    internal class ScrollBar : IDisposable
     {
         public int height;
         public int maxwidth;
@@ -17,9 +17,11 @@ namespace ImageStretcher
         public int offset = 5;
         public Panel parent;
         PictureBox scrollviewarea;
+        Form main;
 
         public ScrollBar(int height, Panel parent, Form main)
         {
+            this.main = main;
             this.height = height;
             this.width = parent.Width;
             this.maxwidth = parent.Width;
@@ -87,6 +89,11 @@ namespace ImageStretcher
         public void MouseUp(object sender, EventArgs e)
         {
             mousedown = false;
+        }
+
+        public void Dispose()
+        {
+            main.Controls.Remove(scrollviewarea);
         }
     }
 }

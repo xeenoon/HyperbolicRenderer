@@ -7,17 +7,14 @@ using AnimatedGif;
 
 namespace ImageStretcher
 {
-    public partial class Form1 : Form
+    public partial class AnimationEditor : Form
     {
-        System.Timers.Timer UpdateTimer = new System.Timers.Timer(10);
         PointTransformer scalar;
         FrameCollection framecollection;
         PolygonMenu menu;
-        public Form1()
+        public AnimationEditor()
         {
             InitializeComponent();
-            UpdateTimer.Elapsed += new System.Timers.ElapsedEventHandler(Update);
-            UpdateTimer.Start();
             image = (Bitmap)pictureBox1.Image.Clone();
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
@@ -29,114 +26,27 @@ namespace ImageStretcher
             Bitmap[] originalimage = new Bitmap[1];
             originalimage[0] = image;
             framecollection.GenerateFrames(originalimage);
-
-            //  hScrollBar1.Paint += hScrollBar1_Paint;
-        }
-        private void hScrollBar1_Paint(object sender, PaintEventArgs e)
-        {
-            HScrollBar scrollBar = (HScrollBar)sender;
-            e.Graphics.Clear(Color.White); // Clear the scrollbar to a background color
-
-            // Replace Color.Red with your desired color
-            using (SolidBrush brush = new SolidBrush(Color.Red))
-            {
-                int thumbX = CalculateThumbPosition(scrollBar);
-                int thumbWidth = CalculateThumbSize(scrollBar);
-                int thumbHeight = scrollBar.Height;
-
-                // Draw the thumb
-                e.Graphics.FillRectangle(brush, thumbX, 0, thumbWidth, thumbHeight);
-            }
-        }
-
-        private int CalculateThumbPosition(HScrollBar scrollBar)
-        {
-            int thumbMin = scrollBar.Minimum;
-            int thumbMax = scrollBar.Maximum - scrollBar.LargeChange + 1;
-            int thumbValue = scrollBar.Value;
-
-            // Calculate the thumb position within the scrollbar's range
-            return (int)(((float)(thumbValue - thumbMin) / (thumbMax - thumbMin)) * (scrollBar.Width - scrollBar.LargeChange));
-        }
-
-        private int CalculateThumbSize(HScrollBar scrollBar)
-        {
-            int thumbSize = scrollBar.LargeChange;
-
-            // Ensure the thumb size is at least 16 pixels (you can adjust this value)
-            return Math.Max(thumbSize, 16);
-        }
-
-        double lastlooptime;
-        int frameidx = 0;
-        bool direction = true;
-        private void Update(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            lastlooptime += 10;
-            if (lastlooptime > delay && animating)
-            {
-                lastlooptime = 0;
-
-                if (direction)
-                {
-                    frameidx++;
-                }
-                else
-                {
-                    frameidx--;
-                }
-                if (frameidx == frames.Length)
-                {
-                    if (restartanimation)
-                    {
-                        frameidx = 0;
-                    }
-                    else
-                    {
-                        direction = false;
-                        frameidx -= 2;
-                    }
-                }
-                else if (frameidx == 0)
-                {
-                    direction = true;
-                }
-
-                image = frames[frameidx];
-                scalar.centre = new PointF(image.Width / 2, image.Height / 2);
-            }
-            if (started)
-            {
-                pictureBox1.Invalidate();
-            }
+            Resize += framecollection.Resize;
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            if (image != null)
+            e.Graphics.DrawImage(framecollection.selectedframe.preview.Image, new Point(offset.X, offset.Y));
+
+            foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
             {
-                Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, result);
-
-                e.Graphics.DrawImage(result, 0, 0, result.Width, result.Height);
-
-                foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
+                PointF[] offsetpolygon = new PointF[polygon.Count];
+                for (int i = 0; i < polygon.Count; i++)
                 {
-                    PointF[] offsetpolygon = new PointF[polygon.Count];
-                    for (int i = 0; i < polygon.Count; i++)
-                    {
-                        PointF point = polygon[i];
-                        PointF offsetedpoint = new PointF(point.X + offset.X, point.Y + offset.Y);
-                        e.Graphics.FillEllipse(new Pen(Color.Blue).Brush, new Rectangle((int)(offsetedpoint.X - 2), (int)(offsetedpoint.Y - 2), 4, 4));
-                        offsetpolygon[i] = offsetedpoint;
-                    }
-                    if (offsetpolygon.Count() >= 3)
-                    {
-                        e.Graphics.DrawPolygon(new Pen(Color.Black), offsetpolygon.ToArray());
-                    }
+                    PointF point = polygon[i];
+                    PointF offsetedpoint = new PointF(point.X + offset.X, point.Y + offset.Y);
+                    e.Graphics.FillEllipse(new Pen(Color.Blue).Brush, new Rectangle((int)(offsetedpoint.X - 2), (int)(offsetedpoint.Y - 2), 4, 4));
+                    offsetpolygon[i] = offsetedpoint;
                 }
-
-                result.Dispose();
+                if (offsetpolygon.Count() >= 3)
+                {
+                    e.Graphics.DrawPolygon(new Pen(Color.Black), offsetpolygon.ToArray());
+                }
             }
         }
         Bitmap image;

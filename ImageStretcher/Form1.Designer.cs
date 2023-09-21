@@ -1,6 +1,6 @@
 ﻿namespace ImageStretcher
 {
-    partial class Form1
+    partial class AnimationEditor
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AnimationEditor));
             pictureBox1 = new PictureBox();
             importButton = new Button();
             generateButton = new Button();
@@ -356,6 +356,7 @@
             // 
             // frameViewer
             // 
+            frameViewer.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             frameViewer.BackColor = Color.Black;
             frameViewer.Location = new Point(0, 408);
             frameViewer.Name = "frameViewer";
@@ -401,7 +402,7 @@
 
         #endregion
 
-        private PictureBox pictureBox1;
+        public PictureBox pictureBox1;
         private Button importButton;
         private Button generateButton;
         private Button restartButton;

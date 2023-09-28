@@ -57,12 +57,14 @@
             saveButton = new Button();
             ImportSettingsButton = new Button();
             frameViewer = new Panel();
+            startstopButton = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ImportSettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
             ExportPanelSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).BeginInit();
             polygonMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)startstopButton).BeginInit();
             SuspendLayout();
             // 
             // pictureBox1
@@ -100,7 +102,7 @@
             generateButton.TabIndex = 2;
             generateButton.Text = "Generate frames";
             generateButton.UseVisualStyleBackColor = false;
-            generateButton.Click += StartStopButton;
+            generateButton.Click += Generate;
             // 
             // restartButton
             // 
@@ -363,11 +365,24 @@
             frameViewer.Size = new Size(698, 175);
             frameViewer.TabIndex = 27;
             // 
+            // startstopButton
+            // 
+            startstopButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            startstopButton.Location = new Point(0, 378);
+            startstopButton.Name = "startstopButton";
+            startstopButton.Size = new Size(30, 30);
+            startstopButton.SizeMode = PictureBoxSizeMode.StretchImage;
+            startstopButton.TabIndex = 28;
+            startstopButton.TabStop = false;
+            startstopButton.Click += startstopButton_Click;
+            startstopButton.Paint += startstopButton_Paint;
+            // 
             // AnimationEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1035, 528);
+            Controls.Add(startstopButton);
             Controls.Add(frameViewer);
             Controls.Add(ImportSettingsButton);
             Controls.Add(saveButton);
@@ -397,6 +412,7 @@
             ExportPanelSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).EndInit();
             polygonMenu.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)startstopButton).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -431,5 +447,6 @@
         private Button saveButton;
         private Button ImportSettingsButton;
         private Panel frameViewer;
+        private PictureBox startstopButton;
     }
 }

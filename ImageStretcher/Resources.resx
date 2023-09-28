@@ -786,10 +786,16 @@
   <data name="InvisibleIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\invisible.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="playicon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\playicon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="stopicon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\stopicon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="VisibleIcon" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAy4AAAGWCAYAAACetdeaAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EAAACxABrSO9dQAA1ypJREFUeF7snQmYFUWW7+lmGR5DQzM8aBi6GBhoZGCAEYZlEEZgQGFEYFBAHVTc
+        DwAACw8BkvkDpQAA1ypJREFUeF7snQmYFUWW7+lmGR5DQzM8aBi6GBhoZGCAEYZlEEZgQGFEYFBAHVTc
         1yeC4r6goKioqNhuKLgjoriBNKAoiiiCCoIiKEuBQLEvRVEUoPnOP7knPTcqbrHdqrp16x/f96uIPJmV
         GTczzolzMiIzywRBQAgh5Bj55Zdfyvz666/edT6wLf7Htw5gnbse/6NY+ZGg+0t0THe/2O7AgQNl9u/f
         X2bfvn1lcnJyymRnZ5fZvXt3mZ07d5bZsWPH77Zt2/a7rKys3wtlN2zYUG79+vXl161bV2Ht2rUVMjMz

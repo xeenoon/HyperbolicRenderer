@@ -28,13 +28,27 @@ namespace ImageStretcher
             framecollection.GenerateFrames(originalimage);
             Resize += framecollection.Resize;
             this.WindowState = FormWindowState.Maximized;
-
+            startstopButton.Invalidate();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            var image = framecollection.selectedframe.preview.Image;
-            e.Graphics.DrawImage(image, new Point(offset.X, offset.Y));
+            if (!playanimation)
+            {
+                e.Graphics.DrawImage(displayimage, new Point(animationoffset.X + offset.X, animationoffset.Y + offset.Y));
+            }
+            else
+            {
+                var image = framecollection.selectedframe.preview.Image;
+                if (framecollection.selectedframe != framecollection.master)
+                {
+                    e.Graphics.DrawImage(image, new Point(animationoffset.X + offset.X, animationoffset.Y + offset.Y));
+                }
+                else
+                {
+                    e.Graphics.DrawImage(image, new Point(offset.X, offset.Y));
+                }
+            }
 
             foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
             {
@@ -71,13 +85,14 @@ namespace ImageStretcher
                 }
             }
         }
-        bool started = false;
-        double lasttime = 0;
-        private void StartStopButton(object sender, EventArgs e)
+        private void Generate(object sender, EventArgs e)
         {
-            Bitmap[] originalimage = new Bitmap[1];
-            originalimage[0] = image;
-            framecollection.GenerateFrames(originalimage.Concat(GetFrames()).ToArray());
+            frames = new Bitmap[1];
+            frames[0] = image;
+            frames = frames.Concat(GetFrames()).ToArray();
+
+            framecollection.GenerateFrames(frames);
+            frames = frames.TakeLast(frames.Count()-1).ToArray(); //remove first frame
         }
 
         int resolution = 2;
@@ -191,6 +206,7 @@ namespace ImageStretcher
                 MessageBox.Show("Finished exporting");
             }
         }
+        Point animationoffset;
         public Bitmap[] GetFrames()
         {
             if (menu.menuItems.Count == 0)
@@ -215,6 +231,7 @@ namespace ImageStretcher
                 maxright = Math.Max(maxright, data.right);
                 maxbottom = Math.Max(maxbottom, data.bottom);
             }
+            animationoffset = new Point(minleft - offset.X, mintop - offset.Y);
             for (int i = 0; i < tempbitmaps.Length; i++)
             {
                 Bitmap temp = tempbitmaps[i];
@@ -439,6 +456,59 @@ namespace ImageStretcher
             offset = new Point(pictureBox1.Width / 2 - image.Width / 2, pictureBox1.Height / 2 - image.Height / 2);
             offsetTextbox.Text = string.Format("{0},{1}", offset.X, offset.Y);
 
+            pictureBox1.Invalidate();
+        }
+
+        bool playanimation = true;
+        private void startstopButton_Click(object sender, EventArgs e)
+        {
+            playanimation = !playanimation;
+            startstopButton.Invalidate();
+        }
+
+        private void startstopButton_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            e.Graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+            if (playanimation)
+            {
+                e.Graphics.DrawImage(Resources.playicon, 0, 0, startstopButton.Width, startstopButton.Height);
+                if (animationtimer != null)
+                {
+                    animationtimer.Stop();
+                }
+            }
+            else
+            {
+                e.Graphics.DrawImage(Resources.stopicon, 0, 0, startstopButton.Width, startstopButton.Height);
+                if (frames != null)
+                {
+                    firstanimationframe = true;
+                    Animate();
+                }
+            }
+        }
+        System.Timers.Timer animationtimer;
+        bool firstanimationframe = true;
+        int animationframeidx = 0;
+        Bitmap displayimage;
+        public void Animate(object sender = null, System.Timers.ElapsedEventArgs e = null)
+        {
+            if (firstanimationframe)
+            {
+                animationtimer = new System.Timers.Timer(16);
+                animationtimer.Elapsed += Animate;
+                firstanimationframe = false;
+                animationtimer.Start();
+            }
+            animationframeidx++;
+            if (animationframeidx >= frames.Count()) 
+            {
+                animationframeidx -= frames.Count();
+            }
+            displayimage = frames[animationframeidx];
             pictureBox1.Invalidate();
         }
     }

@@ -128,7 +128,8 @@ namespace ImageStretcher
             Task.Run(() =>
             {
                 frames = frames.Concat(GetFrames()).ToArray();
-                loadingpanel.Invoke(() => {
+                loadingpanel.Invoke(() =>
+                {
                     framecollection.GenerateFrames(frames);
                     frames = frames.TakeLast(frames.Count() - 1).ToArray(); //remove first frame
                     MessageBox.Show("Finished animating");
@@ -272,7 +273,7 @@ namespace ImageStretcher
             Parallel.For(0, frames, i =>
             {
                 PointTransformer newscalar = new PointTransformer(scalar.centre, scalar.width, scalar.polygonMenu);
-                newscalar.time = (i+1)*((2 * Math.PI) / (31.4f));
+                newscalar.time = (i + 1) * ((2 * Math.PI) / (31.4f));
                 tempbitmaps[i] = new Bitmap(canvas.Width, canvas.Height);
                 var data = ImageDeformer.DeformImageToPolygon(newscalar.TransformPoint, new Point(offset.X, offset.Y), readcopies[i], tempbitmaps[i], true);
                 bar.percentloaded += (1f / frames);

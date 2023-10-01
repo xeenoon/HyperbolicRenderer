@@ -184,7 +184,6 @@ namespace ImageStretcher
             saveFileDialogue.ShowDialog();
             if (saveFileDialogue.FileName != "")
             {
-
                 if (!saveFileDialogue.FileName.Contains('.') || saveFileDialogue.FileName.Split('.')[1] != "gif") //TODO add this into the fileopen dialogue
                 {
                     MessageBox.Show("Must save as GIF");
@@ -195,9 +194,8 @@ namespace ImageStretcher
                     var file = File.Create(saveFileDialogue.FileName);
                     file.Dispose();
                 }
-                using (var gif = AnimatedGif.AnimatedGif.Create(saveFileDialogue.FileName, 33))
+                using (var gif = AnimatedGif.AnimatedGif.Create(saveFileDialogue.FileName, 16))
                 {
-                    var frames = GetFrames();
                     foreach (var bmp in frames)
                     {
                         gif.AddFrame(bmp, delay: (int)(33 / scalar.speed), quality: GifQuality.Default);

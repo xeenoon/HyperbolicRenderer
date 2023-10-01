@@ -58,6 +58,7 @@
             ImportSettingsButton = new Button();
             frameViewer = new Panel();
             startstopButton = new PictureBox();
+            panel2 = new Panel();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ImportSettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
@@ -71,9 +72,9 @@
             // 
             pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(-2, 0);
+            pictureBox1.Location = new Point(47, 0);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(700, 516);
+            pictureBox1.Size = new Size(1520, 921);
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             pictureBox1.Click += AddPoint;
@@ -82,7 +83,7 @@
             // importButton
             // 
             importButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            importButton.Location = new Point(816, 15);
+            importButton.Location = new Point(1685, 15);
             importButton.Name = "importButton";
             importButton.Size = new Size(104, 23);
             importButton.TabIndex = 1;
@@ -96,7 +97,7 @@
             generateButton.BackColor = SystemColors.ActiveCaption;
             generateButton.FlatAppearance.BorderSize = 0;
             generateButton.FlatStyle = FlatStyle.Popup;
-            generateButton.Location = new Point(814, 73);
+            generateButton.Location = new Point(1683, 73);
             generateButton.Name = "generateButton";
             generateButton.Size = new Size(107, 23);
             generateButton.TabIndex = 2;
@@ -107,7 +108,7 @@
             // restartButton
             // 
             restartButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            restartButton.Location = new Point(927, 73);
+            restartButton.Location = new Point(1796, 73);
             restartButton.Name = "restartButton";
             restartButton.Size = new Size(107, 23);
             restartButton.TabIndex = 9;
@@ -118,7 +119,7 @@
             // exportGIFButton
             // 
             exportGIFButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            exportGIFButton.Location = new Point(927, 44);
+            exportGIFButton.Location = new Point(1796, 44);
             exportGIFButton.Name = "exportGIFButton";
             exportGIFButton.Size = new Size(107, 23);
             exportGIFButton.TabIndex = 12;
@@ -129,7 +130,7 @@
             // exportFramesButton
             // 
             exportFramesButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            exportFramesButton.Location = new Point(816, 44);
+            exportFramesButton.Location = new Point(1685, 44);
             exportFramesButton.Name = "exportFramesButton";
             exportFramesButton.Size = new Size(107, 23);
             exportFramesButton.TabIndex = 13;
@@ -140,7 +141,7 @@
             // importFramesButton
             // 
             importFramesButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            importFramesButton.Location = new Point(926, 15);
+            importFramesButton.Location = new Point(1795, 15);
             importFramesButton.Name = "importFramesButton";
             importFramesButton.Size = new Size(104, 23);
             importFramesButton.TabIndex = 15;
@@ -159,7 +160,7 @@
             ImportSettingsPanel.Controls.Add(delayTextbox);
             ImportSettingsPanel.Controls.Add(delayLabel);
             ImportSettingsPanel.Controls.Add(animationsettingsLabel);
-            ImportSettingsPanel.Location = new Point(424, 194);
+            ImportSettingsPanel.Location = new Point(859, 450);
             ImportSettingsPanel.Name = "ImportSettingsPanel";
             ImportSettingsPanel.Size = new Size(213, 141);
             ImportSettingsPanel.TabIndex = 16;
@@ -234,7 +235,7 @@
             // 
             offsetLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             offsetLabel.AutoSize = true;
-            offsetLabel.Location = new Point(548, 9);
+            offsetLabel.Location = new Point(1417, 9);
             offsetLabel.Name = "offsetLabel";
             offsetLabel.Size = new Size(39, 15);
             offsetLabel.TabIndex = 19;
@@ -243,7 +244,7 @@
             // offsetTextbox
             // 
             offsetTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            offsetTextbox.Location = new Point(593, 6);
+            offsetTextbox.Location = new Point(1462, 6);
             offsetTextbox.Name = "offsetTextbox";
             offsetTextbox.Size = new Size(100, 23);
             offsetTextbox.TabIndex = 20;
@@ -259,7 +260,7 @@
             ExportPanelSettings.Controls.Add(framenameTextbox);
             ExportPanelSettings.Controls.Add(framenameLabel);
             ExportPanelSettings.Controls.Add(ExportSettingsTitleLabel);
-            ExportPanelSettings.Location = new Point(424, 210);
+            ExportPanelSettings.Location = new Point(859, 466);
             ExportPanelSettings.Name = "ExportPanelSettings";
             ExportPanelSettings.Size = new Size(213, 100);
             ExportPanelSettings.TabIndex = 22;
@@ -319,9 +320,9 @@
             polygonMenu.BackColor = SystemColors.Control;
             polygonMenu.BorderStyle = BorderStyle.FixedSingle;
             polygonMenu.Controls.Add(addPolygonButton);
-            polygonMenu.Location = new Point(709, 102);
+            polygonMenu.Location = new Point(1578, 102);
             polygonMenu.Name = "polygonMenu";
-            polygonMenu.Size = new Size(325, 414);
+            polygonMenu.Size = new Size(325, 927);
             polygonMenu.TabIndex = 24;
             // 
             // addPolygonButton
@@ -337,7 +338,7 @@
             // saveButton
             // 
             saveButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            saveButton.Location = new Point(706, 44);
+            saveButton.Location = new Point(1575, 44);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(104, 23);
             saveButton.TabIndex = 25;
@@ -348,7 +349,7 @@
             // ImportSettingsButton
             // 
             ImportSettingsButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            ImportSettingsButton.Location = new Point(706, 15);
+            ImportSettingsButton.Location = new Point(1575, 15);
             ImportSettingsButton.Name = "ImportSettingsButton";
             ImportSettingsButton.Size = new Size(104, 23);
             ImportSettingsButton.TabIndex = 26;
@@ -360,15 +361,15 @@
             // 
             frameViewer.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             frameViewer.BackColor = Color.Black;
-            frameViewer.Location = new Point(0, 408);
+            frameViewer.Location = new Point(0, 921);
             frameViewer.Name = "frameViewer";
-            frameViewer.Size = new Size(698, 175);
+            frameViewer.Size = new Size(1567, 175);
             frameViewer.TabIndex = 27;
             // 
             // startstopButton
             // 
-            startstopButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            startstopButton.Location = new Point(0, 378);
+            startstopButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            startstopButton.Location = new Point(1537, 891);
             startstopButton.Name = "startstopButton";
             startstopButton.Size = new Size(30, 30);
             startstopButton.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -377,11 +378,20 @@
             startstopButton.Click += startstopButton_Click;
             startstopButton.Paint += startstopButton_Paint;
             // 
+            // panel2
+            // 
+            panel2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            panel2.Location = new Point(0, 0);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(50, 921);
+            panel2.TabIndex = 29;
+            // 
             // AnimationEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1035, 528);
+            ClientSize = new Size(1904, 1041);
+            Controls.Add(panel2);
             Controls.Add(startstopButton);
             Controls.Add(frameViewer);
             Controls.Add(ImportSettingsButton);
@@ -448,5 +458,6 @@
         private Button ImportSettingsButton;
         private Panel frameViewer;
         private PictureBox startstopButton;
+        private Panel panel2;
     }
 }

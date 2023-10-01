@@ -23,9 +23,9 @@ namespace ImageStretcher
 
             framecollection = new FrameCollection(frameViewer, this);
 
-            Bitmap[] originalimage = new Bitmap[1];
-            originalimage[0] = image;
-            framecollection.GenerateFrames(originalimage);
+            frames = new Bitmap[1];
+            frames[0] = image;
+            framecollection.GenerateFrames(frames);
             Resize += framecollection.Resize;
             this.WindowState = FormWindowState.Maximized;
             startstopButton.Invalidate();
@@ -35,18 +35,18 @@ namespace ImageStretcher
         {
             if (!playanimation)
             {
-                e.Graphics.DrawImage(displayimage, new Point(animationoffset.X + offset.X, animationoffset.Y + offset.Y));
+                e.Graphics.DrawImage(displayimage, animationoffset.X + offset.X, animationoffset.Y + offset.Y, displayimage.Width, displayimage.Height);
             }
             else
             {
-                var image = framecollection.selectedframe.preview.Image;
+                var image = framecollection.selectedframe.frameimg;
                 if (framecollection.selectedframe != framecollection.master)
                 {
-                    e.Graphics.DrawImage(image, new Point(animationoffset.X + offset.X, animationoffset.Y + offset.Y));
+                    e.Graphics.DrawImage(image, animationoffset.X + offset.X, animationoffset.Y + offset.Y, image.Width, image.Height);
                 }
                 else
                 {
-                    e.Graphics.DrawImage(image, new Point(offset.X, offset.Y));
+                    e.Graphics.DrawImage(image, offset.X, offset.Y, image.Width, image.Height);
                 }
             }
 
@@ -75,12 +75,20 @@ namespace ImageStretcher
             if (File.Exists(name))
             {
                 string extension = name.Split(".")[1];
-                if (extension == "png" || extension == "jpg")
+                if (extension == "png" || extension == "jpg" || extension == "jpeg")
                 {
                     animating = false;
                     var temp = (Bitmap)Image.FromFile(name);
                     image = temp.Clone(new Rectangle(0, 0, temp.Width, temp.Height), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                     scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu);
+
+                    Bitmap[] originalimage = new Bitmap[1];
+                    originalimage[0] = image;
+                    framecollection.GenerateFrames(originalimage);
+
+                    offset = new Point(pictureBox1.Width / 2 - image.Width / 2, pictureBox1.Height / 2 - image.Height / 2);
+                    offsetTextbox.Text = string.Format("{0},{1}", offset.X, offset.Y);
+
                     pictureBox1.Invalidate();
                 }
             }
@@ -92,7 +100,7 @@ namespace ImageStretcher
             frames = frames.Concat(GetFrames()).ToArray();
 
             framecollection.GenerateFrames(frames);
-            frames = frames.TakeLast(frames.Count()-1).ToArray(); //remove first frame
+            frames = frames.TakeLast(frames.Count() - 1).ToArray(); //remove first frame
         }
 
         int resolution = 2;
@@ -504,7 +512,7 @@ namespace ImageStretcher
                 animationtimer.Start();
             }
             animationframeidx++;
-            if (animationframeidx >= frames.Count()) 
+            if (animationframeidx >= frames.Count())
             {
                 animationframeidx -= frames.Count();
             }

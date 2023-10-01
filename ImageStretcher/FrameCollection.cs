@@ -13,6 +13,7 @@ namespace ImageStretcher
     {
         public Panel backgroundpanel;
         public PictureBox preview;
+        public Bitmap frameimg;
         public Label name;
         FrameCollection frames;
         public Frame(FrameCollection frames)
@@ -86,6 +87,7 @@ namespace ImageStretcher
             bgpanel.Controls.Clear();
             Frame master = new Frame(this);
             master.preview.Image = frames[0];
+            master.frameimg = frames[0];
             master.preview.SizeMode = PictureBoxSizeMode.StretchImage;
             master.backgroundpanel.BackColor = Color.LightGray;
             selectedframe = master;
@@ -105,6 +107,7 @@ namespace ImageStretcher
                 bg.Location = new Point(bg.Location.X + 90 * (i), bg.Location.Y);
                 frame.name.Text = i.ToString();
                 frame.preview.Image = frames[i];
+                frame.frameimg = frames[i];
                 frame.preview.SizeMode = PictureBoxSizeMode.StretchImage;
                 farright = frame.backgroundpanel.Right;
             }

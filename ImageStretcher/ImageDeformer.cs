@@ -96,7 +96,9 @@ namespace ImageStretcher
                         finalxresolution <= 0 ||
                         finalyresolution <= 0 ||
                         finalxresolution >= int.MaxValue ||
-                        finalyresolution >= int.MaxValue
+                        finalyresolution >= int.MaxValue ||
+                        row >= imagedata.Height ||
+                        col >= imagedata.Width
                         )
                     {
                         continue;

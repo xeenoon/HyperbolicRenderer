@@ -20,6 +20,7 @@ namespace ImageStretcher
     {
         public const int BG_HEIGHT = 130;
         public static string[] transformoptions = new string[5] { "Jello", "RotateLeft", "RotateRight", "Horizontal", "Vertical" };
+        public StretchType stretchType = StretchType.Jello;
 
         public Panel background = new Panel() { Size = new Size(300, BG_HEIGHT), BackColor = Color.White, BorderStyle = BorderStyle.FixedSingle };
         public TextBox polygonlabel = new TextBox();
@@ -40,15 +41,6 @@ namespace ImageStretcher
         public double amplitude=0.05;
         public int period = 2;
         public double offset = 0;
-
-        public StretchType stretchType
-        {
-            get
-            {
-                string selected = transformoptions[dropdown.SelectedIndex];
-                return Enum.Parse<StretchType>(selected);
-            }
-        }
 
         public List<PointF> polygonpoints;
         Func<bool> Paint;
@@ -83,7 +75,8 @@ namespace ImageStretcher
             dropdown.Items.AddRange(transformoptions);
             dropdown.SelectedIndex = 0;
             dropdown.DropDownStyle = ComboBoxStyle.DropDownList;
-            
+            dropdown.SelectedIndexChanged += StretchTypeChanged;
+
             visiblebutton.Location = new Point(225, 3);
             visiblebutton.Size = new Size(40, 20);
             visiblebutton.Image = Resources.VisibleIcon;
@@ -127,6 +120,7 @@ namespace ImageStretcher
 
             menu.AddItem(this);
         }
+
 
         public void Delete(object sender, EventArgs e)
         {
@@ -182,6 +176,10 @@ namespace ImageStretcher
             {
                 amplitude = temp;
             }
+        }
+        void StretchTypeChanged(object sender, EventArgs e)
+        {
+            stretchType = Enum.Parse<StretchType>((string)dropdown.SelectedItem);
         }
     }
     public class PolygonMenu

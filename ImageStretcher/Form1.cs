@@ -125,11 +125,16 @@ namespace ImageStretcher
             bar.percentloaded = 0;
             loadingpanel.Visible = true;
             Refresh();//Force update to display label
-            frames = frames.Concat(GetFrames()).ToArray();
-            loadingpanel.Visible = false;
-
-            framecollection.GenerateFrames(frames);
-            frames = frames.TakeLast(frames.Count() - 1).ToArray(); //remove first frame
+            Task.Run(() =>
+            {
+                frames = frames.Concat(GetFrames()).ToArray();
+                loadingpanel.Invoke(() => {
+                    framecollection.GenerateFrames(frames);
+                    frames = frames.TakeLast(frames.Count() - 1).ToArray(); //remove first frame
+                    MessageBox.Show("Finished animating");
+                    loadingpanel.Visible = false;
+                });
+            });
         }
 
         int resolution = 2;
@@ -258,18 +263,25 @@ namespace ImageStretcher
             int mintop = int.MaxValue;
             int maxright = int.MinValue;
             int maxbottom = int.MinValue;
+            List<Bitmap> readcopies = new List<Bitmap>(); //Allow image data to be readable from multiple threads
             for (int i = 0; i < frames; ++i)
             {
-                scalar.time += ((2 * Math.PI) / (31.4f));
+                readcopies.Add(new Bitmap(image)); //Avoids concurrent access errors
+            }
+
+            Parallel.For(0, frames, i =>
+            {
+                PointTransformer newscalar = new PointTransformer(scalar.centre, scalar.width, scalar.polygonMenu);
+                newscalar.time = (i+1)*((2 * Math.PI) / (31.4f));
                 tempbitmaps[i] = new Bitmap(canvas.Width, canvas.Height);
-                var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, tempbitmaps[i], true);
+                var data = ImageDeformer.DeformImageToPolygon(newscalar.TransformPoint, new Point(offset.X, offset.Y), readcopies[i], tempbitmaps[i], true);
                 bar.percentloaded += (1f / frames);
-                loadingbar.Refresh();
+                Invoke(() => loadingbar.Refresh());
                 minleft = Math.Min(minleft, data.left);
                 mintop = Math.Min(mintop, data.top);
                 maxright = Math.Max(maxright, data.right);
                 maxbottom = Math.Max(maxbottom, data.bottom);
-            }
+            });
             animationoffset = new Point(minleft - offset.X, mintop - offset.Y);
             for (int i = 0; i < tempbitmaps.Length; i++)
             {

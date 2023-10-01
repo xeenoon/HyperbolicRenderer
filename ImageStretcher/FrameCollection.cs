@@ -53,7 +53,7 @@ namespace ImageStretcher
             frames.selectedframe.backgroundpanel.BackColor = Color.White;
             frames.selectedframe = this;
             backgroundpanel.BackColor = Color.LightGray;
-            frames.parent.pictureBox1.Invalidate();
+            frames.parent.canvas.Invalidate();
         }
     }
     public class FrameCollection

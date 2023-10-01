@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AnimationEditor));
-            pictureBox1 = new PictureBox();
+            canvas = new PictureBox();
             importButton = new Button();
             generateButton = new Button();
             restartButton = new Button();
@@ -59,26 +59,31 @@
             frameViewer = new Panel();
             startstopButton = new PictureBox();
             panel2 = new Panel();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            zoomoutButton = new PictureBox();
+            zoominButton = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)canvas).BeginInit();
             ImportSettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
             ExportPanelSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).BeginInit();
             polygonMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)startstopButton).BeginInit();
+            panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)zoomoutButton).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)zoominButton).BeginInit();
             SuspendLayout();
             // 
-            // pictureBox1
+            // canvas
             // 
-            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(47, 0);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1520, 921);
-            pictureBox1.TabIndex = 0;
-            pictureBox1.TabStop = false;
-            pictureBox1.Click += AddPoint;
-            pictureBox1.Paint += pictureBox1_Paint;
+            canvas.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            canvas.Image = (Image)resources.GetObject("canvas.Image");
+            canvas.Location = new Point(47, 0);
+            canvas.Name = "canvas";
+            canvas.Size = new Size(1520, 921);
+            canvas.TabIndex = 0;
+            canvas.TabStop = false;
+            canvas.Click += AddPoint;
+            canvas.Paint += pictureBox1_Paint;
             // 
             // importButton
             // 
@@ -381,10 +386,35 @@
             // panel2
             // 
             panel2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            panel2.BackColor = Color.FromArgb(50, 117, 168);
+            panel2.Controls.Add(zoomoutButton);
+            panel2.Controls.Add(zoominButton);
             panel2.Location = new Point(0, 0);
             panel2.Name = "panel2";
             panel2.Size = new Size(50, 921);
             panel2.TabIndex = 29;
+            // 
+            // zoomoutButton
+            // 
+            zoomoutButton.Image = (Image)resources.GetObject("zoomoutButton.Image");
+            zoomoutButton.Location = new Point(0, 48);
+            zoomoutButton.Name = "zoomoutButton";
+            zoomoutButton.Size = new Size(50, 50);
+            zoomoutButton.SizeMode = PictureBoxSizeMode.StretchImage;
+            zoomoutButton.TabIndex = 1;
+            zoomoutButton.TabStop = false;
+            zoomoutButton.Click += zoomoutButton_Click;
+            // 
+            // zoominButton
+            // 
+            zoominButton.Image = (Image)resources.GetObject("zoominButton.Image");
+            zoominButton.Location = new Point(0, 0);
+            zoominButton.Name = "zoominButton";
+            zoominButton.Size = new Size(50, 50);
+            zoominButton.SizeMode = PictureBoxSizeMode.StretchImage;
+            zoominButton.TabIndex = 0;
+            zoominButton.TabStop = false;
+            zoominButton.Click += ZoomInClick;
             // 
             // AnimationEditor
             // 
@@ -407,14 +437,14 @@
             Controls.Add(restartButton);
             Controls.Add(generateButton);
             Controls.Add(importButton);
-            Controls.Add(pictureBox1);
+            Controls.Add(canvas);
             DoubleBuffered = true;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "AnimationEditor";
             Text = "Jello Machine";
             Load += Form1_Load;
             Resize += AnimationEditor_Resize;
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)canvas).EndInit();
             ImportSettingsPanel.ResumeLayout(false);
             ImportSettingsPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).EndInit();
@@ -423,13 +453,16 @@
             ((System.ComponentModel.ISupportInitialize)exportSettingsCloseButton).EndInit();
             polygonMenu.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)startstopButton).EndInit();
+            panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)zoomoutButton).EndInit();
+            ((System.ComponentModel.ISupportInitialize)zoominButton).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        public PictureBox pictureBox1;
+        public PictureBox canvas;
         private Button importButton;
         private Button generateButton;
         private Button restartButton;
@@ -459,5 +492,7 @@
         private Panel frameViewer;
         private PictureBox startstopButton;
         private Panel panel2;
+        private PictureBox zoominButton;
+        private PictureBox zoomoutButton;
     }
 }

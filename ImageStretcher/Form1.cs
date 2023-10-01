@@ -3,6 +3,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.Pkcs;
+using System.Security.Policy;
 using AnimatedGif;
 
 namespace ImageStretcher
@@ -12,12 +13,27 @@ namespace ImageStretcher
         PointTransformer scalar;
         FrameCollection framecollection;
         PolygonMenu menu;
+        public float zoom = 1;
+        public int newwidth
+        {
+            get
+            {
+                return (int)((1f / zoom) * canvas.Width);
+            }
+        }
+        public int newheight
+        {
+            get
+            {
+                return (int)((1f / zoom) * canvas.Width);
+            }
+        }
         public AnimationEditor()
         {
             InitializeComponent();
-            image = (Bitmap)pictureBox1.Image.Clone();
-            pictureBox1.Image = null;
-            pictureBox1.Invalidate();
+            image = (Bitmap)canvas.Image.Clone();
+            canvas.Image = null;
+            canvas.Invalidate();
             menu = new PolygonMenu(polygonMenu, addPolygonButton);
             scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu);
 
@@ -30,23 +46,31 @@ namespace ImageStretcher
             this.WindowState = FormWindowState.Maximized;
             startstopButton.Invalidate();
         }
-
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            int newwidth;
+            int newheight;
             if (!playanimation)
             {
-                e.Graphics.DrawImage(displayimage, animationoffset.X + offset.X, animationoffset.Y + offset.Y, displayimage.Width, displayimage.Height);
+                newwidth = (int)(displayimage.Width * zoom);
+                newheight = (int)(displayimage.Height * zoom);
+
+                e.Graphics.DrawImage(displayimage, animationoffset.X + offset.X, animationoffset.Y + offset.Y, newwidth, newheight);
             }
             else
             {
                 var image = framecollection.selectedframe.frameimg;
+
+                newwidth = (int)(image.Width * zoom);
+                newheight = (int)(image.Height * zoom);
+
                 if (framecollection.selectedframe != framecollection.master)
                 {
-                    e.Graphics.DrawImage(image, animationoffset.X + offset.X, animationoffset.Y + offset.Y, image.Width, image.Height);
+                    e.Graphics.DrawImage(image, animationoffset.X + offset.X, animationoffset.Y + offset.Y, newwidth, newheight);
                 }
                 else
                 {
-                    e.Graphics.DrawImage(image, offset.X, offset.Y, image.Width, image.Height);
+                    e.Graphics.DrawImage(image, offset.X, offset.Y, newwidth, newheight);
                 }
             }
 
@@ -86,10 +110,10 @@ namespace ImageStretcher
                     originalimage[0] = image;
                     framecollection.GenerateFrames(originalimage);
 
-                    offset = new Point(pictureBox1.Width / 2 - image.Width / 2, pictureBox1.Height / 2 - image.Height / 2);
+                    offset = new Point(canvas.Width / 2 - image.Width / 2, canvas.Height / 2 - image.Height / 2);
                     offsetTextbox.Text = string.Format("{0},{1}", offset.X, offset.Y);
 
-                    pictureBox1.Invalidate();
+                    canvas.Invalidate();
                 }
             }
         }
@@ -121,18 +145,18 @@ namespace ImageStretcher
                     }
                     break;
             }
-            pictureBox1.Invalidate();
+            canvas.Invalidate();
         }
         private void Restart(object sender, EventArgs e)
         {
             scalar.time = 0;
-            pictureBox1.Invalidate();
+            canvas.Invalidate();
         }
         private void Benchmark(object sender, EventArgs e)
         {
             Stopwatch s = new Stopwatch();
             s.Start();
-            Bitmap result = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            Bitmap result = new Bitmap(canvas.Width, canvas.Height);
             for (int i = 0; i < 1000; ++i)
             {
                 ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result);
@@ -232,7 +256,7 @@ namespace ImageStretcher
             for (int i = 0; i < frames; ++i)
             {
                 scalar.time += ((2 * Math.PI) / (31.4f));
-                tempbitmaps[i] = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+                tempbitmaps[i] = new Bitmap(canvas.Width, canvas.Height);
                 var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, tempbitmaps[i], true);
                 minleft = Math.Min(minleft, data.left);
                 mintop = Math.Min(mintop, data.top);
@@ -319,14 +343,14 @@ namespace ImageStretcher
         }
         bool Repaint()
         {
-            pictureBox1.Invalidate();
+            canvas.Invalidate();
             return false;
         }
         private void AddPoint(object sender, EventArgs e)
         {
             if (menu.selecteditem != null)
             {
-                Point clickpos = pictureBox1.PointToClient(Cursor.Position);
+                Point clickpos = canvas.PointToClient(Cursor.Position);
                 clickpos.X -= offset.X;
                 clickpos.Y -= offset.Y;
                 if (ModifierKeys == Keys.Shift)
@@ -342,7 +366,7 @@ namespace ImageStretcher
                 {
                     menu.selecteditem.AddPoint(clickpos);
                 }
-                pictureBox1.Invalidate();
+                canvas.Invalidate();
             }
         }
 
@@ -446,7 +470,7 @@ namespace ImageStretcher
 
                 polygonMenu.ScrollControlIntoView(addPolygonButton);
             }
-            pictureBox1.Invalidate();
+            canvas.Invalidate();
         }
 
         private void ImportSettingsButton_Click(object sender, EventArgs e)
@@ -461,10 +485,10 @@ namespace ImageStretcher
 
         private void AnimationEditor_Resize(object sender, EventArgs e)
         {
-            offset = new Point(pictureBox1.Width / 2 - image.Width / 2, pictureBox1.Height / 2 - image.Height / 2);
+            offset = new Point(canvas.Width / 2 - image.Width / 2, canvas.Height / 2 - image.Height / 2);
             offsetTextbox.Text = string.Format("{0},{1}", offset.X, offset.Y);
 
-            pictureBox1.Invalidate();
+            canvas.Invalidate();
         }
 
         bool playanimation = true;
@@ -517,7 +541,21 @@ namespace ImageStretcher
                 animationframeidx -= frames.Count();
             }
             displayimage = frames[animationframeidx];
-            pictureBox1.Invalidate();
+            canvas.Invalidate();
+        }
+
+        private void ZoomInClick(object sender, EventArgs e)
+        {
+            zoom += 0.1f;
+            canvas.Invalidate();
+            //Zoom will effect image display
+            //Polygon positions
+        }
+
+        private void zoomoutButton_Click(object sender, EventArgs e)
+        {
+            zoom -= 0.1f;
+            canvas.Invalidate();
         }
     }
 }

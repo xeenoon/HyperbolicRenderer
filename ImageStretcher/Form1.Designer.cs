@@ -61,6 +61,9 @@
             panel2 = new Panel();
             zoomoutButton = new PictureBox();
             zoominButton = new PictureBox();
+            loadingpanel = new Panel();
+            loadingbar = new PictureBox();
+            loadingLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)canvas).BeginInit();
             ImportSettingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)importSettingsCloseButton).BeginInit();
@@ -71,13 +74,15 @@
             panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)zoomoutButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)zoominButton).BeginInit();
+            loadingpanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)loadingbar).BeginInit();
             SuspendLayout();
             // 
             // canvas
             // 
             canvas.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             canvas.Image = (Image)resources.GetObject("canvas.Image");
-            canvas.Location = new Point(47, 0);
+            canvas.Location = new Point(52, 6);
             canvas.Name = "canvas";
             canvas.Size = new Size(1520, 921);
             canvas.TabIndex = 0;
@@ -156,7 +161,6 @@
             // 
             // ImportSettingsPanel
             // 
-            ImportSettingsPanel.Anchor = AnchorStyles.None;
             ImportSettingsPanel.BackColor = SystemColors.ActiveCaption;
             ImportSettingsPanel.Controls.Add(importSettingsCloseButton);
             ImportSettingsPanel.Controls.Add(animationImportButton);
@@ -258,7 +262,6 @@
             // 
             // ExportPanelSettings
             // 
-            ExportPanelSettings.Anchor = AnchorStyles.None;
             ExportPanelSettings.BackColor = SystemColors.ActiveCaption;
             ExportPanelSettings.Controls.Add(exportSettingsCloseButton);
             ExportPanelSettings.Controls.Add(finalExportButton);
@@ -416,11 +419,45 @@
             zoominButton.TabStop = false;
             zoominButton.Click += ZoomInClick;
             // 
+            // loadingpanel
+            // 
+            loadingpanel.BackColor = SystemColors.ActiveCaption;
+            loadingpanel.Controls.Add(loadingbar);
+            loadingpanel.Controls.Add(loadingLabel);
+            loadingpanel.Location = new Point(814, 503);
+            loadingpanel.Name = "loadingpanel";
+            loadingpanel.Size = new Size(297, 78);
+            loadingpanel.TabIndex = 30;
+            loadingpanel.Visible = false;
+            // 
+            // loadingbar
+            // 
+            loadingbar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            loadingbar.BackColor = SystemColors.ButtonHighlight;
+            loadingbar.Location = new Point(0, 43);
+            loadingbar.Name = "loadingbar";
+            loadingbar.Size = new Size(297, 29);
+            loadingbar.TabIndex = 1;
+            loadingbar.TabStop = false;
+            loadingbar.Paint += loadingbar_Paint;
+            // 
+            // loadingLabel
+            // 
+            loadingLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            loadingLabel.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            loadingLabel.Location = new Point(0, 9);
+            loadingLabel.Name = "loadingLabel";
+            loadingLabel.Size = new Size(297, 23);
+            loadingLabel.TabIndex = 0;
+            loadingLabel.Text = "Loading Deformations";
+            loadingLabel.TextAlign = ContentAlignment.MiddleCenter;
+            // 
             // AnimationEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1904, 1041);
+            Controls.Add(loadingpanel);
             Controls.Add(panel2);
             Controls.Add(startstopButton);
             Controls.Add(frameViewer);
@@ -456,6 +493,8 @@
             panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)zoomoutButton).EndInit();
             ((System.ComponentModel.ISupportInitialize)zoominButton).EndInit();
+            loadingpanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)loadingbar).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -494,5 +533,8 @@
         private Panel panel2;
         private PictureBox zoominButton;
         private PictureBox zoomoutButton;
+        private Panel loadingpanel;
+        private Label loadingLabel;
+        private PictureBox loadingbar;
     }
 }

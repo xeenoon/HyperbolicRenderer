@@ -117,11 +117,16 @@ namespace ImageStretcher
                 }
             }
         }
+        LoadingBar bar = new LoadingBar();
         private void Generate(object sender, EventArgs e)
         {
             frames = new Bitmap[1];
             frames[0] = image;
+            bar.percentloaded = 0;
+            loadingpanel.Visible = true;
+            Refresh();//Force update to display label
             frames = frames.Concat(GetFrames()).ToArray();
+            loadingpanel.Visible = false;
 
             framecollection.GenerateFrames(frames);
             frames = frames.TakeLast(frames.Count() - 1).ToArray(); //remove first frame
@@ -258,6 +263,8 @@ namespace ImageStretcher
                 scalar.time += ((2 * Math.PI) / (31.4f));
                 tempbitmaps[i] = new Bitmap(canvas.Width, canvas.Height);
                 var data = ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(offset.X, offset.Y), image, tempbitmaps[i], true);
+                bar.percentloaded += (1f / frames);
+                loadingbar.Refresh();
                 minleft = Math.Min(minleft, data.left);
                 mintop = Math.Min(mintop, data.top);
                 maxright = Math.Max(maxright, data.right);
@@ -548,14 +555,17 @@ namespace ImageStretcher
         {
             zoom += 0.1f;
             canvas.Invalidate();
-            //Zoom will effect image display
-            //Polygon positions
         }
 
         private void zoomoutButton_Click(object sender, EventArgs e)
         {
             zoom -= 0.1f;
             canvas.Invalidate();
+        }
+
+        private void loadingbar_Paint(object sender, PaintEventArgs e)
+        {
+            bar.Draw(e.Graphics, loadingbar.Width, loadingbar.Height, 0);
         }
     }
 }

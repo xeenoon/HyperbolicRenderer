@@ -50,7 +50,7 @@ namespace ImageStretcher
         {
             int newwidth;
             int newheight;
-            if (!playanimation)
+            if (playanimation)
             {
                 newwidth = (int)(displayimage.Width * zoom);
                 newheight = (int)(displayimage.Height * zoom);
@@ -90,7 +90,21 @@ namespace ImageStretcher
                 }
             }
         }
-        Bitmap image;
+        Bitmap image
+        {
+            get
+            {
+                return img;
+            }
+            set
+            {
+                asyncimage = new Bitmap(value);
+                img = value;
+            }
+        }
+        Bitmap img;
+        Bitmap asyncimage; //For use on other threads, is a copy of image
+
         private void ImportImage(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -120,6 +134,9 @@ namespace ImageStretcher
         LoadingBar bar = new LoadingBar();
         private void Generate(object sender, EventArgs e)
         {
+            playanimation = false;
+            startstopButton.Refresh(); //Force update with .Refresh instead of .Invalidate
+            framecollection.selectedframe = framecollection.master; //Reset animation
             frames = new Bitmap[1];
             frames[0] = image;
             bar.percentloaded = 0;
@@ -184,6 +201,7 @@ namespace ImageStretcher
             saveFileDialogue.ShowDialog();
             if (saveFileDialogue.FileName != "")
             {
+
                 if (!saveFileDialogue.FileName.Contains('.') || saveFileDialogue.FileName.Split('.')[1] != "gif") //TODO add this into the fileopen dialogue
                 {
                     MessageBox.Show("Must save as GIF");
@@ -263,9 +281,15 @@ namespace ImageStretcher
             int maxright = int.MinValue;
             int maxbottom = int.MinValue;
             List<Bitmap> readcopies = new List<Bitmap>(); //Allow image data to be readable from multiple threads
-            for (int i = 0; i < frames; ++i)
+            int frame_i = 0;
+            while (frame_i < frames)
             {
-                readcopies.Add(new Bitmap(image)); //Avoids concurrent access errors
+                try
+                {
+                    readcopies.Add(new Bitmap(asyncimage)); //Avoids concurrent access errors
+                    ++frame_i;
+                }
+                catch { } //Try again
             }
 
             Parallel.For(0, frames, i =>
@@ -509,7 +533,7 @@ namespace ImageStretcher
             canvas.Invalidate();
         }
 
-        bool playanimation = true;
+        bool playanimation = false;
         private void startstopButton_Click(object sender, EventArgs e)
         {
             playanimation = !playanimation;
@@ -524,19 +548,20 @@ namespace ImageStretcher
 
             if (playanimation)
             {
-                e.Graphics.DrawImage(Resources.playicon, 0, 0, startstopButton.Width, startstopButton.Height);
-                if (animationtimer != null)
-                {
-                    animationtimer.Stop();
-                }
-            }
-            else
-            {
+
                 e.Graphics.DrawImage(Resources.stopicon, 0, 0, startstopButton.Width, startstopButton.Height);
                 if (frames != null)
                 {
                     firstanimationframe = true;
                     Animate();
+                }
+            }
+            else
+            {
+                e.Graphics.DrawImage(Resources.playicon, 0, 0, startstopButton.Width, startstopButton.Height);
+                if (animationtimer != null)
+                {
+                    animationtimer.Stop();
                 }
             }
         }

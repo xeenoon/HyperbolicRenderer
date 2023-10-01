@@ -152,7 +152,7 @@ namespace GameUI
                         framedirection = true;
                     }
                 }
-                if (timebetweenframes > 0.05f && blinking) //Change frames every second
+                if (timebetweenframes > 0.05f && blinking)
                 {
                     if (framedrawidx == 9)
                     {
@@ -172,8 +172,7 @@ namespace GameUI
                     }
                     timebetweenframes = 0;
                 }
-
-                Game1.game.spriteBatch.Draw(texture, position, null, Color.White, (float)rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 1);
+                Game1.game.spriteBatch.Draw(frames[framedrawidx], position, null, Color.White, (float)rotation, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 1);
             }
             else
             {

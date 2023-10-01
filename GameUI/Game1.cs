@@ -73,6 +73,7 @@ namespace GameUI
         public static List<Asteroid> asteroids = new List<Asteroid>();
         public static List<Bullet> projectiles = new List<Bullet>();
         public static Game1 game;
+        public static bool godmode = true;
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);

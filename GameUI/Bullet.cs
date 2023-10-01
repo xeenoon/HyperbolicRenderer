@@ -27,7 +27,7 @@ namespace GameUI
         }
         public bool OnCollision(string tag)
         {
-            if (tag == "PLAYER")
+            if (tag == "PLAYER" && !Game1.godmode)
             {
                 GameManager.Stop();
                 return true;

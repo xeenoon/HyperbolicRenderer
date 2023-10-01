@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            pictureBox1 = new PictureBox();
             button1 = new Button();
             button2 = new Button();
             textBox1 = new TextBox();
@@ -45,26 +44,15 @@
             textBox4 = new TextBox();
             label5 = new Label();
             checkBox2 = new CheckBox();
-            checkBox3 = new CheckBox();
             button3 = new Button();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            pictureBox1 = new PictureBox();
             panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
-            // 
-            // pictureBox1
-            // 
-            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox1.Location = new Point(12, 12);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(430, 465);
-            pictureBox1.TabIndex = 0;
-            pictureBox1.TabStop = false;
-            pictureBox1.Click += pictureBox1_Click;
-            pictureBox1.Paint += pictureBox1_Paint;
             // 
             // button1
             // 
-            button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             button1.Location = new Point(330, 447);
             button1.Name = "button1";
             button1.Size = new Size(105, 23);
@@ -95,7 +83,7 @@
             // 
             // label1
             // 
-            label1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
             label1.Location = new Point(474, 160);
@@ -106,7 +94,8 @@
             // 
             // comboBox1
             // 
-            comboBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            comboBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox1.FormattingEnabled = true;
             comboBox1.Items.AddRange(new object[] { "Vector2", "Point", "PointF" });
             comboBox1.Location = new Point(542, 160);
@@ -117,6 +106,7 @@
             // 
             // textBox2
             // 
+            textBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             textBox2.Location = new Point(542, 37);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(100, 23);
@@ -125,6 +115,7 @@
             // 
             // label2
             // 
+            label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label2.AutoSize = true;
             label2.Location = new Point(473, 40);
             label2.Name = "label2";
@@ -135,7 +126,7 @@
             // 
             // label3
             // 
-            label3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
             label3.Location = new Point(474, 12);
@@ -146,6 +137,7 @@
             // 
             // label4
             // 
+            label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
             label4.Location = new Point(493, 67);
             label4.Name = "label4";
@@ -155,6 +147,7 @@
             // 
             // textBox3
             // 
+            textBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             textBox3.Location = new Point(542, 64);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(100, 23);
@@ -163,8 +156,9 @@
             // 
             // checkBox1
             // 
+            checkBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(660, 56);
+            checkBox1.Location = new Point(660, 42);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(108, 19);
             checkBox1.TabIndex = 13;
@@ -174,7 +168,6 @@
             // 
             // panel1
             // 
-            panel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(button4);
             panel1.Controls.Add(textBox4);
@@ -213,8 +206,9 @@
             // 
             // checkBox2
             // 
+            checkBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox2.AutoSize = true;
-            checkBox2.Location = new Point(660, 77);
+            checkBox2.Location = new Point(660, 63);
             checkBox2.Name = "checkBox2";
             checkBox2.Size = new Size(100, 19);
             checkBox2.TabIndex = 15;
@@ -222,19 +216,9 @@
             checkBox2.UseVisualStyleBackColor = true;
             checkBox2.CheckedChanged += ShowMarkersCheckedChange;
             // 
-            // checkBox3
-            // 
-            checkBox3.AutoSize = true;
-            checkBox3.Location = new Point(660, 36);
-            checkBox3.Name = "checkBox3";
-            checkBox3.Size = new Size(111, 19);
-            checkBox3.TabIndex = 16;
-            checkBox3.Text = "Custom vertices";
-            checkBox3.UseVisualStyleBackColor = true;
-            checkBox3.CheckedChanged += CustomVerticesCheckChanged;
-            // 
             // button3
             // 
+            button3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button3.Location = new Point(547, 122);
             button3.Name = "button3";
             button3.Size = new Size(95, 23);
@@ -243,13 +227,23 @@
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click;
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pictureBox1.Location = new Point(0, 0);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(464, 477);
+            pictureBox1.TabIndex = 0;
+            pictureBox1.TabStop = false;
+            pictureBox1.Click += pictureBox1_Click;
+            pictureBox1.Paint += pictureBox1_Paint;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 489);
             Controls.Add(button3);
-            Controls.Add(checkBox3);
             Controls.Add(checkBox2);
             Controls.Add(panel1);
             Controls.Add(checkBox1);
@@ -266,16 +260,15 @@
             Controls.Add(pictureBox1);
             Name = "Form1";
             Text = "Generate polygon from image";
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            Resize += Form1_Resize;
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-
-        private PictureBox pictureBox1;
         private Button button1;
         private Button button2;
         private TextBox textBox1;
@@ -292,7 +285,7 @@
         private Label label5;
         private Button button4;
         private CheckBox checkBox2;
-        private CheckBox checkBox3;
         private Button button3;
+        private PictureBox pictureBox1;
     }
 }

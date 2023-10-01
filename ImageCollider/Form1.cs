@@ -49,7 +49,6 @@ namespace ImageCollider
         }
 
         bool repaintrequired = false;
-        bool autogenerate = false;
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
             if (!repaintrequired)
@@ -62,14 +61,8 @@ namespace ImageCollider
                 e.Graphics.DrawImage(image, 0, 0, pictureBox1.Width, pictureBox1.Height);
             }
             // return;
-            if (autogenerate)
-            {
-                AutoGenerateImage(e.Graphics);
-            }
-            else
-            {
-                ManualGenerateImage(e.Graphics);
-            }
+
+            ManualGenerateImage(e.Graphics);
         }
         class Vertex
         {
@@ -137,7 +130,7 @@ namespace ImageCollider
             textBox1.Text = data;
         }
 
-        private void AutoGenerateImage(Graphics g)
+        private void AutoGenerateImage()
         {
             if (image == null)
             {
@@ -190,7 +183,6 @@ namespace ImageCollider
 
             Bitmap result = new Bitmap(image.Width, image.Height);
 
-            Graphics graphics = Graphics.FromImage(result);
             string data = "";
 
             List<PointF> polygonpoints = new List<PointF>();
@@ -226,11 +218,7 @@ namespace ImageCollider
                 MessageBox.Show("Resolution is too low");
                 return;
             }
-            graphics.DrawPolygon(new Pen(Color.Orange), polygonpoints.ToArray());
-
             textBox1.Text = data;
-
-            g.DrawImage(result, 0, 0, pictureBox1.Width - 20, pictureBox1.Height - 20);
         }
 
         private static double GetAngle(PointF start, PointF end)
@@ -276,7 +264,6 @@ namespace ImageCollider
 
         private void Generate_Click(object sender, EventArgs e)
         {
-            autogenerate = true;
             float userinput = -1f;
             if (float.TryParse(textBox2.Text, out userinput))
             {
@@ -301,6 +288,7 @@ namespace ImageCollider
 
 
             repaintrequired = true;
+            AutoGenerateImage();
             pictureBox1.Invalidate();
         }
         List<PointF> movedpoints = new List<PointF>();
@@ -353,11 +341,6 @@ namespace ImageCollider
         int selectedpoint = -1;
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            if (autogenerate)
-            {
-                return;
-            }
-
             //Add manual mouseclick positions to the points
             var mpos = pictureBox1.PointToClient(Cursor.Position);
 
@@ -433,20 +416,15 @@ namespace ImageCollider
             repaintrequired = true;
             pictureBox1.Invalidate();
         }
-
-        private void CustomVerticesCheckChanged(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)
         {
+            userdefinedpoints.Clear();
             repaintrequired = true;
-            autogenerate = !checkBox3.Checked;
-            checkBox2.Checked = checkBox3.Checked;
-
             pictureBox1.Invalidate();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void Form1_Resize(object sender, EventArgs e)
         {
-            autogenerate = false;
-            userdefinedpoints.Clear();
             repaintrequired = true;
             pictureBox1.Invalidate();
         }

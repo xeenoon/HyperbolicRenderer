@@ -39,9 +39,9 @@ namespace ImageStretcher
         {
             if (time == 0)
             {
-                return input;
+                return new Point(int.MinValue, int.MinValue);
             }
-            if(polygonMenu != null && polygonMenu.menuItems.Count >= 1)
+            if (polygonMenu != null && polygonMenu.menuItems.Count >= 1)
             {
                 foreach (PolygonMenuItem menuItem in polygonMenu.menuItems)
                 {

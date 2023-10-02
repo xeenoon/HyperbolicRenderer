@@ -45,7 +45,6 @@ namespace ImageStretcher
             Resize += framecollection.Resize;
             this.WindowState = FormWindowState.Maximized;
             startstopButton.Invalidate();
-            Benchmark(null,null);
         }
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
@@ -135,6 +134,7 @@ namespace ImageStretcher
         LoadingBar bar = new LoadingBar();
         private void Generate(object sender, EventArgs e)
         {
+            Benchmark(null, null);
             playanimation = false;
             startstopButton.Refresh(); //Force update with .Refresh instead of .Invalidate
             framecollection.selectedframe = framecollection.master; //Reset animation
@@ -188,6 +188,7 @@ namespace ImageStretcher
             Bitmap result = new Bitmap(canvas.Width, canvas.Height);
             for (int i = 0; i < 1000; ++i)
             {
+                scalar.time = 1; //Test value
                 ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result);
             }
             s.Stop();

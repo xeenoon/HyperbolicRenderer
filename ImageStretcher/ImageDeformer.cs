@@ -42,15 +42,20 @@ namespace ImageStretcher
             int width = imagedata.Width;
             int height = imagedata.Height;
 
+            //Draw the image
+            var graphics = Graphics.FromImage(resultBitmap);
+            graphics.DrawImage(originalimage, offset);
             BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
             int numRows = height + 2;
             int numCols = width + 2; //Add 2 to store elements behind and infront
-            
+
             int numElements = (numRows) * (numCols);
 
             int* xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
             int* yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
+
+            List<int> outputpixels = new List<int>();
 
             for (int row = 0; row < numRows; row++)
             {
@@ -60,62 +65,63 @@ namespace ImageStretcher
 
                     Point blockcentre = new Point(col, row);
                     Point newtransform = DeformFunction(blockcentre);
-
+                    if (newtransform != new Point(int.MinValue, int.MinValue) && row >= 1 && row <= numRows - 2
+                                                             && col >= 1 && col <= numCols - 2)
+                    {
+                        outputpixels.Add(row * numCols + col);
+                    }
                     xCoordinates[index] = newtransform.X;
                     yCoordinates[index] = newtransform.Y;
                 }
             }
-            
 
             // Now, use the precomputed deformation values
-            for (int row = 1; row < numRows - 1; row++)
+            foreach (var index in outputpixels)
             {
-                for (int col = 1; col < numCols - 1; col++)
+                int row = index / numCols;
+                int col = index % numCols;
+
+                int newtransformx = xCoordinates[index];
+                int newtransformy = yCoordinates[index];
+
+                int leftdist = newtransformx - xCoordinates[index - 1];
+                int rightdist = xCoordinates[index + 1] - newtransformx;
+                int topdist = newtransformy - yCoordinates[index - numCols];
+                int downdist = yCoordinates[index + numCols] - newtransformy;
+
+                if (leftdist < 0 || rightdist < 0 || topdist < 0 || downdist < 0)
                 {
-                    int index = row * numCols + col;
-
-                    int newtransformx = xCoordinates[index];
-                    int newtransformy = yCoordinates[index];
-
-                    int leftdist = newtransformx - xCoordinates[index - 1];
-                    int rightdist = xCoordinates[index + 1] - newtransformx;
-                    int topdist = newtransformy - yCoordinates[index - numCols];
-                    int downdist = yCoordinates[index + numCols] - newtransformy;
-
-                    if (leftdist < 0 || rightdist < 0 || topdist < 0 || downdist < 0)
-                    {
-                        continue;
-                    }
-
-                    int finalxresolution = (leftdist + rightdist);
-                    int finalyresolution = (topdist + downdist);
-
-                    // Ensure the new position is within bounds
-                    if (newtransformx + offset.X < 0 ||
-                        newtransformy + offset.Y < 0 ||
-                        newtransformx + offset.X > resultBitmap.Width - (finalxresolution) ||
-                        newtransformy + offset.Y > resultBitmap.Height - (finalyresolution) ||
-                        finalxresolution <= 0 ||
-                        finalyresolution <= 0 ||
-                        finalxresolution >= int.MaxValue ||
-                        finalyresolution >= int.MaxValue ||
-                        row >= imagedata.Height ||
-                        col >= imagedata.Width
-                        )
-                    {
-                        continue;
-                    }
-                    deformData.left   = Math.Min(deformData.left, newtransformx + offset.X);
-                    deformData.right  = Math.Max(deformData.right, newtransformx + offset.X);
-                    deformData.top    = Math.Min(deformData.top, newtransformy + offset.Y);
-                    deformData.bottom = Math.Max(deformData.bottom, newtransformy + offset.Y);
-
-                    //Resize the section to fit, and copy it into the result
-                    SmootheResizeCopy(imagedata,
-                        col, row,
-                        outputData,
-                        new Rectangle(newtransformx + offset.X, newtransformy + offset.Y, finalxresolution, finalyresolution));
+                    continue;
                 }
+
+                int finalxresolution = (leftdist + rightdist);
+                int finalyresolution = (topdist + downdist);
+
+                // Ensure the new position is within bounds
+                if (newtransformx + offset.X < 0 ||
+                    newtransformy + offset.Y < 0 ||
+                    newtransformx + offset.X > resultBitmap.Width - (finalxresolution) ||
+                    newtransformy + offset.Y > resultBitmap.Height - (finalyresolution) ||
+                    finalxresolution <= 0 ||
+                    finalyresolution <= 0 ||
+                    finalxresolution >= int.MaxValue ||
+                    finalyresolution >= int.MaxValue ||
+                    row >= imagedata.Height ||
+                    col >= imagedata.Width
+                    )
+                {
+                    continue;
+                }
+                deformData.left = Math.Min(deformData.left, newtransformx + offset.X);
+                deformData.right = Math.Max(deformData.right, newtransformx + offset.X);
+                deformData.top = Math.Min(deformData.top, newtransformy + offset.Y);
+                deformData.bottom = Math.Max(deformData.bottom, newtransformy + offset.Y);
+
+                //Resize the section to fit, and copy it into the result
+                SmootheResizeCopy(imagedata,
+                    col, row,
+                    outputData,
+                    new Rectangle(newtransformx + offset.X, newtransformy + offset.Y, finalxresolution, finalyresolution));
             }
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);

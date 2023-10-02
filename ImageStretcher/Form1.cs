@@ -45,6 +45,7 @@ namespace ImageStretcher
             Resize += framecollection.Resize;
             this.WindowState = FormWindowState.Maximized;
             startstopButton.Invalidate();
+            Benchmark(null,null);
         }
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {

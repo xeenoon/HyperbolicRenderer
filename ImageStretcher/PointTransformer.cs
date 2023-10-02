@@ -79,10 +79,10 @@ namespace ImageStretcher
                     }
                 }
             }
-            return input;
+            return new Point(int.MinValue,int.MinValue);
         }
 
-        const float scale = 100;
+        const float scale = 1000;
         public void BakeHeights(int period, double amplitude, double offset, out double[] bakedjello, out double[] bakedrotations)
         {
             int length = (int)((scale) * Math.Tau);

@@ -134,7 +134,6 @@ namespace ImageStretcher
         LoadingBar bar = new LoadingBar();
         private void Generate(object sender, EventArgs e)
         {
-            Benchmark(null, null);
             playanimation = false;
             startstopButton.Refresh(); //Force update with .Refresh instead of .Invalidate
             framecollection.selectedframe = framecollection.master; //Reset animation

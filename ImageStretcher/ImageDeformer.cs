@@ -45,6 +45,7 @@ namespace ImageStretcher
             //Draw the image
             var graphics = Graphics.FromImage(resultBitmap);
             graphics.DrawImage(originalimage, offset);
+
             BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
             int numRows = height + 2;
@@ -65,15 +66,13 @@ namespace ImageStretcher
 
                     Point blockcentre = new Point(col, row);
                     Point newtransform = DeformFunction(blockcentre);
-                    if (newtransform != new Point(int.MinValue, int.MinValue) 
+                    if ((newtransform != new Point(int.MinValue, int.MinValue) 
                         && row >= 1 && row <= numRows - 2
-                        && col >= 1 && col <= numCols - 2)
+                        && col >= 1 && col <= numCols - 2) || 
+                        
+                        (col == 5) && row >= 1 && row <= numRows - 2) //for col == 2 check if left column, this forces deformdata to update
                     {
                         outputpixels.Add(row * numCols + col);
-                    }
-                    else if(newtransform == new Point(int.MinValue, int.MinValue))
-                    {
-
                     }
                     xCoordinates[index] = newtransform.X;
                     yCoordinates[index] = newtransform.Y;

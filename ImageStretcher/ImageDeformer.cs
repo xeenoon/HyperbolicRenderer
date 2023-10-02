@@ -51,6 +51,7 @@ namespace ImageStretcher
 
             int* xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
             int* yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
+
             for (int row = 0; row < numRows; row++)
             {
                 for (int col = 0; col < numCols; col++)
@@ -64,6 +65,7 @@ namespace ImageStretcher
                     yCoordinates[index] = newtransform.Y;
                 }
             }
+            
 
             // Now, use the precomputed deformation values
             for (int row = 1; row < numRows - 1; row++)

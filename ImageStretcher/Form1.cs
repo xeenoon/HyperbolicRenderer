@@ -194,8 +194,10 @@ namespace ImageStretcher
         }
         private void ExportGIF(object sender, EventArgs e)
         {
+            playanimation = false;
+            startstopButton.Invalidate();
+
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
-            scalar.speed = this.scalar.speed;
 
             SaveFileDialog saveFileDialogue = new SaveFileDialog();
             saveFileDialogue.ShowDialog();
@@ -216,7 +218,7 @@ namespace ImageStretcher
                 {
                     foreach (var bmp in frames)
                     {
-                        gif.AddFrame(bmp, delay: (int)(33 / scalar.speed), quality: GifQuality.Default);
+                        gif.AddFrame(bmp, delay = 33, GifQuality.Default);
 
                     }
                 }
@@ -248,7 +250,6 @@ namespace ImageStretcher
         private void ExportFrames()
         {
             PointTransformer scalar = new PointTransformer(new PointF(image.Width / 2, image.Height / 2), image.Width, menu, false);
-            scalar.speed = this.scalar.speed;
             //const float timeamt = 2;
             //choose the largest period, if the user specifies periods that dont line up, its their problem
 
@@ -272,7 +273,7 @@ namespace ImageStretcher
             {
                 return new Bitmap[0];
             }
-            int frames = (int)((menu.menuItems.Max(m => m.period) * 4) / (Math.PI * 2)) * 33;
+            int frames = (int)((menu.menuItems.Max(m => m.period) * 4) / (Math.PI * 2)) * 31;
 
             Bitmap[] GIFbitmaps = new Bitmap[frames];
             Bitmap[] tempbitmaps = new Bitmap[(int)frames];
@@ -305,6 +306,7 @@ namespace ImageStretcher
                 maxright = Math.Max(maxright, data.right);
                 maxbottom = Math.Max(maxbottom, data.bottom);
             });
+
             animationoffset = new Point(minleft - offset.X, mintop - offset.Y);
             for (int i = 0; i < tempbitmaps.Length; i++)
             {

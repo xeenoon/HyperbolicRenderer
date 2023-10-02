@@ -44,6 +44,11 @@ namespace ImageStretcher
 
         public List<PointF> polygonpoints;
         Func<bool> Paint;
+
+        //Baked heights for specific settings
+        public double[] bakedjello;
+        public double[] bakedrotations;
+
         public PolygonMenuItem(PolygonMenu menu, Func<bool> PaintFunc)
         {
             this.Paint = PaintFunc;

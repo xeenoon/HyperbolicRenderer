@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,6 @@ namespace ImageStretcher
         System.Timers.Timer timer = new System.Timers.Timer();
 
         public double time = 0;
-        public double speed = 1;
         public int width;
         public PolygonMenu polygonMenu;
 
@@ -47,10 +47,16 @@ namespace ImageStretcher
                 {
                     if (menuItem.polygonpoints.Count() >= 3 && input.InPolygon(menuItem.polygonpoints.ToArray()))
                     {
+                        if (menuItem.bakedjello == null)
+                        {
+                            BakeHeights(menuItem.period, menuItem.amplitude, menuItem.offset, 
+                                out menuItem.bakedjello, 
+                                out menuItem.bakedrotations);
+                        }
                         switch (menuItem.stretchType)
                         {
                             case StretchType.Jello:
-                                return MakeJello(input, menuItem.period, menuItem.amplitude, menuItem.offset);
+                                return MakeJello(input, menuItem);
                             case StretchType.RotateLeft:
                                 return RotateLeft(input, menuItem.period, menuItem.amplitude, menuItem.offset);
                             case StretchType.RotateRight:
@@ -76,14 +82,40 @@ namespace ImageStretcher
             return input;
         }
 
-        public Point MakeJello(Point input, int period, double amplitude, double offset)
+        const float scale = 100;
+        public void BakeHeights(int period, double amplitude, double offset, out double[] bakedjello, out double[] bakedrotations)
+        {
+            int length = (int)((scale) * Math.Tau);
+
+            bakedjello = new double[length];
+            bakedrotations = new double[length];
+
+            for (int i = 0; i < length; ++i) //Go through all possible angles
+            {
+                bakedjello[i] = (Math.Sin(((i / scale) * period * 2) + offset) * amplitude) + (1 + amplitude);
+            }
+            for (int i = 0; i < length; ++i) //Go through all possible angles
+            {
+                bakedrotations[i] = Math.Sin(((i / scale) * period * 2) + offset) * amplitude;
+            }
+        }
+        public Point MakeJello(Point input, PolygonMenuItem menuItem)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
             //Based on time, points will be scaled based on their angle to the centre
             double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X) + Math.PI / 2;
-            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed) + offset) * amplitude) + (1+amplitude));
-            
+            if (double.IsNaN(angle))
+            {
+                angle = 0;
+            }
+            int idx = (int)((angle + time/4) * scale);
+            while (idx >= Math.Floor(scale * Math.Tau))
+            {
+                idx -= (int)Math.Floor(scale * Math.Tau);
+            }
+            float heightmultiplier = (float)(menuItem.bakedjello[idx]);
+
             adjustedpoint.X *= heightmultiplier;
             adjustedpoint.Y *= heightmultiplier;
 
@@ -99,7 +131,7 @@ namespace ImageStretcher
             //amplitude defines rotation amount
             amplitude = Math.Min(Math.PI/2, amplitude);
             double angle = PointManager.GetAngle(centre, input);
-            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + (time * speed) + offset) * amplitude));
+            float heightmultiplier = (float)((Math.Sin((angle * period * 2) + time + offset) * amplitude));
             angle += heightmultiplier;
             double radius = Math.Sqrt(adjustedpoint.X * adjustedpoint.X + adjustedpoint.Y * adjustedpoint.Y);
 
@@ -118,7 +150,7 @@ namespace ImageStretcher
             //amplitude defines rotation amount
             amplitude = Math.Min(Math.PI / 2, amplitude);
             double angle = PointManager.GetAngle(centre, input);
-            float heightmultiplier = -(float)((Math.Sin((angle * period * 2) + (time * speed) + offset) * amplitude));
+            float heightmultiplier = -(float)((Math.Sin((angle * period * 2) + time + offset) * amplitude));
             angle += heightmultiplier;
             double radius = Math.Sqrt(adjustedpoint.X * adjustedpoint.X + adjustedpoint.Y * adjustedpoint.Y);
 
@@ -147,7 +179,8 @@ namespace ImageStretcher
                 edgedistance = Math.Pow(Math.Max((adjustedpoint.Y - lowestpoint), 0), 2) / 100f;
             }
 
-            adjustedpoint.X += (float)(Math.Sin(time * speed + offset) * amplitude * edgedistance + 1 + amplitude);
+            float heightmultiplier = (float)(Math.Sin(time + offset) * amplitude * edgedistance + 1 + amplitude);
+            adjustedpoint.X += heightmultiplier;
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
@@ -171,7 +204,7 @@ namespace ImageStretcher
                 edgedistance = Math.Pow(Math.Max((adjustedpoint.X - lowestpoint), 0), 2) / 100f;
             }
 
-            adjustedpoint.Y += (float)(Math.Sin(time * speed + offset) * amplitude * edgedistance + 1 + amplitude);
+            adjustedpoint.Y += (float)(Math.Sin(time + offset) * amplitude * edgedistance + 1 + amplitude);
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;

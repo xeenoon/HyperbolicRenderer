@@ -401,8 +401,8 @@ namespace ImageStretcher
         {
             if (erasing && framecollection.selectedframe != framecollection.master) //Dont allow editing of base image
             {
-                Rectangle erasedarea = new Rectangle(eraserlocation.X - erasersize / 2 - offset.X,
-                                                     eraserlocation.Y - erasersize / 2 - offset.Y, 
+                Rectangle erasedarea = new Rectangle(eraserlocation.X - offset.X,
+                                                     eraserlocation.Y - offset.Y, 
                                                      erasersize, erasersize);
                 Graphics g = Graphics.FromImage(framecollection.selectedframe.preview.Image);
                 g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;

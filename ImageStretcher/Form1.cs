@@ -306,8 +306,8 @@ namespace ImageStretcher
                 Invoke(() => loadingbar.Refresh());
                 minleft   = Math.Max(Math.Min(minleft, data.left),0);
                 mintop    = Math.Max(Math.Min(mintop, data.top),0);
-                maxright  = Math.Max(maxright, data.right);
-                maxbottom = Math.Max(maxbottom, data.bottom);
+                maxright  = Math.Min(Math.Max(maxright, data.right),canvas.Width);
+                maxbottom = Math.Min(Math.Max(maxbottom, data.bottom),canvas.Height);
             });
 
             animationoffset = new Point(minleft - offset.X, mintop - offset.Y);

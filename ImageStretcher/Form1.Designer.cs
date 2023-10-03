@@ -59,6 +59,7 @@
             frameViewer = new Panel();
             startstopButton = new PictureBox();
             panel2 = new Panel();
+            eraserToolboxItem = new PictureBox();
             zoomoutButton = new PictureBox();
             zoominButton = new PictureBox();
             loadingpanel = new Panel();
@@ -72,6 +73,7 @@
             polygonMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)startstopButton).BeginInit();
             panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)eraserToolboxItem).BeginInit();
             ((System.ComponentModel.ISupportInitialize)zoomoutButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)zoominButton).BeginInit();
             loadingpanel.SuspendLayout();
@@ -390,12 +392,24 @@
             // 
             panel2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             panel2.BackColor = Color.FromArgb(50, 117, 168);
+            panel2.Controls.Add(eraserToolboxItem);
             panel2.Controls.Add(zoomoutButton);
             panel2.Controls.Add(zoominButton);
             panel2.Location = new Point(0, 0);
             panel2.Name = "panel2";
             panel2.Size = new Size(50, 921);
             panel2.TabIndex = 29;
+            // 
+            // eraserToolboxItem
+            // 
+            eraserToolboxItem.Image = (Image)resources.GetObject("eraserToolboxItem.Image");
+            eraserToolboxItem.Location = new Point(0, 102);
+            eraserToolboxItem.Name = "eraserToolboxItem";
+            eraserToolboxItem.Size = new Size(50, 50);
+            eraserToolboxItem.SizeMode = PictureBoxSizeMode.StretchImage;
+            eraserToolboxItem.TabIndex = 2;
+            eraserToolboxItem.TabStop = false;
+            eraserToolboxItem.Click += EraserClick;
             // 
             // zoomoutButton
             // 
@@ -491,6 +505,7 @@
             polygonMenu.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)startstopButton).EndInit();
             panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)eraserToolboxItem).EndInit();
             ((System.ComponentModel.ISupportInitialize)zoomoutButton).EndInit();
             ((System.ComponentModel.ISupportInitialize)zoominButton).EndInit();
             loadingpanel.ResumeLayout(false);
@@ -536,5 +551,6 @@
         private Panel loadingpanel;
         private Label loadingLabel;
         private PictureBox loadingbar;
+        private PictureBox eraserToolboxItem;
     }
 }

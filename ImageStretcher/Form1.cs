@@ -189,7 +189,7 @@ namespace ImageStretcher
             for (int i = 0; i < 1000; ++i)
             {
                 scalar.time = 1; //Test value
-                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result, menu.menuItems.Select(m=>m.polygonpoints.ToArray()).ToList());
+                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result, menu.menuItems.Select(m => m.polygonpoints.ToArray()).ToList());
             }
             s.Stop();
             MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
@@ -304,10 +304,10 @@ namespace ImageStretcher
                 readcopies[i].Dispose();
                 bar.percentloaded += (1f / frames);
                 Invoke(() => loadingbar.Refresh());
-                minleft   = Math.Max(Math.Min(minleft, data.left),0);
-                mintop    = Math.Max(Math.Min(mintop, data.top),0);
-                maxright  = Math.Min(Math.Max(maxright, data.right),canvas.Width);
-                maxbottom = Math.Min(Math.Max(maxbottom, data.bottom),canvas.Height);
+                minleft = Math.Max(Math.Min(minleft, data.left), 0);
+                mintop = Math.Max(Math.Min(mintop, data.top), 0);
+                maxright = Math.Min(Math.Max(maxright, data.right), canvas.Width);
+                maxbottom = Math.Min(Math.Max(maxbottom, data.bottom), canvas.Height);
             });
 
             animationoffset = new Point(minleft - offset.X, mintop - offset.Y);
@@ -611,6 +611,11 @@ namespace ImageStretcher
         private void loadingbar_Paint(object sender, PaintEventArgs e)
         {
             bar.Draw(e.Graphics, loadingbar.Width, loadingbar.Height, 0);
+        }
+
+        private void EraserClick(object sender, EventArgs e)
+        {
+
         }
     }
 }

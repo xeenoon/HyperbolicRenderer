@@ -35,12 +35,13 @@ namespace ImageStretcher
 
         public static unsafe DeformData DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, List<PointF[]> polygons, bool overridescale = false)
         {
+            int width = originalimage.Width;
+            int height = originalimage.Height;
+
             GC_pacifier = (Bitmap)originalimage.Clone();
-            imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
+            imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
             DeformData deformData = new DeformData();
 
-            int width = imagedata.Width;
-            int height = imagedata.Height;
 
             Bitmap temp = new Bitmap(resultBitmap);
             BitmapData outputData = temp.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
@@ -63,9 +64,12 @@ namespace ImageStretcher
 
                     Point blockcentre = new Point(col, row);
                     Point newtransform = DeformFunction(blockcentre);
+
                     if ((newtransform != new Point(int.MinValue, int.MinValue) 
                         && row >= 1 && row <= numRows - 2
                         && col >= 1 && col <= numCols - 2))
+
+                        //&& (col >= 1 && newtransform.X - xCoordinates[index - 1] == 1))
                     {
                         outputpixels.Add(row * numCols + col);
                     }
@@ -88,13 +92,13 @@ namespace ImageStretcher
                 int topdist = newtransformy - yCoordinates[index - numCols];
                 int downdist = yCoordinates[index + numCols] - newtransformy;
 
-                if (leftdist < 0 || rightdist < 0 || topdist < 0 || downdist < 0)
-                {
-                    continue;
-                }
+               if (leftdist < 0 || rightdist < 0 || topdist < 0 || downdist < 0)
+               {
+                   continue;
+               }
 
-                int finalxresolution = (leftdist + rightdist);
-                int finalyresolution = (topdist + downdist);
+                int finalxresolution = leftdist + rightdist;
+                int finalyresolution = topdist + downdist;
 
                 // Ensure the new position is within bounds
                 if (newtransformx + offset.X < 0 ||
@@ -133,6 +137,10 @@ namespace ImageStretcher
             graphics.DrawImage(originalimage, new Point(offset.X, offset.Y));
             foreach (var polygon in polygons)
             {
+                if (polygon.Count() <= 2)
+                {
+                    continue;
+                }
                 PointF[] newpolygon = new PointF[polygon.Count()];
                 for (int i = 0; i < polygon.Length; i++)
                 {
@@ -150,6 +158,10 @@ namespace ImageStretcher
             {
                 //Make edge the unchanged pixels
                 deformData.left = offset.X;
+            }
+            if (deformData.right < offset.X + originalimage.Width)
+            {
+                deformData.right = offset.X + originalimage.Width;
             }
             if (deformData.top > offset.Y)
             {

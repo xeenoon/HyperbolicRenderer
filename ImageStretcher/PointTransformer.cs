@@ -50,8 +50,7 @@ namespace ImageStretcher
                         if (menuItem.bakedjello == null)
                         {
                             BakeHeights(menuItem.period, menuItem.amplitude, menuItem.offset, 
-                                out menuItem.bakedjello, 
-                                out menuItem.bakedrotations);
+                                out menuItem.bakedjello);
                         }
                         switch (menuItem.stretchType)
                         {
@@ -83,20 +82,15 @@ namespace ImageStretcher
         }
 
         const float scale = 1000;
-        public void BakeHeights(int period, double amplitude, double offset, out double[] bakedjello, out double[] bakedrotations)
+        public void BakeHeights(int period, double amplitude, double offset, out double[] bakedjello)
         {
             int length = (int)((scale) * Math.Tau);
 
             bakedjello = new double[length];
-            bakedrotations = new double[length];
 
             for (int i = 0; i < length; ++i) //Go through all possible angles
             {
                 bakedjello[i] = (Math.Sin(((i / scale) * period * 2) + offset) * amplitude) + (1 + amplitude);
-            }
-            for (int i = 0; i < length; ++i) //Go through all possible angles
-            {
-                bakedrotations[i] = Math.Sin(((i / scale) * period * 2) + offset) * amplitude;
             }
         }
         public Point MakeJello(Point input, PolygonMenuItem menuItem)
@@ -107,9 +101,9 @@ namespace ImageStretcher
             double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X) + Math.PI / 2;
             if (double.IsNaN(angle))
             {
-                angle = 0;
+                angle = Math.PI;
             }
-            int idx = (int)((angle + time/4) * scale);
+            int idx = (int)((angle + (time/4)) * scale);
             while (idx >= Math.Floor(scale * Math.Tau))
             {
                 idx -= (int)Math.Floor(scale * Math.Tau);

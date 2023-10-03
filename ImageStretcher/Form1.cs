@@ -302,9 +302,9 @@ namespace ImageStretcher
                 var data = ImageDeformer.DeformImageToPolygon(newscalar.TransformPoint, new Point(offset.X, offset.Y), readcopies[i], tempbitmaps[i], menu.menuItems.Select(m => m.polygonpoints.ToArray()).ToList(), true);
                 bar.percentloaded += (1f / frames);
                 Invoke(() => loadingbar.Refresh());
-                minleft = Math.Min(minleft, data.left);
-                mintop = Math.Min(mintop, data.top);
-                maxright = Math.Max(maxright, data.right);
+                minleft   = Math.Max(Math.Min(minleft, data.left),0);
+                mintop    = Math.Max(Math.Min(mintop, data.top),0);
+                maxright  = Math.Max(maxright, data.right);
                 maxbottom = Math.Max(maxbottom, data.bottom);
             });
 
@@ -586,7 +586,11 @@ namespace ImageStretcher
             {
                 animationframeidx -= frames.Count();
             }
-            displayimage = frames[animationframeidx];
+            try
+            {
+                displayimage = frames[animationframeidx];
+            }
+            catch { } //Fix multithreading issues
             canvas.Invalidate();
         }
 

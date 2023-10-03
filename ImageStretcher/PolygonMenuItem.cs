@@ -47,7 +47,6 @@ namespace ImageStretcher
 
         //Baked heights for specific settings
         public double[] bakedjello;
-        public double[] bakedrotations;
 
         public PolygonMenuItem(PolygonMenu menu, Func<bool> PaintFunc)
         {
@@ -167,6 +166,7 @@ namespace ImageStretcher
             {
                 period = temp;
             }
+            bakedjello = null;
         }
         void OffsetTextChange(object sender, EventArgs e)
         {
@@ -174,6 +174,7 @@ namespace ImageStretcher
             {
                 offset = temp;
             }
+            bakedjello = null;
         }
         void AmplitudeTextChange(object sender, EventArgs e)
         {
@@ -181,6 +182,7 @@ namespace ImageStretcher
             {
                 amplitude = temp;
             }
+            bakedjello = null;
         }
         void StretchTypeChanged(object sender, EventArgs e)
         {

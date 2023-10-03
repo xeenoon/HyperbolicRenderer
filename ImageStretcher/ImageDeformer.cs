@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,22 +31,18 @@ namespace ImageStretcher
     }
     public class ImageDeformer
     {
-        public static BitmapData imagedata;
-        public static Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
-
         public static unsafe DeformData DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, List<PointF[]> polygons, bool overridescale = false)
         {
             int width = originalimage.Width;
             int height = originalimage.Height;
 
-            GC_pacifier = (Bitmap)originalimage.Clone();
-            imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
+            var imagedata = originalimage.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
             DeformData deformData = new DeformData();
-
-
-            Bitmap temp = new Bitmap(resultBitmap);
+            
+            Bitmap temp = new Bitmap(resultBitmap.Width, resultBitmap.Height);
+            
             BitmapData outputData = temp.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
-
+            
             int numRows = height + 2;
             int numCols = width + 2; //Add 2 to store elements behind and infront
 
@@ -55,7 +52,7 @@ namespace ImageStretcher
             int* yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
 
             List<int> outputpixels = new List<int>();
-
+            
             for (int row = 0; row < numRows; row++)
             {
                 for (int col = 0; col < numCols; col++)
@@ -77,7 +74,7 @@ namespace ImageStretcher
                     yCoordinates[index] = newtransform.Y;
                 }
             }
-
+            
             // Now, use the precomputed deformation values
             foreach (var index in outputpixels)
             {
@@ -126,12 +123,11 @@ namespace ImageStretcher
                     outputData,
                     new Rectangle(newtransformx + offset.X, newtransformy + offset.Y, finalxresolution, finalyresolution));
             }
+
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             temp.UnlockBits(outputData);
-
-            GC_pacifier.Dispose();
-
+            originalimage.UnlockBits(imagedata);
             //Draw the image
             var graphics = Graphics.FromImage(resultBitmap);
             graphics.DrawImage(originalimage, new Point(offset.X, offset.Y));
@@ -153,7 +149,7 @@ namespace ImageStretcher
             }
             graphics.DrawImage(temp.Clone(new Rectangle(deformData.left, deformData.top, deformData.right - deformData.left, deformData.bottom - deformData.top), PixelFormat.Format32bppPArgb), 
                 new Point(deformData.left, deformData.top));
-
+            
             if (deformData.left > offset.X) //Didn't draw left side
             {
                 //Make edge the unchanged pixels

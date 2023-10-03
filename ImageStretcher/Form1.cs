@@ -134,6 +134,7 @@ namespace ImageStretcher
         LoadingBar bar = new LoadingBar();
         private void Generate(object sender, EventArgs e)
         {
+            //Benchmark(null, null);
             playanimation = false;
             startstopButton.Refresh(); //Force update with .Refresh instead of .Invalidate
             framecollection.selectedframe = framecollection.master; //Reset animation
@@ -300,6 +301,7 @@ namespace ImageStretcher
                 newscalar.time = (i + 1) * ((2 * Math.PI) / (31.4f));
                 tempbitmaps[i] = new Bitmap(canvas.Width, canvas.Height);
                 var data = ImageDeformer.DeformImageToPolygon(newscalar.TransformPoint, new Point(offset.X, offset.Y), readcopies[i], tempbitmaps[i], menu.menuItems.Select(m => m.polygonpoints.ToArray()).ToList(), true);
+                readcopies[i].Dispose();
                 bar.percentloaded += (1f / frames);
                 Invoke(() => loadingbar.Refresh());
                 minleft   = Math.Max(Math.Min(minleft, data.left),0);

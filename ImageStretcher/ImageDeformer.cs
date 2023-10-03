@@ -42,11 +42,8 @@ namespace ImageStretcher
             int width = imagedata.Width;
             int height = imagedata.Height;
 
-            //Draw the image
-            var graphics = Graphics.FromImage(resultBitmap);
-            graphics.DrawImage(originalimage, offset);
-
-            BitmapData outputData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
+            Bitmap temp = new Bitmap(resultBitmap);
+            BitmapData outputData = temp.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
             int numRows = height + 2;
             int numCols = width + 2; //Add 2 to store elements behind and infront
@@ -68,9 +65,7 @@ namespace ImageStretcher
                     Point newtransform = DeformFunction(blockcentre);
                     if ((newtransform != new Point(int.MinValue, int.MinValue) 
                         && row >= 1 && row <= numRows - 2
-                        && col >= 1 && col <= numCols - 2) || 
-                        
-                        (col == 5) && row >= 1 && row <= numRows - 2) //for col == 2 check if left column, this forces deformdata to update
+                        && col >= 1 && col <= numCols - 2))
                     {
                         outputpixels.Add(row * numCols + col);
                     }
@@ -129,9 +124,30 @@ namespace ImageStretcher
             }
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
-            resultBitmap.UnlockBits(outputData);
+            temp.UnlockBits(outputData);
 
             GC_pacifier.Dispose();
+
+            //Draw the image
+            var graphics = Graphics.FromImage(resultBitmap);
+            graphics.DrawImage(originalimage, new Point(offset.X, offset.Y));
+            graphics.DrawImage(temp.Clone(new Rectangle(deformData.left, deformData.top, deformData.right - deformData.left, deformData.bottom - deformData.top), PixelFormat.Format32bppPArgb), 
+                new Point(deformData.left, deformData.top));
+
+            if (deformData.left > offset.X) //Didn't draw left side
+            {
+                //Make edge the unchanged pixels
+                deformData.left = offset.X;
+            }
+            if (deformData.top > offset.Y)
+            {
+                deformData.top = offset.Y;
+            }
+            if (deformData.bottom < offset.Y + originalimage.Height)
+            {
+                deformData.bottom = offset.Y + originalimage.Height;
+            }
+
             return deformData;
         }
 

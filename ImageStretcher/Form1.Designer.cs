@@ -89,8 +89,9 @@
             canvas.Size = new Size(1520, 921);
             canvas.TabIndex = 0;
             canvas.TabStop = false;
-            canvas.Click += AddPoint;
+            canvas.Click += CanvasClick;
             canvas.Paint += pictureBox1_Paint;
+            canvas.MouseMove += canvas_MouseMove;
             // 
             // importButton
             // 
@@ -491,9 +492,11 @@
             Controls.Add(canvas);
             DoubleBuffered = true;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            KeyPreview = true;
             Name = "AnimationEditor";
             Text = "Jello Machine";
             Load += Form1_Load;
+            KeyUp += AnimationEditor_KeyUp;
             Resize += AnimationEditor_Resize;
             ((System.ComponentModel.ISupportInitialize)canvas).EndInit();
             ImportSettingsPanel.ResumeLayout(false);

@@ -73,7 +73,11 @@ namespace ImageStretcher
                     e.Graphics.DrawImage(image, offset.X, offset.Y, newwidth, newheight);
                 }
             }
-
+            if (erasing)
+            {
+                e.Graphics.DrawRectangle(new Pen(Color.Black), 
+                    eraserlocation.X - erasersize / 2, eraserlocation.Y - erasersize / 2, erasersize, erasersize);
+            }
             foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
             {
                 PointF[] offsetpolygon = new PointF[polygon.Count];
@@ -393,9 +397,19 @@ namespace ImageStretcher
             canvas.Invalidate();
             return false;
         }
-        private void AddPoint(object sender, EventArgs e)
+        private void CanvasClick(object sender, EventArgs e)
         {
-            if (menu.selecteditem != null)
+            if (erasing && framecollection.selectedframe != framecollection.master) //Dont allow editing of base image
+            {
+                Rectangle erasedarea = new Rectangle(eraserlocation.X - erasersize / 2 - offset.X,
+                                                     eraserlocation.Y - erasersize / 2 - offset.Y, 
+                                                     erasersize, erasersize);
+                Graphics g = Graphics.FromImage(framecollection.selectedframe.preview.Image);
+                g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                g.FillRectangle(new Pen(Color.Transparent).Brush, erasedarea);
+                g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
+            }
+            else if (menu.selecteditem != null)
             {
                 Point clickpos = canvas.PointToClient(Cursor.Position);
                 clickpos.X -= offset.X;
@@ -613,9 +627,43 @@ namespace ImageStretcher
             bar.Draw(e.Graphics, loadingbar.Width, loadingbar.Height, 0);
         }
 
+        bool erasing = false;
         private void EraserClick(object sender, EventArgs e)
         {
+            if (erasing)
+            {
+                eraserToolboxItem.BackColor = Color.Transparent;
+            }
+            else
+            {
+                eraserToolboxItem.BackColor = Color.Gray;
+            }
+            erasing = !erasing;
+            canvas.Invalidate();
+        }
+        Point eraserlocation = new Point(0, 0);
+        int erasersize = 2;
+        private void canvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (erasing)
+            {
+                eraserlocation = canvas.PointToClient(Cursor.Position);
+                canvas.Invalidate();
+            }
+        }
 
+        private void AnimationEditor_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Oemplus)
+            {
+                erasersize++;
+                canvas.Invalidate();
+            }
+            if (e.KeyCode == Keys.OemMinus)
+            {
+                erasersize--;
+                canvas.Invalidate();
+            }
         }
     }
 }

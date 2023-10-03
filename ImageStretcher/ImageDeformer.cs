@@ -140,7 +140,7 @@ namespace ImageStretcher
                 PointF[] newpolygon = new PointF[polygon.Count()];
                 for (int i = 0; i < polygon.Length; i++)
                 {
-                    PointF p = (PointF)polygon[i];
+                    PointF p = polygon[i];
                     newpolygon[i] = new PointF(p.X + offset.X, p.Y + offset.Y);
                 }
                 graphics.CompositingMode = CompositingMode.SourceCopy;

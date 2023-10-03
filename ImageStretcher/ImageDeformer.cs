@@ -33,7 +33,7 @@ namespace ImageStretcher
         public static BitmapData imagedata;
         public static Bitmap GC_pacifier; //This has to exist or GC will have a temper tantrum and delete it
 
-        public static unsafe DeformData DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, bool overridescale = false)
+        public static unsafe DeformData DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, List<PointF[]> polygons, bool overridescale = false)
         {
             GC_pacifier = (Bitmap)originalimage.Clone();
             imagedata = GC_pacifier.LockBits(new Rectangle(0, 0, originalimage.Width, originalimage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
@@ -131,6 +131,18 @@ namespace ImageStretcher
             //Draw the image
             var graphics = Graphics.FromImage(resultBitmap);
             graphics.DrawImage(originalimage, new Point(offset.X, offset.Y));
+            foreach (var polygon in polygons)
+            {
+                PointF[] newpolygon = new PointF[polygon.Count()];
+                for (int i = 0; i < polygon.Length; i++)
+                {
+                    PointF p = (PointF)polygon[i];
+                    newpolygon[i] = new PointF(p.X + offset.X, p.Y + offset.Y);
+                }
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.FillPolygon(new Pen(Color.Transparent).Brush, newpolygon);
+                graphics.CompositingMode = CompositingMode.SourceOver;
+            }
             graphics.DrawImage(temp.Clone(new Rectangle(deformData.left, deformData.top, deformData.right - deformData.left, deformData.bottom - deformData.top), PixelFormat.Format32bppPArgb), 
                 new Point(deformData.left, deformData.top));
 

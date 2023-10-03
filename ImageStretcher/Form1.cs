@@ -188,7 +188,7 @@ namespace ImageStretcher
             for (int i = 0; i < 1000; ++i)
             {
                 scalar.time = 1; //Test value
-                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result);
+                ImageDeformer.DeformImageToPolygon(scalar.TransformPoint, new Point(0, 0), image, result, menu.menuItems.Select(m=>m.polygonpoints.ToArray()).ToList());
             }
             s.Stop();
             MessageBox.Show("Did 1000 operations, averaging: " + (s.ElapsedMilliseconds / 1000f).ToString() + "ms per frame");
@@ -299,7 +299,7 @@ namespace ImageStretcher
                 PointTransformer newscalar = new PointTransformer(scalar.centre, scalar.width, scalar.polygonMenu);
                 newscalar.time = (i + 1) * ((2 * Math.PI) / (31.4f));
                 tempbitmaps[i] = new Bitmap(canvas.Width, canvas.Height);
-                var data = ImageDeformer.DeformImageToPolygon(newscalar.TransformPoint, new Point(offset.X, offset.Y), readcopies[i], tempbitmaps[i], true);
+                var data = ImageDeformer.DeformImageToPolygon(newscalar.TransformPoint, new Point(offset.X, offset.Y), readcopies[i], tempbitmaps[i], menu.menuItems.Select(m => m.polygonpoints.ToArray()).ToList(), true);
                 bar.percentloaded += (1f / frames);
                 Invoke(() => loadingbar.Refresh());
                 minleft = Math.Min(minleft, data.left);

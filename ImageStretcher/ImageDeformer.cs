@@ -31,7 +31,7 @@ namespace ImageStretcher
     }
     public class ImageDeformer
     {
-        public static unsafe DeformData DeformImageToPolygon(Func<Point, Point> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, List<PointF[]> polygons, bool overridescale = false)
+        public static unsafe DeformData DeformImageToPolygon(Func<Point, PointF> DeformFunction, Point offset, Bitmap originalimage, Bitmap resultBitmap, List<PointF[]> polygons, bool overridescale = false)
         {
             int width = originalimage.Width;
             int height = originalimage.Height;
@@ -48,8 +48,8 @@ namespace ImageStretcher
 
             int numElements = (numRows) * (numCols);
 
-            int* xCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
-            int* yCoordinates = (int*)Marshal.AllocHGlobal(sizeof(int) * numElements);
+            float* xCoordinates = (float*)Marshal.AllocHGlobal(sizeof(float) * numElements);
+            float* yCoordinates = (float*)Marshal.AllocHGlobal(sizeof(float) * numElements);
 
             List<int> outputpixels = new List<int>();
             
@@ -60,9 +60,9 @@ namespace ImageStretcher
                     int index = row * (numCols) + col;
 
                     Point blockcentre = new Point(col, row);
-                    Point newtransform = DeformFunction(blockcentre);
+                    PointF newtransform = DeformFunction(blockcentre);
 
-                    if ((newtransform != new Point(int.MinValue, int.MinValue) 
+                    if ((newtransform != new PointF(int.MinValue, int.MinValue) 
                         && row >= 1 && row <= numRows - 2
                         && col >= 1 && col <= numCols - 2))
 
@@ -81,21 +81,21 @@ namespace ImageStretcher
                 int row = index / numCols;
                 int col = index % numCols;
 
-                int newtransformx = xCoordinates[index];
-                int newtransformy = yCoordinates[index];
+                int newtransformx = (int)xCoordinates[index];
+                int newtransformy = (int)yCoordinates[index];
 
-                int leftdist = newtransformx - xCoordinates[index - 1];
-                int rightdist = xCoordinates[index + 1] - newtransformx;
-                int topdist = newtransformy - yCoordinates[index - numCols];
-                int downdist = yCoordinates[index + numCols] - newtransformy;
+                float leftdist = newtransformx - xCoordinates[index - 1];
+                float rightdist = xCoordinates[index + 1] - newtransformx;
+                float topdist = newtransformy - yCoordinates[index - numCols];
+                float downdist = yCoordinates[index + numCols] - newtransformy;
 
                if (leftdist < 0 || rightdist < 0 || topdist < 0 || downdist < 0)
                {
                    continue;
                }
 
-                int finalxresolution = leftdist + rightdist;
-                int finalyresolution = topdist + downdist;
+                int finalxresolution = (int)Math.Ceiling((leftdist + rightdist) / 2f);
+                int finalyresolution = (int)Math.Ceiling((topdist + downdist) / 2f);
 
                 // Ensure the new position is within bounds
                 if (newtransformx + offset.X < 0 ||
@@ -122,6 +122,82 @@ namespace ImageStretcher
                     col, row,
                     outputData,
                     new Rectangle(newtransformx + offset.X, newtransformy + offset.Y, finalxresolution, finalyresolution));
+            }
+            //Patch holes in the image
+            for (int x = deformData.left; x < deformData.right; ++x)
+            {
+                for (int y = deformData.top; y < deformData.bottom; ++y)
+                {
+                    byte* position = ((byte*)outputData.Scan0) + x * 4 + y * outputData.Stride;
+                    int alpha = *position;
+                    if (alpha == 0) //On a transparent pixel?
+                    {
+                        //Cast rays left right up and down to determine if we are a hole
+                        int uproof = -1;
+                        for (int up = 0; up < 10 && up < y - deformData.top && uproof == -1; ++up)
+                        {
+                            byte* newlocation = position - up * outputData.Stride;
+                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            {
+                                uproof = up; //Ray hit a wall
+                            }
+                        }
+                        if (uproof == -1) { continue; }
+
+                        int downroof = -1;
+                        for (int down = 0; down < 10 && down < deformData.bottom - y && downroof == -1; ++down)
+                        {
+                            byte* newlocation = (position + down * outputData.Stride);
+                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            {
+                                downroof = down; //Ray hit a wall
+                            }
+                        }
+                        if (downroof == -1) { continue; }
+
+                        int rightroof = -1;
+                        for (int right = 0; right < 10 && right < deformData.right - x && rightroof == -1; ++right)
+                        {
+                            byte* newlocation = (position + right * 4);
+                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            {
+                                rightroof = right; //Ray hit a wall
+                            }
+                        }
+                        if (rightroof == -1) { continue; }
+
+                        int leftroof = -1; ;
+                        for (int left = 0; left < 10 && left < x - deformData.left && leftroof == -1; ++left)
+                        {
+                            byte* newlocation = (position - left * 4);
+                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            {
+                                leftroof = left; //Ray hit a wall
+                            }
+                        }
+                        if (leftroof == -1) { continue; }
+
+                        //All checks passed? Change the color
+                        byte[] newcolor = BlendColors(position - (uproof * outputData.Stride),
+                                                      position + (downroof * outputData.Stride),
+                                                      position - (leftroof * 4),
+                                                      position + (rightroof * 4));
+
+                        byte* ptr = position - (uproof * outputData.Stride);
+                        byte[] result = new byte[4];
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            result[i] = ptr[i];
+                        }
+
+                        fixed (byte* colorptr = newcolor)
+                        {
+                            Buffer.MemoryCopy(position - (uproof * outputData.Stride),
+                                              position, 4, 4);
+                        }
+                    }
+                }
             }
 
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
@@ -171,7 +247,48 @@ namespace ImageStretcher
             return deformData;
         }
 
-        [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        static unsafe byte[] BlendColors(byte* color1, byte* color2, byte* color3, byte* color4)
+        {
+            // Calculate the distances between the target color and the four input colors
+            double distance1 = CalculateRGBDistance(color1, color4);
+            double distance2 = CalculateRGBDistance(color2, color4);
+            double distance3 = CalculateRGBDistance(color3, color4);
+
+            // Calculate the weights for blending based on inverse distances
+            double totalDistance = distance1 + distance2 + distance3;
+            double weight1 = (distance1 / totalDistance);
+            double weight2 = (distance2 / totalDistance);
+            double weight3 = (distance3 / totalDistance);
+
+            // Blend the colors based on weights
+            byte red = (byte)((weight1 * color1[1] + weight2 * color2[1] + weight3 * color3[1]) / 3);
+            byte green = (byte)((weight1 * color1[2] + weight2 * color2[2] + weight3 * color3[2]) / 3);
+            byte blue = (byte)((weight1 * color1[3] + weight2 * color2[3] + weight3 * color3[3]) / 3);
+
+            byte[] result = new byte[4];
+            result[0] = 255;
+            result[1] = 255;
+            result[2] = 0;
+            result[3] = 0;
+
+            return result;
+        }
+
+
+        static unsafe double CalculateRGBDistance(byte* color1, byte* color2)
+        {
+            // Calculate the Euclidean distance between two colors in RGB space
+            int deltaRed = color1[1] - color2[1];
+            int deltaGreen = color1[2] - color2[2];
+            int deltaBlue = color1[3] - color2[3];
+
+            return Math.Sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen + deltaBlue * deltaBlue);
+        }
+        
+
+
+
+    [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         public static extern unsafe IntPtr memset(void* dest, int c, int count);
         private static unsafe void SmootheResizeCopy(BitmapData input, int xinput, int yinput, BitmapData dest, Rectangle destrect)
         {

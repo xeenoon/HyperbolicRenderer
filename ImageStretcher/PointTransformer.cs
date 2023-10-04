@@ -35,7 +35,7 @@ namespace ImageStretcher
         {
             time += increment;
         }
-        public Point TransformPoint(Point input)
+        public PointF TransformPoint(Point input)
         {
             if (time == 0)
             {
@@ -93,7 +93,7 @@ namespace ImageStretcher
                 bakedjello[i] = (Math.Sin(((i / scale) * period * 2) + offset) * amplitude) + (1 + amplitude);
             }
         }
-        public Point MakeJello(Point input, PolygonMenuItem menuItem)
+        public PointF MakeJello(Point input, PolygonMenuItem menuItem)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
@@ -116,9 +116,9 @@ namespace ImageStretcher
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
 
-            return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
+            return new PointF(adjustedpoint.X, adjustedpoint.Y);
         }
-        public Point RotateLeft(Point input, int period, double amplitude, double offset)
+        public PointF RotateLeft(Point input, int period, double amplitude, double offset)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
             //period defines speed
@@ -142,9 +142,9 @@ namespace ImageStretcher
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
 
-            return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
+            return new PointF(adjustedpoint.X, adjustedpoint.Y);
         }
-        public Point RotateRight(Point input, int period, double amplitude, double offset)
+        public PointF RotateRight(Point input, int period, double amplitude, double offset)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
             //period defines speed
@@ -161,9 +161,9 @@ namespace ImageStretcher
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
 
-            return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
+            return new PointF(adjustedpoint.X, adjustedpoint.Y);
         }
-        public Point HorizontalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude, double offset)
+        public PointF HorizontalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude, double offset)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
@@ -186,9 +186,9 @@ namespace ImageStretcher
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
 
-            return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
+            return new PointF(adjustedpoint.X, adjustedpoint.Y);
         }
-        public Point VerticalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude, double offset)
+        public PointF VerticalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude, double offset)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
@@ -210,7 +210,7 @@ namespace ImageStretcher
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
 
-            return new Point((int)adjustedpoint.X, (int)adjustedpoint.Y);
+            return new PointF(adjustedpoint.X, adjustedpoint.Y);
         }
         double increment = 0.5;
         internal void Pause()

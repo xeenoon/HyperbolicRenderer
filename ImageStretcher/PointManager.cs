@@ -80,7 +80,7 @@ namespace ImageStretcher
             }
             else if (ychange == 0 && xchange < 0)
             {
-                angle = 3 * Math.PI / 2;
+                angle = - Math.PI / 2;
             }
             else if (xchange == 0 && ychange < 0)
             {

@@ -101,7 +101,7 @@ namespace ImageStretcher
             double angle = Math.Atan(adjustedpoint.Y / adjustedpoint.X) + Math.PI / 2;
             if (double.IsNaN(angle))
             {
-                angle = Math.PI;
+                angle = 0;
             }
             int idx = (int)((angle + (time/4)) * scale);
             while (idx >= Math.Floor(scale * Math.Tau))
@@ -125,12 +125,19 @@ namespace ImageStretcher
             //amplitude defines rotation amount
             amplitude = Math.Min(Math.PI/2, amplitude);
             double angle = PointManager.GetAngle(centre, input);
+
             float heightmultiplier = (float)((Math.Sin((angle * period * 2) + time + offset) * amplitude));
+
             angle += heightmultiplier;
             double radius = Math.Sqrt(adjustedpoint.X * adjustedpoint.X + adjustedpoint.Y * adjustedpoint.Y);
-
-            adjustedpoint.X = (float)(Math.Cos(angle) * radius);
-            adjustedpoint.Y = (float)(Math.Sin(angle) * radius);
+            if (!double.IsNaN(Math.Cos(angle)))
+            {
+                adjustedpoint.X = (float)(Math.Cos(angle) * radius);
+            }
+            if (!double.IsNaN(Math.Sin(angle)))
+            {
+                adjustedpoint.Y = (float)(Math.Sin(angle) * radius);
+            }
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;

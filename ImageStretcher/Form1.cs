@@ -76,7 +76,7 @@ namespace ImageStretcher
             if (erasing)
             {
                 e.Graphics.DrawRectangle(new Pen(Color.Black), 
-                    eraserlocation.X - erasersize / 2, eraserlocation.Y - erasersize / 2, erasersize, erasersize);
+                    eraserlocation.X - erasersize, eraserlocation.Y - erasersize, erasersize, erasersize);
             }
             foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
             {
@@ -273,6 +273,7 @@ namespace ImageStretcher
             }
         }
         Point animationoffset;
+        DeformData deformdata;
         public Bitmap[] GetFrames()
         {
             if (menu.menuItems.Count == 0)
@@ -313,6 +314,11 @@ namespace ImageStretcher
                 maxright = Math.Min(Math.Max(maxright, data.right), canvas.Width);
                 maxbottom = Math.Min(Math.Max(maxbottom, data.bottom), canvas.Height);
             });
+            this.deformdata = new DeformData();
+            deformdata.left = minleft;
+            deformdata.right = maxright;
+            deformdata.top = mintop;
+            deformdata.bottom = maxbottom;
 
             animationoffset = new Point(minleft - offset.X, mintop - offset.Y);
             for (int i = 0; i < tempbitmaps.Length; i++)
@@ -401,8 +407,8 @@ namespace ImageStretcher
         {
             if (erasing && framecollection.selectedframe != framecollection.master) //Dont allow editing of base image
             {
-                Rectangle erasedarea = new Rectangle(eraserlocation.X - offset.X,
-                                                     eraserlocation.Y - offset.Y, 
+                Rectangle erasedarea = new Rectangle(eraserlocation.X - erasersize - deformdata.left,
+                                                     eraserlocation.Y - erasersize - deformdata.top, 
                                                      erasersize, erasersize);
                 Graphics g = Graphics.FromImage(framecollection.selectedframe.preview.Image);
                 g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;

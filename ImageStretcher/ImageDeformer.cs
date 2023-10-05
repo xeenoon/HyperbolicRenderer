@@ -181,27 +181,12 @@ namespace ImageStretcher
                         if (leftroof == -1) { continue; }
 
                         //All checks passed? Change the color
-                        byte[] newcolor = BlendColors(position - (uproof * outputData.Stride),
+                        
+                        var newcolor = BlendColors(position - (uproof * outputData.Stride),
                                                       position + (downroof * outputData.Stride),
                                                       position - (leftroof * 4),
                                                       position + (rightroof * 4));
-                        byte[] topcolor = new byte[4];
-                        byte* upptr = position - (uproof * outputData.Stride);
-                        topcolor[0] = upptr[0];
-                        topcolor[1] = upptr[1]; 
-                        topcolor[2] = upptr[2];
-                        topcolor[3] = upptr[3];
-
-                       // if (newcolor[0] < 50 && newcolor[1] < 50 && newcolor[2] < 50 &&
-                       //     upptr[0] > 50 && upptr[1] > 50 && upptr[2] > 50)
-                       // {
-                       //     newcolor[2] = 0xff;
-                       // }
-
-                        position[0] = newcolor[0];
-                        position[1] = newcolor[1];
-                        position[2] = newcolor[2];
-                        position[3] = newcolor[3];
+                        Buffer.MemoryCopy(newcolor, position, 4, 4);
                     }
                 }
             }
@@ -253,17 +238,18 @@ namespace ImageStretcher
             return deformData;
         }
 
-        static unsafe byte[] BlendColors(byte* color1, byte* color2, byte* color3, byte* color4)
+        static unsafe byte* BlendColors(byte* color1, byte* color2, byte* color3, byte* color4)
         {
+            byte* result = (byte*)Marshal.AllocHGlobal(4);
+
             const double weight = 0.25f;
             // Blend the colors based on weights
-            byte alpha = (byte)(weight * ((color1[3] + color2[3] + color3[3]) + color4[3]));
-            byte red = (byte)(weight * (color1[2] + color2[2] + color3[2] + color4[2]));
-            byte green = (byte)(weight * ((color1[1] + color2[1] + color3[1]) + color4[1]));
-            byte blue = (byte)(weight * ((color1[0] + color2[0] + color3[0]) + color4[0]));
-            
+            result[3] = (byte)(weight * ((color1[3] + color2[3] + color3[3]) + color4[3]));
+            result[2] = (byte)(weight * (color1[2] + color2[2] + color3[2] + color4[2]));
+            result[1] = (byte)(weight * ((color1[1] + color2[1] + color3[1]) + color4[1]));
+            result[0] = (byte)(weight * ((color1[0] + color2[0] + color3[0]) + color4[0])); //Color order doesn't matter
 
-            return new byte[4] { blue, green, red, alpha };
+            return result; //REMEMBER TO FREE!!!
         }
 
 

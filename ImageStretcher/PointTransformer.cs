@@ -45,40 +45,52 @@ namespace ImageStretcher
             {
                 foreach (PolygonMenuItem menuItem in polygonMenu.menuItems)
                 {
-                    if (menuItem.polygonpoints.Count() >= 3 && input.InPolygon(menuItem.polygonpoints.ToArray()))
+                    if (menuItem.polygonpoints.Count() >= 3)
                     {
-                        if (menuItem.bakedjello == null)
+                        if (input.InPolygon(menuItem.smallpoints)) //Scale normally
                         {
-                            BakeHeights(menuItem.period, menuItem.amplitude, menuItem.offset, 
-                                out menuItem.bakedjello);
+                            TransformPolygon(menuItem, input);
                         }
-                        switch (menuItem.stretchType)
+                        else if (input.InPolygon(menuItem.polygonpoints.ToArray())) //Smoothe to edges
                         {
-                            case StretchType.Jello:
-                                return MakeJello(input, menuItem);
-                            case StretchType.RotateLeft:
-                                return RotateLeft(input, menuItem.period, menuItem.amplitude, menuItem.offset);
-                            case StretchType.RotateRight:
-                                return RotateRight(input, menuItem.period, menuItem.amplitude, menuItem.offset);
-                            case StretchType.Horizontal:
-                                double maxy = menuItem.polygonpoints.Max(p => p.Y);
-                                maxy -= centre.Y;
-
-                                double miny = menuItem.polygonpoints.Min(p => p.Y);
-                                miny -= centre.Y;
-                                return HorizontalWave(input, maxy, miny, menuItem.period, menuItem.amplitude, menuItem.offset);
-                            case StretchType.Vertical:
-                                double maxx = menuItem.polygonpoints.Max(p => p.X);
-                                maxx -= centre.X;
-
-                                double minx = menuItem.polygonpoints.Min(p => p.X);
-                                minx -= centre.X;
-                                return VerticalWave(input, maxx, minx, menuItem.period, menuItem.amplitude, menuItem.offset);
+                            TransformPolygon(menuItem, input);
                         }
                     }
                 }
             }
             return new Point(int.MinValue,int.MinValue);
+        }
+
+        void TransformPolygon(PolygonMenuItem menuItem, Point input)
+        {
+            if (menuItem.bakedjello == null)
+            {
+                BakeHeights(menuItem.period, menuItem.amplitude, menuItem.offset,
+                    out menuItem.bakedjello);
+            }
+            switch (menuItem.stretchType)
+            {
+                case StretchType.Jello:
+                    return MakeJello(input, menuItem);
+                case StretchType.RotateLeft:
+                    return RotateLeft(input, menuItem.period, menuItem.amplitude, menuItem.offset);
+                case StretchType.RotateRight:
+                    return RotateRight(input, menuItem.period, menuItem.amplitude, menuItem.offset);
+                case StretchType.Horizontal:
+                    double maxy = menuItem.polygonpoints.Max(p => p.Y);
+                    maxy -= centre.Y;
+
+                    double miny = menuItem.polygonpoints.Min(p => p.Y);
+                    miny -= centre.Y;
+                    return HorizontalWave(input, maxy, miny, menuItem.period, menuItem.amplitude, menuItem.offset);
+                case StretchType.Vertical:
+                    double maxx = menuItem.polygonpoints.Max(p => p.X);
+                    maxx -= centre.X;
+
+                    double minx = menuItem.polygonpoints.Min(p => p.X);
+                    minx -= centre.X;
+                    return VerticalWave(input, maxx, minx, menuItem.period, menuItem.amplitude, menuItem.offset);
+            }
         }
 
         const float scale = 1000;

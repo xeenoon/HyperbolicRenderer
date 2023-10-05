@@ -43,6 +43,7 @@ namespace ImageStretcher
         public double offset = 0;
 
         public List<PointF> polygonpoints;
+        public PointF[] smallpoints;
         Func<bool> Paint;
 
         //Baked heights for specific settings
@@ -158,6 +159,8 @@ namespace ImageStretcher
             PointManager.GrahamsAlgorithm(polygonpoints[0], polygonpoints, ref temp);
             polygonpoints.Clear();
             polygonpoints.AddRange(temp);
+
+            smallpoints = polygonpoints.ToArray().ScalePolygon(10);
         }
 
         void PeriodTextChange(object sender, EventArgs e)

@@ -133,7 +133,7 @@ namespace ImageStretcher
                     int alpha = *(position + alphaoffset);
                     if (alpha == 0) //On a transparent pixel?
                     {
-                        const int maxdist = 5;
+                        const int maxdist = 50;
 
                         //Cast rays left right up and down to determine if we are a hole
                         int uproof = -1;
@@ -188,20 +188,20 @@ namespace ImageStretcher
                         byte[] topcolor = new byte[4];
                         byte* upptr = position - (uproof * outputData.Stride);
                         topcolor[0] = upptr[0];
-                        topcolor[1] = upptr[1];
+                        topcolor[1] = upptr[1]; 
                         topcolor[2] = upptr[2];
                         topcolor[3] = upptr[3];
+
+                       // if (newcolor[0] < 50 && newcolor[1] < 50 && newcolor[2] < 50 &&
+                       //     upptr[0] > 50 && upptr[1] > 50 && upptr[2] > 50)
+                       // {
+                       //     newcolor[2] = 0xff;
+                       // }
 
                         position[0] = newcolor[0];
                         position[1] = newcolor[1];
                         position[2] = newcolor[2];
                         position[3] = newcolor[3];
-
-                      // fixed (byte* colorptr = newcolor)
-                      // {
-                      //     Buffer.MemoryCopy(position - (uproof * outputData.Stride),
-                      //                       position, 4, 4);
-                      // }
                     }
                 }
             }
@@ -255,23 +255,15 @@ namespace ImageStretcher
 
         static unsafe byte[] BlendColors(byte* color1, byte* color2, byte* color3, byte* color4)
         {
-            // Calculate the distances between the target color and the four input colors
-            double distance1 = CalculateRGBDistance(color1, color4);
-            double distance2 = CalculateRGBDistance(color2, color4);
-            double distance3 = CalculateRGBDistance(color3, color4);
-
-            // Calculate the weights for blending based on inverse distances
-            double totalDistance = distance1 + distance2 + distance3;
-            double weight1 = 1 - (distance1 / totalDistance);
-            double weight2 = 1 - (distance2 / totalDistance);
-            double weight3 = 1 - (distance3 / totalDistance);
-
+            const double weight = 0.25f;
             // Blend the colors based on weights
-            byte red = (byte)((weight1 * color1[2] + weight2 * color2[2] + weight3 * color3[2]) / 3);
-            byte green = (byte)((weight1 * color1[1] + weight2 * color2[1] + weight3 * color3[1]) / 3);
-            byte blue = (byte)((weight1 * color1[0] + weight2 * color2[0] + weight3 * color3[0]) / 3);
+            byte alpha = (byte)(weight * ((color1[3] + color2[3] + color3[3]) + color4[3]));
+            byte red = (byte)(weight * (color1[2] + color2[2] + color3[2] + color4[2]));
+            byte green = (byte)(weight * ((color1[1] + color2[1] + color3[1]) + color4[1]));
+            byte blue = (byte)(weight * ((color1[0] + color2[0] + color3[0]) + color4[0]));
+            
 
-            return new byte[4] { blue, green, red, 0xff };
+            return new byte[4] { blue, green, red, alpha };
         }
 
 

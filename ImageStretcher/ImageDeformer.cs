@@ -43,8 +43,8 @@ namespace ImageStretcher
             greenscreen.UnlockBits(greenscreendata);
             var graphics = Graphics.FromImage(greenscreen);
             graphics.CompositingMode = CompositingMode.SourceOver;
-            graphics.DrawImage(originalimage, new Point(0,0));
-            
+            graphics.DrawImage(originalimage, new Point(0, 0));
+
             var imagedata = greenscreen.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
             DeformData deformData = new DeformData();
             deformData.left = offset.X;
@@ -53,7 +53,7 @@ namespace ImageStretcher
             deformData.right = offset.X + width;
 
             Bitmap temp = new Bitmap(resultBitmap.Width, resultBitmap.Height);
-            
+
             BitmapData outputData = temp.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
 
             int numRows = height + 2;
@@ -65,7 +65,7 @@ namespace ImageStretcher
             float* yCoordinates = (float*)Marshal.AllocHGlobal(sizeof(float) * numElements);
 
             List<int> outputpixels = new List<int>();
-            
+
             for (int row = 0; row < numRows; row++)
             {
                 for (int col = 0; col < numCols; col++)
@@ -75,11 +75,11 @@ namespace ImageStretcher
                     Point blockcentre = new Point(col, row);
                     PointF newtransform = DeformFunction(blockcentre);
 
-                    if ((newtransform != new PointF(int.MinValue, int.MinValue) 
+                    if ((newtransform != new PointF(int.MinValue, int.MinValue)
                         && row >= 1 && row <= numRows - 2
                         && col >= 1 && col <= numCols - 2))
 
-                        //&& (col >= 1 && newtransform.X - xCoordinates[index - 1] == 1))
+                    //&& (col >= 1 && newtransform.X - xCoordinates[index - 1] == 1))
                     {
                         outputpixels.Add(row * numCols + col);
                     }
@@ -87,7 +87,6 @@ namespace ImageStretcher
                     yCoordinates[index] = newtransform.Y;
                 }
             }
-            
             // Now, use the precomputed deformation values
             foreach (var index in outputpixels)
             {
@@ -102,10 +101,10 @@ namespace ImageStretcher
                 float topdist = newtransformy - yCoordinates[index - numCols];
                 float downdist = yCoordinates[index + numCols] - newtransformy;
 
-               if (leftdist < 0 || rightdist < 0 || topdist < 0 || downdist < 0)
-               {
-                   continue;
-               }
+                if (leftdist < 0 || rightdist < 0 || topdist < 0 || downdist < 0)
+                {
+                    continue;
+                }
 
                 int finalxresolution = (int)Math.Ceiling((leftdist + rightdist) / 2f);
                 int finalyresolution = (int)Math.Ceiling((topdist + downdist) / 2f);
@@ -137,6 +136,8 @@ namespace ImageStretcher
                     new Rectangle(newtransformx + offset.X, newtransformy + offset.Y, finalxresolution, finalyresolution));
             }
 
+            PatchHoles(deformData, outputData);
+
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             temp.UnlockBits(outputData);
@@ -160,8 +161,6 @@ namespace ImageStretcher
                 graphics.FillPolygon(new Pen(Color.Transparent).Brush, newpolygon);
                 graphics.CompositingMode = CompositingMode.SourceOver;
             }
-            //graphics.FillRectangle(new Pen(Color.FromArgb(1,0,0,0)).Brush, 
-            //    new Rectangle(0,0, resultBitmap.Width, resultBitmap.Height));
             graphics.DrawImage(temp.Clone(new Rectangle(deformData.left, deformData.top, deformData.right - deformData.left, deformData.bottom - deformData.top), PixelFormat.Format32bppPArgb),
                 new Point(deformData.left, deformData.top));
 
@@ -182,9 +181,12 @@ namespace ImageStretcher
             {
                 deformData.bottom = offset.Y + originalimage.Height;
             }
-            //return deformData;
-            outputData = resultBitmap.LockBits(new Rectangle(0,0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
 
+            return deformData;
+        }
+
+        private static unsafe void PatchHoles(DeformData deformData, BitmapData outputData)
+        {
             //Patch holes in the image
             for (int x = deformData.left; x < deformData.right; ++x)
             {
@@ -202,7 +204,7 @@ namespace ImageStretcher
                         for (int up = 0; up < maxdist && up < y - deformData.top; ++up)
                         {
                             byte* newlocation = position - (up * outputData.Stride) + alphaoffset;
-                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            if (*newlocation >= 2) //Hit a non-transparent pixel
                             {
                                 uproof = up; //Ray hit a wall
                                 break;
@@ -214,7 +216,7 @@ namespace ImageStretcher
                         for (int down = 0; down < maxdist && down < deformData.bottom - y; ++down)
                         {
                             byte* newlocation = (position + down * outputData.Stride) + alphaoffset;
-                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            if (*newlocation >= 2) //Hit a non-transparent pixel
                             {
                                 downroof = down; //Ray hit a wall
                                 break;
@@ -226,7 +228,7 @@ namespace ImageStretcher
                         for (int right = 0; right < maxdist && right < deformData.right - x; ++right)
                         {
                             byte* newlocation = (position + right * 4) + alphaoffset;
-                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            if (*newlocation >= 2) //Hit a non-transparent pixel
                             {
                                 rightroof = right; //Ray hit a wall
                                 break;
@@ -238,7 +240,7 @@ namespace ImageStretcher
                         for (int left = 0; left < maxdist && left < x - deformData.left; ++left)
                         {
                             byte* newlocation = (position - left * 4) + alphaoffset;
-                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            if (*newlocation >= 2) //Hit a non-transparent pixel
                             {
                                 leftroof = left; //Ray hit a wall
                                 break;
@@ -261,9 +263,6 @@ namespace ImageStretcher
                     }
                 }
             }
-            resultBitmap.UnlockBits(outputData);
-
-            return deformData;
         }
 
         static unsafe byte* BlendColors(byte* color1, byte* color2, byte* color3, byte* color4) //TODO: scale with distance for texture

@@ -129,15 +129,18 @@ namespace ImageStretcher
                 for (int y = deformData.top; y < deformData.bottom; ++y)
                 {
                     byte* position = ((byte*)outputData.Scan0) + x * 4 + y * outputData.Stride;
-                    int alpha = *position;
+                    const int alphaoffset = 3;
+                    int alpha = *(position + alphaoffset);
                     if (alpha == 0) //On a transparent pixel?
                     {
+                        const int maxdist = 10;
+
                         //Cast rays left right up and down to determine if we are a hole
                         int uproof = -1;
-                        for (int up = 0; up < 10 && up < y - deformData.top && uproof == -1; ++up)
+                        for (int up = 0; up < maxdist && up < y - deformData.top && uproof == -1; ++up)
                         {
-                            byte* newlocation = position - up * outputData.Stride;
-                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            byte* newlocation = position - (up * outputData.Stride) + alphaoffset;
+                            if (*newlocation == 255) //Hit a non-transparent pixel
                             {
                                 uproof = up; //Ray hit a wall
                             }
@@ -145,10 +148,10 @@ namespace ImageStretcher
                         if (uproof == -1) { continue; }
 
                         int downroof = -1;
-                        for (int down = 0; down < 10 && down < deformData.bottom - y && downroof == -1; ++down)
+                        for (int down = 0; down < maxdist && down < deformData.bottom - y && downroof == -1; ++down)
                         {
-                            byte* newlocation = (position + down * outputData.Stride);
-                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            byte* newlocation = (position + down * outputData.Stride) + alphaoffset;
+                            if (*newlocation == 255) //Hit a non-transparent pixel
                             {
                                 downroof = down; //Ray hit a wall
                             }
@@ -156,10 +159,10 @@ namespace ImageStretcher
                         if (downroof == -1) { continue; }
 
                         int rightroof = -1;
-                        for (int right = 0; right < 10 && right < deformData.right - x && rightroof == -1; ++right)
+                        for (int right = 0; right < maxdist && right < deformData.right - x && rightroof == -1; ++right)
                         {
-                            byte* newlocation = (position + right * 4);
-                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            byte* newlocation = (position + right * 4) + alphaoffset;
+                            if (*newlocation == 255) //Hit a non-transparent pixel
                             {
                                 rightroof = right; //Ray hit a wall
                             }
@@ -167,10 +170,10 @@ namespace ImageStretcher
                         if (rightroof == -1) { continue; }
 
                         int leftroof = -1; ;
-                        for (int left = 0; left < 10 && left < x - deformData.left && leftroof == -1; ++left)
+                        for (int left = 0; left < maxdist && left < x - deformData.left && leftroof == -1; ++left)
                         {
-                            byte* newlocation = (position - left * 4);
-                            if (*newlocation != 0) //Hit a non-transparent pixel
+                            byte* newlocation = (position - left * 4) + alphaoffset;
+                            if (*newlocation == 255) //Hit a non-transparent pixel
                             {
                                 leftroof = left; //Ray hit a wall
                             }
@@ -183,19 +186,16 @@ namespace ImageStretcher
                                                       position - (leftroof * 4),
                                                       position + (rightroof * 4));
 
-                        byte* ptr = position - (uproof * outputData.Stride);
-                        byte[] result = new byte[4];
+                        position[0] = 0;
+                        position[1] = 0;
+                        position[2] = 0xff;
+                        position[3] = 0xff;
 
-                        for (int i = 0; i < 4; i++)
-                        {
-                            result[i] = ptr[i];
-                        }
-
-                        fixed (byte* colorptr = newcolor)
-                        {
-                            Buffer.MemoryCopy(position - (uproof * outputData.Stride),
-                                              position, 4, 4);
-                        }
+                      // fixed (byte* colorptr = newcolor)
+                      // {
+                      //     Buffer.MemoryCopy(position - (uproof * outputData.Stride),
+                      //                       position, 4, 4);
+                      // }
                     }
                 }
             }
@@ -261,26 +261,20 @@ namespace ImageStretcher
             double weight3 = (distance3 / totalDistance);
 
             // Blend the colors based on weights
-            byte red = (byte)((weight1 * color1[1] + weight2 * color2[1] + weight3 * color3[1]) / 3);
-            byte green = (byte)((weight1 * color1[2] + weight2 * color2[2] + weight3 * color3[2]) / 3);
-            byte blue = (byte)((weight1 * color1[3] + weight2 * color2[3] + weight3 * color3[3]) / 3);
+            byte red = (byte)((weight1 * color1[2] + weight2 * color2[2] + weight3 * color3[2]) / 3);
+            byte green = (byte)((weight1 * color1[1] + weight2 * color2[1] + weight3 * color3[1]) / 3);
+            byte blue = (byte)((weight1 * color1[0] + weight2 * color2[0] + weight3 * color3[0]) / 3);
 
-            byte[] result = new byte[4];
-            result[0] = 255;
-            result[1] = 255;
-            result[2] = 0;
-            result[3] = 0;
-
-            return result;
+            return new byte[4] { blue, green, red, 0xff };
         }
 
 
         static unsafe double CalculateRGBDistance(byte* color1, byte* color2)
         {
             // Calculate the Euclidean distance between two colors in RGB space
-            int deltaRed = color1[1] - color2[1];
-            int deltaGreen = color1[2] - color2[2];
-            int deltaBlue = color1[3] - color2[3];
+            int deltaRed = color1[2] - color2[2];
+            int deltaGreen = color1[1] - color2[1];
+            int deltaBlue = color1[0] - color2[0];
 
             return Math.Sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen + deltaBlue * deltaBlue);
         }

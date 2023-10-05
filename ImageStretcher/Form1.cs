@@ -75,7 +75,7 @@ namespace ImageStretcher
             }
             if (erasing)
             {
-                e.Graphics.DrawRectangle(new Pen(Color.Black), 
+                e.Graphics.DrawRectangle(new Pen(Color.Black),
                     eraserlocation.X - erasersize, eraserlocation.Y - erasersize, erasersize, erasersize);
             }
             foreach (var polygon in menu.menuItems.Where(m => m.visiblepolygon).Select(m => m.polygonpoints))
@@ -408,7 +408,7 @@ namespace ImageStretcher
             if (erasing && framecollection.selectedframe != framecollection.master) //Dont allow editing of base image
             {
                 Rectangle erasedarea = new Rectangle(eraserlocation.X - erasersize - deformdata.left,
-                                                     eraserlocation.Y - erasersize - deformdata.top, 
+                                                     eraserlocation.Y - erasersize - deformdata.top,
                                                      erasersize, erasersize);
                 Graphics g = Graphics.FromImage(framecollection.selectedframe.preview.Image);
                 g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;

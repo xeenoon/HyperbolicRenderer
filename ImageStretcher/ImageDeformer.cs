@@ -185,6 +185,12 @@ namespace ImageStretcher
                                                       position + (downroof * outputData.Stride),
                                                       position - (leftroof * 4),
                                                       position + (rightroof * 4));
+                        byte[] topcolor = new byte[4];
+                        byte* upptr = position - (uproof * outputData.Stride);
+                        topcolor[0] = upptr[0];
+                        topcolor[1] = upptr[1];
+                        topcolor[2] = upptr[2];
+                        topcolor[3] = upptr[3];
 
                         position[0] = newcolor[0];
                         position[1] = newcolor[1];
@@ -256,9 +262,9 @@ namespace ImageStretcher
 
             // Calculate the weights for blending based on inverse distances
             double totalDistance = distance1 + distance2 + distance3;
-            double weight1 = (distance1 / totalDistance);
-            double weight2 = (distance2 / totalDistance);
-            double weight3 = (distance3 / totalDistance);
+            double weight1 = 1 - (distance1 / totalDistance);
+            double weight2 = 1 - (distance2 / totalDistance);
+            double weight3 = 1 - (distance3 / totalDistance);
 
             // Blend the colors based on weights
             byte red = (byte)((weight1 * color1[2] + weight2 * color2[2] + weight3 * color3[2]) / 3);

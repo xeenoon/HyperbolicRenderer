@@ -63,6 +63,7 @@ namespace ImageStretcher
         public AnimationEditor parent;
         public Frame selectedframe = null;
         public Frame master;
+        public List<Frame> frames = new List<Frame>();
         public FrameCollection(Panel bgpanel, AnimationEditor parent)
         {
             this.parent = parent;
@@ -110,6 +111,7 @@ namespace ImageStretcher
                 frame.frameimg = frames[i];
                 frame.preview.SizeMode = PictureBoxSizeMode.StretchImage;
                 farright = frame.backgroundpanel.Right;
+                this.frames.Add(frame);
             }
             Panel buffer = new Panel();
             buffer.Location = new Point(farright, 0);

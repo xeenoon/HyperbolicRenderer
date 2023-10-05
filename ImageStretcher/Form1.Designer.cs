@@ -32,7 +32,7 @@
             canvas = new PictureBox();
             importButton = new Button();
             generateButton = new Button();
-            restartButton = new Button();
+            smootheButton = new Button();
             exportGIFButton = new Button();
             exportFramesButton = new Button();
             importFramesButton = new Button();
@@ -118,16 +118,16 @@
             generateButton.UseVisualStyleBackColor = false;
             generateButton.Click += Generate;
             // 
-            // restartButton
+            // smootheButton
             // 
-            restartButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            restartButton.Location = new Point(1796, 73);
-            restartButton.Name = "restartButton";
-            restartButton.Size = new Size(107, 23);
-            restartButton.TabIndex = 9;
-            restartButton.Text = "Reset";
-            restartButton.UseVisualStyleBackColor = true;
-            restartButton.Click += Restart;
+            smootheButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            smootheButton.Location = new Point(1796, 73);
+            smootheButton.Name = "smootheButton";
+            smootheButton.Size = new Size(107, 23);
+            smootheButton.TabIndex = 9;
+            smootheButton.Text = "Smoothe frames";
+            smootheButton.UseVisualStyleBackColor = true;
+            smootheButton.Click += SmootheFrames;
             // 
             // exportGIFButton
             // 
@@ -486,7 +486,7 @@
             Controls.Add(importFramesButton);
             Controls.Add(exportFramesButton);
             Controls.Add(exportGIFButton);
-            Controls.Add(restartButton);
+            Controls.Add(smootheButton);
             Controls.Add(generateButton);
             Controls.Add(importButton);
             Controls.Add(canvas);
@@ -522,7 +522,7 @@
         public PictureBox canvas;
         private Button importButton;
         private Button generateButton;
-        private Button restartButton;
+        private Button smootheButton;
         private Button exportGIFButton;
         private Button exportFramesButton;
         private Button importFramesButton;

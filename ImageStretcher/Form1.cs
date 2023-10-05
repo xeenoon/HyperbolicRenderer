@@ -180,10 +180,91 @@ namespace ImageStretcher
             }
             canvas.Invalidate();
         }
-        private void Restart(object sender, EventArgs e)
+        private void SmootheFrames(object sender, EventArgs e)
         {
-            scalar.time = 0;
-            canvas.Invalidate();
+            for (int i = 0; i < frames.Length; i++)
+            {
+                Bitmap? frame = frames[i];
+                //Smoothe the frames
+                frames[i] = ApplyCustomAntiAliasing(frame);
+            }
+            for (int i = 0; i < framecollection.frames.Count; i++)
+            {
+                Frame? box = framecollection.frames[i];
+                box.preview.Image = frames[i];
+                box.frameimg = frames[i];
+                box.preview.Invalidate();
+            }
+        }
+        static Bitmap ApplyCustomAntiAliasing(Bitmap inputImage)
+        {
+            int width = inputImage.Width;
+            int height = inputImage.Height;
+
+            // Create an output bitmap with the same resolution as the input
+            Bitmap outputImage = new Bitmap(width, height);
+
+            // Lock the bits of the input and output bitmaps
+            BitmapData inputData = inputImage.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData outputData = outputImage.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            unsafe
+            {
+                byte* inputPtr = (byte*)inputData.Scan0.ToPointer();
+                byte* outputPtr = (byte*)outputData.Scan0.ToPointer();
+
+                int stride = inputData.Stride;
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        inputPtr = (byte*)inputData.Scan0 + y * stride + x * 4;
+                        outputPtr = (byte*)outputData.Scan0 + y * stride + x * 4;
+
+                        // Initialize color accumulators
+                        int totalRed = 0;
+                        int totalGreen = 0;
+                        int totalBlue = 0;
+                        int pixelCount = 0;
+                        const int blur = 3;
+                        for (int dx = -blur; dx <= blur; dx++)
+                        {
+                            for (int dy = -blur; dy <= blur; dy++)
+                            {
+                                int newX = x + dx;
+                                int newY = y + dy;
+
+                                // Check bounds to avoid out-of-range pixels
+                                if (newX >= 0 && newX < width && newY >= 0 && newY < height)
+                                {
+                                    byte* neighborPixel = inputPtr + dy * stride + dx * 4;
+
+                                    // Accumulate color values
+                                    totalBlue += neighborPixel[0];
+                                    totalGreen += neighborPixel[1];
+                                    totalRed += neighborPixel[2];
+
+                                    // Increment the pixel count
+                                    pixelCount++;
+                                }
+                            }
+                        }
+
+                        // Calculate the averaged color
+                        outputPtr[0] = (byte)(totalBlue / pixelCount);
+                        outputPtr[1] = (byte)(totalGreen / pixelCount);
+                        outputPtr[2] = (byte)(totalRed / pixelCount);
+                        outputPtr[3] = inputPtr[3]; // Alpha channel stays same
+                    }
+                }
+            }
+
+            // Unlock the bits
+            inputImage.UnlockBits(inputData);
+            outputImage.UnlockBits(outputData);
+
+            return outputImage;
         }
         private void Benchmark(object sender, EventArgs e)
         {

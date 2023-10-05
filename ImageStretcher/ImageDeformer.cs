@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace ImageStretcher
 {
@@ -126,7 +127,7 @@ namespace ImageStretcher
                 deformData.bottom = Math.Max(deformData.bottom, newtransformy + offset.Y);
 
                 //Resize the section to fit, and copy it into the result
-                SmootheResizeCopy(imagedata,
+                BilinearResizeCopy(imagedata,
                     col, row,
                     outputData,
                     new Rectangle(newtransformx + offset.X, newtransformy + offset.Y, finalxresolution, finalyresolution));
@@ -292,6 +293,67 @@ namespace ImageStretcher
                 }
             }
         }
+
+        private static unsafe void BilinearResizeCopy(BitmapData input, int xinput, int yinput, BitmapData dest, Rectangle destrect)
+        {
+            const int bytesPerPixel = 4;
+
+            // Calculate the coordinates of the four neighboring pixels in the source image
+            int x1 = xinput-1;
+            int y1 = yinput-1;
+            int x2 = x1 + 1;
+            int y2 = y1 + 1;
+
+            // Fractional parts for interpolation
+            double xFraction = xinput - x1;
+            double yFraction = yinput - y1;
+
+            for (int y = 0; y < destrect.Height; ++y)
+            {
+                for (int x = 0; x < destrect.Width; ++x)
+                {
+                    // Calculate the coordinates of the corresponding pixels in the source image
+                    int srcX1 = x1 + x;
+                    int srcY1 = y1 + y;
+                    int srcX2 = x2 + x;
+                    int srcY2 = y2 + y;
+
+                    // Clamp the coordinates to stay within the bounds of the source image
+                    srcX1 = Math.Max(0, Math.Min(input.Width - 1, srcX1));
+                    srcY1 = Math.Max(0, Math.Min(input.Height - 1, srcY1));
+                    srcX2 = Math.Max(0, Math.Min(input.Width - 1, srcX2));
+                    srcY2 = Math.Max(0, Math.Min(input.Height - 1, srcY2));
+
+                    // Calculate the weight for each neighboring pixel
+                    double weight1 = (1.0 - xFraction) * (1.0 - yFraction);
+                    double weight2 = xFraction * (1.0 - yFraction);
+                    double weight3 = (1.0 - xFraction) * yFraction;
+                    double weight4 = xFraction * yFraction;
+
+                    // Pointer to the first pixel of the source and destination bitmaps
+                    byte* srcPointer1 = (byte*)(input.Scan0 + (srcX1 * bytesPerPixel) + (srcY1 * input.Stride));
+                    byte* srcPointer2 = (byte*)(input.Scan0 + (srcX2 * bytesPerPixel) + (srcY1 * input.Stride));
+                    byte* srcPointer3 = (byte*)(input.Scan0 + (srcX1 * bytesPerPixel) + (srcY2 * input.Stride));
+                    byte* srcPointer4 = (byte*)(input.Scan0 + (srcX2 * bytesPerPixel) + (srcY2 * input.Stride));
+                    byte* destPointer = (byte*)(dest.Scan0 + (destrect.X * bytesPerPixel) + (destrect.Y * dest.Stride));
+
+                    // Calculate the interpolated color values for the destination pixel
+                    for (int i = 0; i < bytesPerPixel; i++)
+                    {
+                        double interpolatedValue = (1.0 - xFraction) * ((1.0 - yFraction) * srcPointer1[i] + yFraction * srcPointer3[i]) +
+                                           xFraction * ((1.0 - yFraction) * srcPointer2[i] + yFraction * srcPointer4[i]);
+
+                        // Calculate the color difference between neighboring pixels and add depth
+                        double depthValue = interpolatedValue - srcPointer1[i];
+                        const double depthfactor = 1f;
+                        int newValue = (int)(interpolatedValue + depthfactor * depthValue);
+                        newValue = Math.Max(0, Math.Min(255, newValue)); // Clamp to the 0-255 range
+                        destPointer[y * dest.Stride + x * bytesPerPixel + i] = (byte)newValue;
+                    }
+                }
+            }
+        }
+
         private static unsafe void CopyRectangles(byte* sourcePtr, int sourceStride, byte* destinationPtr, int destinationStride, Rectangle sourceRect, Rectangle destinationRect)
         {
             const int bytesPerPixel = 4;

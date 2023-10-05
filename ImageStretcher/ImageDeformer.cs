@@ -133,14 +133,14 @@ namespace ImageStretcher
                     int alpha = *(position + alphaoffset);
                     if (alpha == 0) //On a transparent pixel?
                     {
-                        const int maxdist = 10;
+                        const int maxdist = 5;
 
                         //Cast rays left right up and down to determine if we are a hole
                         int uproof = -1;
                         for (int up = 0; up < maxdist && up < y - deformData.top && uproof == -1; ++up)
                         {
                             byte* newlocation = position - (up * outputData.Stride) + alphaoffset;
-                            if (*newlocation == 255) //Hit a non-transparent pixel
+                            if (*newlocation != 0) //Hit a non-transparent pixel
                             {
                                 uproof = up; //Ray hit a wall
                             }
@@ -151,7 +151,7 @@ namespace ImageStretcher
                         for (int down = 0; down < maxdist && down < deformData.bottom - y && downroof == -1; ++down)
                         {
                             byte* newlocation = (position + down * outputData.Stride) + alphaoffset;
-                            if (*newlocation == 255) //Hit a non-transparent pixel
+                            if (*newlocation != 0) //Hit a non-transparent pixel
                             {
                                 downroof = down; //Ray hit a wall
                             }
@@ -162,7 +162,7 @@ namespace ImageStretcher
                         for (int right = 0; right < maxdist && right < deformData.right - x && rightroof == -1; ++right)
                         {
                             byte* newlocation = (position + right * 4) + alphaoffset;
-                            if (*newlocation == 255) //Hit a non-transparent pixel
+                            if (*newlocation != 0) //Hit a non-transparent pixel
                             {
                                 rightroof = right; //Ray hit a wall
                             }
@@ -173,7 +173,7 @@ namespace ImageStretcher
                         for (int left = 0; left < maxdist && left < x - deformData.left && leftroof == -1; ++left)
                         {
                             byte* newlocation = (position - left * 4) + alphaoffset;
-                            if (*newlocation == 255) //Hit a non-transparent pixel
+                            if (*newlocation != 0) //Hit a non-transparent pixel
                             {
                                 leftroof = left; //Ray hit a wall
                             }
@@ -186,10 +186,10 @@ namespace ImageStretcher
                                                       position - (leftroof * 4),
                                                       position + (rightroof * 4));
 
-                        position[0] = 0;
-                        position[1] = 0;
-                        position[2] = 0xff;
-                        position[3] = 0xff;
+                        position[0] = newcolor[0];
+                        position[1] = newcolor[1];
+                        position[2] = newcolor[2];
+                        position[3] = newcolor[3];
 
                       // fixed (byte* colorptr = newcolor)
                       // {

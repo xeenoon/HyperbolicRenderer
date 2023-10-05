@@ -36,13 +36,21 @@ namespace ImageStretcher
             int width = originalimage.Width;
             int height = originalimage.Height;
 
-            var imagedata = originalimage.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
+            Bitmap greenscreen = new Bitmap(width, height);
+            var greenscreendata = greenscreen.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
+            memset((byte*)greenscreendata.Scan0, 1, greenscreendata.Stride * greenscreendata.Height); //1 as alpha value should be negligible
+            greenscreen.UnlockBits(greenscreendata);
+            var graphics = Graphics.FromImage(greenscreen);
+            graphics.CompositingMode = CompositingMode.SourceOver;
+            graphics.DrawImage(originalimage, new Point(0,0));
+            
+            var imagedata = greenscreen.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
             DeformData deformData = new DeformData();
             
             Bitmap temp = new Bitmap(resultBitmap.Width, resultBitmap.Height);
             
             BitmapData outputData = temp.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
-            
+
             int numRows = height + 2;
             int numCols = width + 2; //Add 2 to store elements behind and infront
 
@@ -131,7 +139,7 @@ namespace ImageStretcher
                     byte* position = ((byte*)outputData.Scan0) + x * 4 + y * outputData.Stride;
                     const int alphaoffset = 3;
                     int alpha = *(position + alphaoffset);
-                    if (alpha == 0) //On a transparent pixel?
+                    if (position[0] == 0 && position[1] == 0 && position[2] == 0 && position[3] == 0) //On a transparent pixel?
                     {
                         const int maxdist = 50;
 
@@ -194,9 +202,9 @@ namespace ImageStretcher
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
             temp.UnlockBits(outputData);
-            originalimage.UnlockBits(imagedata);
+            greenscreen.UnlockBits(imagedata);
             //Draw the image
-            var graphics = Graphics.FromImage(resultBitmap);
+            graphics = Graphics.FromImage(resultBitmap);
             graphics.DrawImage(originalimage, new Point(offset.X, offset.Y));
             foreach (var polygon in polygons)
             {
@@ -238,7 +246,7 @@ namespace ImageStretcher
             return deformData;
         }
 
-        static unsafe byte* BlendColors(byte* color1, byte* color2, byte* color3, byte* color4)
+        static unsafe byte* BlendColors(byte* color1, byte* color2, byte* color3, byte* color4) //TODO: scale with distance for texture
         {
             byte* result = (byte*)Marshal.AllocHGlobal(4);
 

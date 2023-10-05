@@ -62,6 +62,40 @@ namespace ImageStretcher
             return inside;
         }
 
+        public static PointF[] ScalePolygon(this PointF[] polygon, int scale)
+        {
+            PointF[] result = new PointF[polygon.Count()];
+            for (int i = 0; i < polygon.Count(); ++i)
+            {
+                PointF centre = polygon[i];
+                PointF left;
+                if (i == 0)
+                {
+                    left = polygon[polygon.Count() - 1];
+                }
+                else
+                {
+                    left = polygon[i - 1];
+                }
+
+                PointF right;
+                if (i == polygon.Count() - 1)
+                {
+                    right = polygon[0];
+                }
+                else
+                {
+                    right = polygon[i + 1];
+                }
+
+                //Let the origin = left
+                Vector c = new Vector(right, left);
+                var perpindicdular = c.GetPerpindicular().GetUnitVector() * scale;
+                result[i] = new PointF((float)(centre.X + perpindicdular.i), (float)(centre.Y + perpindicdular.j));
+            }
+            return result;
+        }
+
         public static string IterateString(this List<PointF> points)
         {
             string result = "";

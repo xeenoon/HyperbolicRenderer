@@ -227,7 +227,7 @@ namespace ImageStretcher
                         int totalGreen = 0;
                         int totalBlue = 0;
                         int pixelCount = 0;
-                        const int blur = 3;
+                        const int blur = 1;
                         for (int dx = -blur; dx <= blur; dx++)
                         {
                             for (int dy = -blur; dy <= blur; dy++)

@@ -162,7 +162,7 @@ namespace ImageStretcher
                 new Point(deformData.left, deformData.top));
 
             outputData = resultBitmap.LockBits(new Rectangle(0,0,resultBitmap.Width, resultBitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
-            //PatchHoles(deformData, outputData, maxdist: 5);
+            PatchHoles(deformData, outputData, maxdist: 5);
             resultBitmap.UnlockBits(outputData);
 
             if (deformData.left > offset.X) //Didn't draw left side
@@ -270,10 +270,10 @@ namespace ImageStretcher
 
             const double weight = 0.25f;
             // Blend the colors based on weights
-            result[3] = 0xff;
-            result[2] = (byte)(weight * (color1[2] + color2[2] + color3[2] + color4[2]));
-            result[1] = (byte)(weight * ((color1[1] + color2[1] + color3[1]) + color4[1]));
-            result[0] = (byte)(weight * ((color1[0] + color2[0] + color3[0]) + color4[0])); //Color order doesn't matter
+            result[3] = Math.Min(Math.Min(Math.Min(color1[3] , color2[3]) , color3[3]) , color4[3]); //Get smallest alpha value
+            result[2] = (byte)(weight * (color1[2] + color2[2] + color3[2] + color4[2])); //r
+            result[1] = (byte)(weight * ((color1[1] + color2[1] + color3[1]) + color4[1])); //g
+            result[0] = (byte)(weight * ((color1[0] + color2[0] + color3[0]) + color4[0])); //b
 
             return result; //REMEMBER TO FREE!!!
         }

@@ -75,11 +75,9 @@ namespace ImageStretcher
                     Point blockcentre = new Point(col, row);
                     PointF newtransform = DeformFunction(blockcentre);
 
-                    if ((newtransform != new PointF(int.MinValue, int.MinValue)
+                    if ((newtransform != new PointF(int.MinValue, int.MinValue) || true)
                         && row >= 1 && row <= numRows - 2
-                        && col >= 1 && col <= numCols - 2))
-
-                    //&& (col >= 1 && newtransform.X - xCoordinates[index - 1] == 1))
+                        && col >= 1 && col <= numCols - 2)
                     {
                         outputpixels.Add(row * numCols + col);
                     }

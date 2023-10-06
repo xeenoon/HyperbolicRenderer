@@ -151,7 +151,7 @@ namespace ImageStretcher
         {
             menu.SelectItem(this);
         }
-
+        public const int scalesize = 50;
         internal void AddPoint(Point clickpos)
         {
             polygonpoints.Add(clickpos);
@@ -160,7 +160,7 @@ namespace ImageStretcher
             polygonpoints.Clear();
             polygonpoints.AddRange(temp);
 
-            smallpoints = polygonpoints.ToArray().ScalePolygon(10);
+            smallpoints = polygonpoints.ToArray().ScalePolygon(scalesize);
         }
 
         void PeriodTextChange(object sender, EventArgs e)

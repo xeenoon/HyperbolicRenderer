@@ -82,7 +82,11 @@ namespace ImageStretcher
                                 mindistance = Math.Min(mindistance, input.DistanceToLine(centre, right)); 
                                 //Calculate all the distances, select smallest one
                             }
-                            return TransformPolygon(menuItem, input, mindistance / 10);
+                            if (mindistance > PolygonMenuItem.scalesize)
+                            {
+
+                            }
+                            return TransformPolygon(menuItem, input, mindistance / PolygonMenuItem.scalesize);
                         }
                     }
                 }

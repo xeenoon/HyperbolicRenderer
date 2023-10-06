@@ -182,6 +182,13 @@ namespace ImageStretcher
         }
         private void SmootheFrames(object sender, EventArgs e)
         {
+            bool restart = false;
+            if (playanimation)
+            {
+                restart = true;
+                playanimation = false;
+                startstopButton.Refresh(); //Force update with .Refresh instead of .Invalidate
+            }
             for (int i = 0; i < frames.Length; i++)
             {
                 Bitmap? frame = frames[i];
@@ -194,6 +201,11 @@ namespace ImageStretcher
                 box.preview.Image = frames[i];
                 box.frameimg = frames[i];
                 box.preview.Invalidate();
+            }
+            if (restart)
+            { 
+                playanimation = true;
+                startstopButton.Refresh(); //Force update with .Refresh instead of .Invalidate
             }
         }
         static Bitmap ApplyCustomAntiAliasing(Bitmap inputImage)

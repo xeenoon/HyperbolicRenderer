@@ -196,7 +196,7 @@ namespace ImageStretcher
                     byte* position = ((byte*)outputData.Scan0) + x * 4 + y * outputData.Stride;
                     const int alphaoffset = 3;
                     int alpha = *(position + alphaoffset);
-                    if ((alphaflag != -1 && alpha == alphaflag) || alpha < 255) //On a transparent pixel?
+                    if (alphaflag != -1 ? alpha == alphaflag : alpha < 255) //On a transparent pixel?
                     {
                         //Cast rays left right up and down to determine if we are a hole
                         int uproof = 0;

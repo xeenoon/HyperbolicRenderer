@@ -249,10 +249,7 @@ namespace ImageStretcher
 
                         //All checks passed? Change the color
 
-                        var newcolor = BlendColors(position - (uproof * outputData.Stride),
-                                                      position + (downroof * outputData.Stride),
-                                                      position - (leftroof * 4),
-                                                      position + (rightroof * 4));
+                        var newcolor = BlendColors(position, outputData.Stride,leftroof, rightroof, uproof, downroof);
                         if (newcolor[0] == 0 && newcolor[1] == 0 && newcolor[2] == 0) //Black pixel?
                         {
                             //It is NOT a hole, ignore it
@@ -264,16 +261,29 @@ namespace ImageStretcher
             }
         }
 
-        static unsafe byte* BlendColors(byte* color1, byte* color2, byte* color3, byte* color4) //TODO: scale with distance for texture
+        static unsafe byte* BlendColors(byte* position, int stride, int left, int right, int up, int down)
         {
             byte* result = (byte*)Marshal.AllocHGlobal(4);
 
+            byte* color1 = position - left * 4;
+            byte* color2 = position + right * 4;
+            byte* color3 = position + down * stride;
+            byte* color4 = position - up * stride;
             const double weight = 0.25f;
+
+            double[] weights = new double[4] {1f/left, 1f/right, 1f/up, 1f/down};
+            double sum = weights.Sum();
+            for (int i = 0; i < 4; ++i)
+            {
+                weights[i] = weights[i] / sum;
+            }
+
             // Blend the colors based on weights
             result[3] = Math.Min(Math.Min(Math.Min(color1[3] , color2[3]) , color3[3]) , color4[3]); //Get smallest alpha value
-            result[2] = (byte)(weight * (color1[2] + color2[2] + color3[2] + color4[2])); //r
-            result[1] = (byte)(weight * ((color1[1] + color2[1] + color3[1]) + color4[1])); //g
-            result[0] = (byte)(weight * ((color1[0] + color2[0] + color3[0]) + color4[0])); //b
+
+            result[2] = (byte)(color1[2]*weights[0] + color2[2]*weights[1] + color3[2]*weights[2] + color4[2]*weights[3]); //r
+            result[1] = (byte)(color1[1]*weights[0] + color2[1]*weights[1] + color3[1]*weights[2] + color4[1]*weights[3]); //g
+            result[0] = (byte)(color1[0]*weights[0] + color2[0]*weights[1] + color3[0]*weights[2] + color4[0]*weights[3]); //b
 
             return result; //REMEMBER TO FREE!!!
         }

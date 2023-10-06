@@ -162,7 +162,7 @@ namespace ImageStretcher
                 new Point(deformData.left, deformData.top));
 
             outputData = resultBitmap.LockBits(new Rectangle(0,0,resultBitmap.Width, resultBitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
-            PatchHoles(deformData, outputData, maxdist: 5);
+            PatchHoles(deformData, outputData, maxdist: 50);
             resultBitmap.UnlockBits(outputData);
 
             if (deformData.left > offset.X) //Didn't draw left side

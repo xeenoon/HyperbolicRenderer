@@ -53,7 +53,36 @@ namespace ImageStretcher
                         }
                         else if (input.InPolygon(menuItem.polygonpoints.ToArray())) //Smoothe to edges
                         {
-                            return TransformPolygon(menuItem, input);
+                            double mindistance = double.MaxValue;
+                            for (int i = 0; i < menuItem.polygonpoints.Count(); ++i) 
+                                //Can be optimized to only select ones where distancesquared < 100
+                            {
+                                PointF centre = menuItem.polygonpoints[i];
+                                PointF left;
+                                if (i == 0)
+                                {
+                                    left = menuItem.polygonpoints[menuItem.polygonpoints.Count() - 1];
+                                }
+                                else
+                                {
+                                    left = menuItem.polygonpoints[i - 1];
+                                }
+
+                                PointF right;
+                                if (i == menuItem.polygonpoints.Count() - 1)
+                                {
+                                    right = menuItem.polygonpoints[0];
+                                }
+                                else
+                                {
+                                    right = menuItem.polygonpoints[i + 1];
+                                }
+
+                                mindistance = Math.Min(mindistance, input.DistanceToLine(centre, left));
+                                mindistance = Math.Min(mindistance, input.DistanceToLine(centre, right)); 
+                                //Calculate all the distances, select smallest one
+                            }
+                            return TransformPolygon(menuItem, input, mindistance / 10);
                         }
                     }
                 }
@@ -61,7 +90,7 @@ namespace ImageStretcher
             return new Point(int.MinValue,int.MinValue);
         }
 
-        PointF TransformPolygon(PolygonMenuItem menuItem, Point input)
+        PointF TransformPolygon(PolygonMenuItem menuItem, Point input, double scale = 1)
         {
             if (menuItem.bakedjello == null)
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -95,8 +96,10 @@ namespace ImageStretcher
             }
             return result;
         }
-
-        public static double DistanceToLine(this PointF p, PointF l1, PointF l2)
+        public static double DistanceToLine(this Point p, Point l1, Point l2) { return p_DistanceToLine(p, l1, l2); }
+        public static double DistanceToLine(this Point p, PointF l1, PointF l2) { return p_DistanceToLine(p, l1, l2); }
+        public static double DistanceToLine(this PointF p, PointF l1, PointF l2) { return p_DistanceToLine(p, l1, l2); }
+        private static double p_DistanceToLine(PointF p, PointF l1, PointF l2)
         {
             var A = p.X - l1.X;
             var B = p.Y - l1.Y;

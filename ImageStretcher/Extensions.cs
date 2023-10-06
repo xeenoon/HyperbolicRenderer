@@ -96,6 +96,43 @@ namespace ImageStretcher
             return result;
         }
 
+        public static double DistanceToLine(this PointF p, PointF l1, PointF l2)
+        {
+            var A = p.X - l1.X;
+            var B = p.Y - l1.Y;
+            var C = l2.X - l1.X;
+            var D = l2.Y - l1.Y;
+
+            var dot = A * C + B * D;
+            var len_sq = C * C + D * D;
+            double param = -1;
+            if (len_sq != 0) //in case of 0 length line
+                param = dot / len_sq;
+
+            double xx;
+            double yy;
+
+            if (param < 0)
+            {
+                xx = l1.X;
+                yy = l1.Y;
+            }
+            else if (param > 1)
+            {
+                xx = l2.X;
+                yy = l2.Y;
+            }
+            else
+            {
+                xx = l1.X + param * C;
+                yy = l1.Y + param * D;
+            }
+
+            var dx = p.X - xx;
+            var dy = p.Y - yy;
+            return Math.Sqrt(dx * dx + dy * dy);
+        }
+
         public static string IterateString(this List<PointF> points)
         {
             string result = "";

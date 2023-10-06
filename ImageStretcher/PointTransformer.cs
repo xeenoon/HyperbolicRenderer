@@ -49,11 +49,11 @@ namespace ImageStretcher
                     {
                         if (input.InPolygon(menuItem.smallpoints)) //Scale normally
                         {
-                            TransformPolygon(menuItem, input);
+                            return TransformPolygon(menuItem, input);
                         }
                         else if (input.InPolygon(menuItem.polygonpoints.ToArray())) //Smoothe to edges
                         {
-                            TransformPolygon(menuItem, input);
+                            return TransformPolygon(menuItem, input);
                         }
                     }
                 }
@@ -61,7 +61,7 @@ namespace ImageStretcher
             return new Point(int.MinValue,int.MinValue);
         }
 
-        void TransformPolygon(PolygonMenuItem menuItem, Point input)
+        PointF TransformPolygon(PolygonMenuItem menuItem, Point input)
         {
             if (menuItem.bakedjello == null)
             {
@@ -91,6 +91,7 @@ namespace ImageStretcher
                     minx -= centre.X;
                     return VerticalWave(input, maxx, minx, menuItem.period, menuItem.amplitude, menuItem.offset);
             }
+            return input;
         }
 
         const float scale = 1000;

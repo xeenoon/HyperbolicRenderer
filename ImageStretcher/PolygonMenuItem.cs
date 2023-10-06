@@ -160,12 +160,12 @@ namespace ImageStretcher
             polygonpoints.Clear();
             polygonpoints.AddRange(temp);
 
-            smallpoints = polygonpoints.ToArray().ScalePolygon(scalesize);
+            smallpoints = polygonpoints.ToArray().ScalePolygon(scalesize, false);
         }
         internal void RemovePoint(PointF p)
         {
             polygonpoints.Remove(p);
-            smallpoints = polygonpoints.ToArray().ScalePolygon(scalesize);
+            smallpoints = polygonpoints.ToArray().ScalePolygon(scalesize, false);
         }
 
         void PeriodTextChange(object sender, EventArgs e)

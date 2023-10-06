@@ -63,7 +63,7 @@ namespace ImageStretcher
             return inside;
         }
 
-        public static PointF[] ScalePolygon(this PointF[] polygon, int scale)
+        public static PointF[] ScalePolygon(this PointF[] polygon, int scale, bool outwards)
         {
             PointF[] result = new PointF[polygon.Count()];
             for (int i = 0; i < polygon.Count(); ++i)
@@ -92,7 +92,16 @@ namespace ImageStretcher
                 //Let the origin = left
                 Vector c = new Vector(right, left);
                 var perpindicdular = c.GetPerpindicular().GetUnitVector() * scale;
-                result[i] = new PointF((float)(centre.X + perpindicdular.i), (float)(centre.Y + perpindicdular.j));
+                PointF trya = new PointF((float)(centre.X + perpindicdular.i), (float)(centre.Y + perpindicdular.j));
+                PointF tryb = new PointF((float)(centre.X - perpindicdular.i), (float)(centre.Y - perpindicdular.j));
+                if (trya.InPolygon(polygon) && !outwards)
+                {
+                    result[i] = trya;
+                }
+                else
+                {
+                    result[i] = tryb;
+                }
             }
             return result;
         }

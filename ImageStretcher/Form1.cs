@@ -519,7 +519,7 @@ namespace ImageStretcher
                     if (menu.selecteditem.polygonpoints.Any(m => m.DistanceTo(clickpos) < 4))
                     {
                         closestpoint = menu.selecteditem.polygonpoints.Where(m => m.DistanceTo(clickpos) < 4).FirstOrDefault();
-                        menu.selecteditem.polygonpoints.Remove(closestpoint);
+                        menu.selecteditem.RemovePoint(closestpoint);
                     }
                 }
                 else

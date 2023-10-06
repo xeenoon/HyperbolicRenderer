@@ -133,8 +133,7 @@ namespace ImageStretcher
                     outputData,
                     new Rectangle(newtransformx + offset.X, newtransformy + offset.Y, finalxresolution, finalyresolution));
             }
-
-            PatchHoles(deformData, outputData);
+            PatchHoles(deformData, outputData, alphaflag: 0, maxdist: 50);
 
             Marshal.FreeHGlobal((IntPtr)xCoordinates);
             Marshal.FreeHGlobal((IntPtr)yCoordinates);
@@ -162,6 +161,10 @@ namespace ImageStretcher
             graphics.DrawImage(temp.Clone(new Rectangle(deformData.left, deformData.top, deformData.right - deformData.left, deformData.bottom - deformData.top), PixelFormat.Format32bppPArgb),
                 new Point(deformData.left, deformData.top));
 
+            outputData = resultBitmap.LockBits(new Rectangle(0,0,resultBitmap.Width, resultBitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
+            //PatchHoles(deformData, outputData, maxdist: 5);
+            resultBitmap.UnlockBits(outputData);
+
             if (deformData.left > offset.X) //Didn't draw left side
             {
                 //Make edge the unchanged pixels
@@ -183,7 +186,7 @@ namespace ImageStretcher
             return deformData;
         }
 
-        private static unsafe void PatchHoles(DeformData deformData, BitmapData outputData)
+        private static unsafe void PatchHoles(DeformData deformData, BitmapData outputData, int alphaflag = -1, int maxdist = int.MaxValue)
         {
             //Patch holes in the image
             for (int x = deformData.left; x < deformData.right; ++x)
@@ -193,10 +196,8 @@ namespace ImageStretcher
                     byte* position = ((byte*)outputData.Scan0) + x * 4 + y * outputData.Stride;
                     const int alphaoffset = 3;
                     int alpha = *(position + alphaoffset);
-                    if (position[0] == 0 && position[1] == 0 && position[2] == 0 && position[3] == 0) //On a transparent pixel?
+                    if ((alphaflag != -1 && alpha == alphaflag) || alpha < 255) //On a transparent pixel?
                     {
-                        const int maxdist = 50;
-
                         //Cast rays left right up and down to determine if we are a hole
                         int uproof = 0;
                         for (int up = 0; up < maxdist && up < y - deformData.top; ++up)

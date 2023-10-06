@@ -162,6 +162,11 @@ namespace ImageStretcher
 
             smallpoints = polygonpoints.ToArray().ScalePolygon(scalesize);
         }
+        internal void RemovePoint(PointF p)
+        {
+            polygonpoints.Remove(p);
+            smallpoints = polygonpoints.ToArray().ScalePolygon(scalesize);
+        }
 
         void PeriodTextChange(object sender, EventArgs e)
         {

@@ -90,7 +90,7 @@ namespace ImageStretcher
             return new Point(int.MinValue,int.MinValue);
         }
 
-        PointF TransformPolygon(PolygonMenuItem menuItem, Point input, double scale = 1)
+        PointF TransformPolygon(PolygonMenuItem menuItem, Point input, double smoothe = 1)
         {
             if (menuItem.bakedjello == null)
             {
@@ -100,25 +100,15 @@ namespace ImageStretcher
             switch (menuItem.stretchType)
             {
                 case StretchType.Jello:
-                    return MakeJello(input, menuItem);
+                    return MakeJello(input, menuItem, smoothe);
                 case StretchType.RotateLeft:
-                    return RotateLeft(input, menuItem.period, menuItem.amplitude, menuItem.offset);
+                    return RotateLeft(input, menuItem.period, menuItem.amplitude, menuItem.offset, smoothe);
                 case StretchType.RotateRight:
-                    return RotateRight(input, menuItem.period, menuItem.amplitude, menuItem.offset);
+                    return RotateRight(input, menuItem.period, menuItem.amplitude, menuItem.offset, smoothe);
                 case StretchType.Horizontal:
-                    double maxy = menuItem.polygonpoints.Max(p => p.Y);
-                    maxy -= centre.Y;
-
-                    double miny = menuItem.polygonpoints.Min(p => p.Y);
-                    miny -= centre.Y;
-                    return HorizontalWave(input, maxy, miny, menuItem.period, menuItem.amplitude, menuItem.offset);
+                    return HorizontalWave(input, menuItem.period, menuItem.amplitude, menuItem.offset, smoothe);
                 case StretchType.Vertical:
-                    double maxx = menuItem.polygonpoints.Max(p => p.X);
-                    maxx -= centre.X;
-
-                    double minx = menuItem.polygonpoints.Min(p => p.X);
-                    minx -= centre.X;
-                    return VerticalWave(input, maxx, minx, menuItem.period, menuItem.amplitude, menuItem.offset);
+                    return VerticalWave(input, menuItem.period, menuItem.amplitude, menuItem.offset, smoothe);
             }
             return input;
         }
@@ -135,7 +125,7 @@ namespace ImageStretcher
                 bakedjello[i] = (Math.Sin(((i / scale) * period * 2) + offset) * amplitude) + (1 + amplitude);
             }
         }
-        public PointF MakeJello(Point input, PolygonMenuItem menuItem)
+        public PointF MakeJello(Point input, PolygonMenuItem menuItem, double smoothe)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
@@ -152,15 +142,21 @@ namespace ImageStretcher
             }
             float heightmultiplier = (float)(menuItem.bakedjello[idx]);
 
-            adjustedpoint.X *= heightmultiplier;
-            adjustedpoint.Y *= heightmultiplier;
+            double dx = adjustedpoint.X - adjustedpoint.X * heightmultiplier;
+            double dy = adjustedpoint.Y - adjustedpoint.Y * heightmultiplier;
+
+            dx *= smoothe;
+            dy *= smoothe;
+
+            adjustedpoint.X += (float)dx;
+            adjustedpoint.Y += (float)dy;
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
 
             return new PointF(adjustedpoint.X, adjustedpoint.Y);
         }
-        public PointF RotateLeft(Point input, int period, double amplitude, double offset)
+        public PointF RotateLeft(Point input, int period, double amplitude, double offset, double smoothe)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
             //period defines speed
@@ -172,21 +168,31 @@ namespace ImageStretcher
 
             angle += heightmultiplier;
             double radius = Math.Sqrt(adjustedpoint.X * adjustedpoint.X + adjustedpoint.Y * adjustedpoint.Y);
+
+            double dx = 0;
+            double dy = 0;
+
             if (!double.IsNaN(Math.Cos(angle)))
             {
-                adjustedpoint.X = (float)(Math.Cos(angle) * radius);
+                dx = Math.Cos(angle) * radius - adjustedpoint.X;
             }
             if (!double.IsNaN(Math.Sin(angle)))
             {
-                adjustedpoint.Y = (float)(Math.Sin(angle) * radius);
+                dy = Math.Sin(angle) * radius - adjustedpoint.Y;
             }
+
+            dx *= smoothe;
+            dy *= smoothe;
+
+            adjustedpoint.X += (float)dx;
+            adjustedpoint.Y += (float)dy;
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
 
             return new PointF(adjustedpoint.X, adjustedpoint.Y);
         }
-        public PointF RotateRight(Point input, int period, double amplitude, double offset)
+        public PointF RotateRight(Point input, int period, double amplitude, double offset, double smoothe)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
             //period defines speed
@@ -197,32 +203,34 @@ namespace ImageStretcher
             angle += heightmultiplier;
             double radius = Math.Sqrt(adjustedpoint.X * adjustedpoint.X + adjustedpoint.Y * adjustedpoint.Y);
 
-            adjustedpoint.X = (float)(Math.Cos(angle) * radius);
-            adjustedpoint.Y = (float)(Math.Sin(angle) * radius);
+            double dx = 0;
+            double dy = 0;
+
+            if (!double.IsNaN(Math.Cos(angle)))
+            {
+                dx = Math.Cos(angle) * radius - adjustedpoint.X;
+            }
+            if (!double.IsNaN(Math.Sin(angle)))
+            {
+                dy = Math.Sin(angle) * radius - adjustedpoint.Y;
+            }
+
+            dx *= smoothe;
+            dy *= smoothe;
+
+            adjustedpoint.X += (float)dx;
+            adjustedpoint.Y += (float)dy;
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
 
             return new PointF(adjustedpoint.X, adjustedpoint.Y);
         }
-        public PointF HorizontalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude, double offset)
+        public PointF HorizontalWave(Point input, int period, double amplitude, double offset, double smoothe)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
-            double edgedistance;
-            double halfway = (highestpoint + lowestpoint) / 2;
-            if (adjustedpoint.Y > halfway)
-            {
-                //Stretch slower upwards
-                edgedistance = Math.Pow(Math.Max((highestpoint - adjustedpoint.Y), 0), 2) / 100f;
-            }
-            else
-            {
-                //Stretch slower downwards
-                edgedistance = Math.Pow(Math.Max((adjustedpoint.Y - lowestpoint), 0), 2) / 100f;
-            }
-
-            float heightmultiplier = (float)(Math.Sin(time + offset) * amplitude * edgedistance + 1 + amplitude);
+            float heightmultiplier = (float)(Math.Sin(time + offset) * amplitude + 1 + amplitude * smoothe);
             adjustedpoint.X += heightmultiplier;
 
             adjustedpoint.X += centre.X;
@@ -230,24 +238,11 @@ namespace ImageStretcher
 
             return new PointF(adjustedpoint.X, adjustedpoint.Y);
         }
-        public PointF VerticalWave(Point input, double highestpoint, double lowestpoint, int period, double amplitude, double offset)
+        public PointF VerticalWave(Point input, int period, double amplitude, double offset, double smoothe)
         {
             PointF adjustedpoint = new PointF((input.X - centre.X), (input.Y - centre.Y));
 
-            double edgedistance;
-            double halfway = (highestpoint + lowestpoint) / 2;
-            if (adjustedpoint.X > halfway)
-            {
-                //Stretch slower upwards
-                edgedistance = Math.Pow(Math.Max((highestpoint - adjustedpoint.X), 0), 2) / 100f;
-            }
-            else
-            {
-                //Stretch slower downwards
-                edgedistance = Math.Pow(Math.Max((adjustedpoint.X - lowestpoint), 0), 2) / 100f;
-            }
-
-            adjustedpoint.Y += (float)(Math.Sin(time + offset) * amplitude * edgedistance + 1 + amplitude);
+            adjustedpoint.Y += (float)(Math.Sin(time + offset) * amplitude + 1 + amplitude * smoothe);
 
             adjustedpoint.X += centre.X;
             adjustedpoint.Y += centre.Y;
